@@ -95,7 +95,7 @@ class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
 
     /**
      * Called when the feature has been digitized.
-     * \param f the new created feature
+     * \param geometry the digitized geometry
      */
     virtual void geometryDigitized( const QgsGeometry &geometry );
 
