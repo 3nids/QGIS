@@ -11,11 +11,11 @@
 class QgsMapToolDigitizeFeature : QgsMapToolCapture
 {
 %Docstring(signature="appended")
-This tool digitizes geometry (point, line or polygon) on already existing vector layers
-Once the map tool is enabled, user can digitize the geometry.
+This tool digitizes geometry of new point/line/polygon features on already existing vector layers
+Once the map tool is enabled, user can digitize the feature geometry.
 A signal will then be emitted.
 
-.. versionadded:: 3.22
+.. versionadded:: 3.10
 %End
 
 %TypeHeaderCode

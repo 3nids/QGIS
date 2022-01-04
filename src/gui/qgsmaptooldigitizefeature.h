@@ -23,10 +23,10 @@ class QgsFeature;
 
 /**
  * \ingroup gui
- * \brief This tool digitizes geometry (point, line or polygon) on already existing vector layers
- * Once the map tool is enabled, user can digitize the geometry.
+ * \brief This tool digitizes geometry of new point/line/polygon features on already existing vector layers
+ * Once the map tool is enabled, user can digitize the feature geometry.
  * A signal will then be emitted.
- * \since QGIS 3.22
+ * \since QGIS 3.10
  */
 class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
 {
@@ -62,7 +62,7 @@ class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
      * Emitted whenever the digitizing has been successfully completed
      * \param feature the new digitized feature
      */
-    void digitizingCompleted( const QgsFeature &feature ) ;
+    void digitizingCompleted( const QgsFeature &feature );
 
     /**
      * Emitted whenever the digitizing has been ended without digitizing
