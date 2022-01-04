@@ -41,7 +41,6 @@ QgsMapToolDigitizeFeature::QgsMapToolDigitizeFeature( QgsMapCanvas *canvas, QgsA
   mToolName = tr( "Digitize feature" );
   connect( QgsProject::instance(), &QgsProject::cleared, this, &QgsMapToolDigitizeFeature::stopCapturing );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &QgsMapToolDigitizeFeature::stopCapturing );
-  connect( this, &QgsMapToolCapture::geometryCaptured, this, &QgsMapToolDigitizeFeature::geometryDigitized );
 }
 
 QgsMapToolCapture::Capabilities QgsMapToolDigitizeFeature::capabilities() const
@@ -57,11 +56,12 @@ bool QgsMapToolDigitizeFeature::supportsTechnique( QgsMapToolCapture::CaptureTec
       return true;
     case QgsMapToolCapture::CircularString:
     case QgsMapToolCapture::Streaming:
+      return mode() != QgsMapToolCapture::CapturePoint;
   }
   return false;
 }
 
-void QgsMapToolDigitizeFeature::geometryDigitized( const QgsGeometry &geometry )
+void QgsMapToolDigitizeFeature::geometryCaptured( const QgsGeometry &geometry )
 {
   QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( mLayer );
   if ( !vlayer )

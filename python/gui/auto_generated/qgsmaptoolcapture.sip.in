@@ -132,15 +132,6 @@ transfers ownership to the caller.
 .. versionadded:: 3.8
 %End
 
-  signals:
-
-    void geometryCaptured( const QgsGeometry &geometry );
-%Docstring
-Emitted when the geometry is captured
-
-.. versionadded:: 3.24
-%End
-
   public slots:
     void setCircularDigitizingEnabled( bool enable );
 %Docstring
@@ -319,6 +310,13 @@ Close an open polygon
 Stop capturing
 %End
 
+  private:
+    virtual void geometryCaptured( const QgsGeometry &geometry );
+%Docstring
+Called when the geometry is captured
+
+.. versionadded:: 3.24
+%End
   public:
     virtual void cadCanvasReleaseEvent( QgsMapMouseEvent *e );
 

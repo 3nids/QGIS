@@ -152,14 +152,6 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
      */
     QgsRubberBand *takeRubberBand() SIP_FACTORY;
 
-  signals:
-
-    /**
-     * Emitted when the geometry is captured
-     * \since QGIS 3.24
-     */
-    void geometryCaptured( const QgsGeometry &geometry );
-
   public slots:
     //! Enable the digitizing with curve
     void setCircularDigitizingEnabled( bool enable );
@@ -328,6 +320,13 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
     void stopCapturing();
 
   private:
+
+    /**
+     * Called when the geometry is captured
+     * \since QGIS 3.24
+     */
+    virtual void geometryCaptured( const QgsGeometry &geometry ) {Q_UNUSED( geometry )} SIP_FORCE
+
     //! whether tracing has been requested by the user
     bool tracingEnabled();
     //! first point that will be used as a start of the trace
@@ -343,7 +342,6 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
     //! Reset the
     void resetRubberBand();
 
-  private:
     //! The capture mode in which this tool operates
     CaptureMode mCaptureMode;
 
