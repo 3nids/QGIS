@@ -104,7 +104,7 @@ void QgsMapToolDigitizeFeature::activate()
 
   if ( vlayer && vlayer->geometryType() == QgsWkbTypes::NullGeometry )
   {
-    geometryDigitized( QgsGeometry() );
+    geometryCaptured( QgsGeometry() );
     return;
   }
 
