@@ -112,44 +112,5 @@ class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
 
     friend class TestQgsRelationReferenceWidget;
 };
-#if 0
-
-/**
- * \ingroup gui
- * \brief This tool digitizes geometry of new point/line/polygon features on already existing vector layers
- * Once the map tool is enabled, user can digitize the feature geometry.
- * A signal will then be emitted.
- * \since QGIS 3.10
- * \deprecated since QGIS 3.22 use QgsMapToolDigitizeFeature instead
- */
-Q_DECL_DEPRECATED class GUI_EXPORT QgsMapToolDigitizeGeometry SIP_DEPRECATED : public QgsMapToolDigitizeFeature
-{
-
-    /**
-     * \brief QgsMapToolDigitizeFeature is a map tool to digitize a feature geometry
-     * \param canvas the map canvas
-     * \param cadDockWidget widget to setup advanced digitizing parameters
-     * \param mode type of geometry to capture (point/line/polygon), QgsMapToolCapture::CaptureNone to autodetect geometry
-     */
-    QgsMapToolDigitizeGeometry( QgsMapCanvas *canvas, QgsAdvancedDigitizingDockWidget *cadDockWidget, CaptureMode mode = QgsMapToolCapture::CaptureNone )
-      : QgsMapToolDigitizeFeature( canvas, cadDockWidget, mode ) {}
-
-  signals:
-
-    /**
-     * Emitted whenever the digitizing has been successfully completed
-     * \param feature the new digitized feature
-     */
-    void digitizingCompleted( const QgsFeature &feature ) ;
-
-  private:
-
-    /**
-     * Called when the feature has been digitized.
-     * \param f the new created feature
-     */
-    virtual void digitized( const QgsGeometry &geometry ) override;
-};
-#endif
 
 #endif // QGSMAPTOOLDIGITIZEFEATURE_H
