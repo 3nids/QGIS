@@ -153,6 +153,11 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
     QgsRubberBand *takeRubberBand() SIP_FACTORY;
 
   signals:
+
+    /**
+     * Emitted when the geometry is captured
+     * \since QGIS 3.24
+     */
     void geometryCaptured( const QgsGeometry &geometry );
 
   public slots:

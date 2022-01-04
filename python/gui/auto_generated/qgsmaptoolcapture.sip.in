@@ -133,7 +133,13 @@ transfers ownership to the caller.
 %End
 
   signals:
+
     void geometryCaptured( const QgsGeometry &geometry );
+%Docstring
+Emitted when the geometry is captured
+
+.. versionadded:: 3.24
+%End
 
   public slots:
     void setCircularDigitizingEnabled( bool enable );
