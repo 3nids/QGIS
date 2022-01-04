@@ -76,7 +76,12 @@ Check if CaptureMode matches layer type. Default is ``True``.
 .. versionadded:: 3.0
 %End
 
-    void setCheckGeometryType( bool checkGeometryType ); // TODO QGIS 4: remove if GRASS plugin is dropped
+    void setCheckGeometryType( bool checkGeometryType );
+%Docstring
+Check if CaptureMode matches layer type. Default is ``True``.
+
+.. versionadded:: 3.0
+%End
 
 
 };

@@ -82,7 +82,8 @@ class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
      * Check if CaptureMode matches layer type. Default is TRUE.
      * \since QGIS 3.0
      */
-    void setCheckGeometryType( bool checkGeometryType ); // TODO QGIS 4: remove if GRASS plugin is dropped
+    void setCheckGeometryType( bool checkGeometryType );
+    // TODO QGIS 4: remove if GRASS plugin is dropped
 
     /**
      * individual layer per digitizing session
