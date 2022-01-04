@@ -619,7 +619,7 @@ void TestQgsRelationReferenceWidget::testAddEntry()
 
   QVERIFY( w.mCurrentMapTool );
   QgsFeature feat( mLayer1->fields() );
-  w.mMapToolDigitize->digitized( feat );
+  w.mMapToolDigitize->geometryDigitized( feat );
 
   QCOMPARE( w.mComboBox->identifierValues().at( 0 ).toInt(), 13 );
 }

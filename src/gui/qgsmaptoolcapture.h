@@ -152,6 +152,9 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
      */
     QgsRubberBand *takeRubberBand() SIP_FACTORY;
 
+  signals:
+    void geometryCaptured( const QgsGeometry &geometry );
+
   public slots:
     //! Enable the digitizing with curve
     void setCircularDigitizingEnabled( bool enable );
@@ -394,6 +397,10 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
 
     friend class TestQgsMapToolCapture;
 
+
+    // QgsMapToolAdvancedDigitizing interface
+  public:
+    void cadCanvasReleaseEvent( QgsMapMouseEvent *e ) override;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( QgsMapToolCapture::Capabilities )

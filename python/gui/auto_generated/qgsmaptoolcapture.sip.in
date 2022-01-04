@@ -132,6 +132,9 @@ transfers ownership to the caller.
 .. versionadded:: 3.8
 %End
 
+  signals:
+    void geometryCaptured( const QgsGeometry &geometry );
+
   public slots:
     void setCircularDigitizingEnabled( bool enable );
 %Docstring
@@ -309,6 +312,9 @@ Close an open polygon
 %Docstring
 Stop capturing
 %End
+
+  public:
+    virtual void cadCanvasReleaseEvent( QgsMapMouseEvent *e );
 
 };
 
