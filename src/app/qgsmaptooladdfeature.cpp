@@ -98,7 +98,7 @@ void QgsMapToolAddFeature::featureDigitized( const QgsFeature &feature )
       {
         if ( sm.at( i ).layer() )
         {
-          sm.at( i ).layer()->addTopologicalPoints( f.geometry().vertexAt( i ) );
+          sm.at( i ).layer()->addTopologicalPoints( feature.geometry().vertexAt( i ) );
         }
       }
       vlayer->addTopologicalPoints( feature.geometry() );
