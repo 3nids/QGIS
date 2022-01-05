@@ -97,7 +97,13 @@ class GUI_EXPORT QgsMapToolDigitizeFeature : public QgsMapToolCapture
      * Called when the feature has been digitized.
      * \param geometry the digitized geometry
      */
-    virtual void geometryCaptured( const QgsGeometry &geometry ) override;
+    void geometryCaptured( const QgsGeometry &geometry ) override FINAL;
+
+    /**
+     * Called when the feture has been digitized
+     * \since QGIS 3.24
+     */
+    virtual void featureDigitized( const QgsFeature &feature ) SIP_FORCE;
 
     /**
      * layer used before digitizing session

@@ -84,6 +84,13 @@ Check if CaptureMode matches layer type. Default is ``True``.
 %End
 
 
+  private:
+    virtual void featureDigitized( const QgsFeature &feature );
+%Docstring
+Called when the feture has been digitized
+
+.. versionadded:: 3.24
+%End
 };
 
 /************************************************************************
