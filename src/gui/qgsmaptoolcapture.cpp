@@ -1166,7 +1166,7 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
     // The snapping result needs to be added so it's available in the @snapping_results variable of default value etc. expression contexts
     addVertex( e->mapPoint(), e->mapPointMatch() );
 
-    emit geometryCaptured( g );
+    geometryCaptured( g );
 
     stopCapturing();
 
