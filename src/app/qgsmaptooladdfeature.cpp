@@ -86,7 +86,7 @@ void QgsMapToolAddFeature::featureDigitized( const QgsFeature &feature )
           //can only add topological points if background layer is editable...
           if ( vl->geometryType() == QgsWkbTypes::PolygonGeometry && vl->isEditable() )
           {
-            vl->addTopologicalPoints( f.geometry() );
+            vl->addTopologicalPoints( feature.geometry() );
           }
         }
       }
