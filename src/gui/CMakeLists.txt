@@ -288,6 +288,8 @@ set(QGIS_GUI_SRCS
 
   locator/qgslocatorwidget.cpp
 
+  maptools/qgsmaptoolcapturelayergeometry.cpp
+
   mesh/qgsmeshlayerproperties.cpp
   mesh/qgsrenderermeshpropertieswidget.cpp
   mesh/qgsmeshdatasetgrouptreewidget.cpp
@@ -1115,6 +1117,8 @@ set(QGIS_GUI_HDRS
 
   locator/qgslocatorwidget.h
 
+  maptools/qgsmaptoolcapturelayergeometry.h
+
   mesh/qgsmeshlayerproperties.h
   mesh/qgsrenderermeshpropertieswidget.h
   mesh/qgsmeshdatasetgrouptreeview.h
@@ -1464,6 +1468,7 @@ target_include_directories(qgis_gui PUBLIC
   ${CMAKE_SOURCE_DIR}/src/gui/layertree
   ${CMAKE_SOURCE_DIR}/src/gui/layout
   ${CMAKE_SOURCE_DIR}/src/gui/locator
+  ${CMAKE_SOURCE_DIR}/src/gui/maptools
   ${CMAKE_SOURCE_DIR}/src/gui/mesh
   ${CMAKE_SOURCE_DIR}/src/gui/numericformats
   ${CMAKE_SOURCE_DIR}/src/gui/ogr
