@@ -1,0 +1,150 @@
+/***************************************************************************
+   qgsmaptoolshaperectangle3points.cpp  -  map tool for adding rectangle
+   from 3 points
+   ---------------------
+   begin                : September 2017
+   copyright            : (C) 2017 by Loïc Bartoletti
+   email                : lbartoletti at tuxfamily dot org
+***************************************************************************
+*                                                                         *
+*   This program is free software; you can redistribute it and/or modify  *
+*   it under the terms of the GNU General Public License as published by  *
+*   the Free Software Foundation; either version 3 of the License, or     *
+*   (at your option) any later version.                                   *
+*                                                                         *
+***************************************************************************/
+
+#include "qgsmaptoolshaperectangle3points.h"
+#include "qgsgeometryrubberband.h"
+#include "qgsgeometryutils.h"
+#include "qgslinestring.h"
+#include "qgsmapcanvas.h"
+#include "qgspoint.h"
+#include "qgsmapmouseevent.h"
+#include <memory>
+#include "qgsmaptoolcapture.h"
+#include "qgsapplication.h"
+
+QString QgsMapToolShapeCircle2PointsMetadata::id() const
+{
+  return QStringLiteral( "circle2points" );
+}
+
+QString QgsMapToolShapeCircle2PointsMetadata::name() const
+{
+  return QObject::tr( "Circle from 2 points" );
+}
+
+QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+{
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+}
+
+QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+{
+  return QgsMapToolShapeRegistry::ShapeCategory::Circle;
+}
+
+QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+{
+  return new QgsMapToolShapeCircle2Points( parentTool );
+}
+
+QgsMapToolShapeRectangle3Points::QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool,
+    QgsMapCanvas *canvas, CreateMode createMode, CaptureMode mode )
+  : QgsMapToolAddRectangle( parentTool, canvas, mode ),
+    mCreateMode( createMode )
+{
+  mToolName = tr( "Add rectangle from 3 points" );
+}
+
+bool QgsMapToolShapeRectangle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
+{
+  QgsPoint point = mapPoint( *e );
+
+  if ( !currentVectorLayer() )
+  {
+    notifyNotVectorLayer();
+    clean();
+    stopCapturing();
+    e->ignore();
+    return;
+  }
+
+  if ( e->button() == Qt::LeftButton )
+  {
+    bool is3D = false;
+    QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mCanvas->currentLayer() );
+    if ( currentLayer )
+      is3D = QgsWkbTypes::hasZ( currentLayer->wkbType() );
+
+    if ( is3D && !point.is3D() )
+      point.addZValue( defaultZValue() );
+
+    if ( mPoints.size() < 2 )
+    {
+      mPoints.append( point );
+    }
+
+    if ( !mPoints.isEmpty() && !mTempRubberBand )
+    {
+      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand->show();
+    }
+    if ( mPoints.size() == 3 )
+    {
+      delete mTempRubberBand;
+      mTempRubberBand = createGeometryRubberBand( mLayerType, true ); // recreate rubberband for polygon
+    }
+  }
+  else if ( e->button() == Qt::RightButton )
+  {
+    release( e );
+  }
+}
+
+void QgsMapToolShapeRectangle3Points::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
+{
+  QgsPoint point = mapPoint( *e );
+
+  mSnapIndicator->setMatch( e->mapPointMatch() );
+
+  if ( mTempRubberBand )
+  {
+    switch ( mPoints.size() )
+    {
+      case 1:
+      {
+        std::unique_ptr<QgsLineString> line( new QgsLineString() );
+        line->addVertex( mPoints.at( 0 ) );
+        line->addVertex( point );
+        mTempRubberBand->setGeometry( line.release() );
+      }
+      break;
+      case 2:
+      {
+        bool is3D = false;
+        QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mCanvas->currentLayer() );
+        if ( currentLayer )
+          is3D = QgsWkbTypes::hasZ( currentLayer->wkbType() );
+
+        if ( is3D && !point.is3D() )
+          point.addZValue( defaultZValue() );
+
+        switch ( mCreateMode )
+        {
+          case DistanceMode:
+            mRectangle = QgsQuadrilateral::rectangleFrom3Points( mPoints.at( 0 ), mPoints.at( 1 ), point, QgsQuadrilateral::Distance );
+            break;
+          case ProjectedMode:
+            mRectangle = QgsQuadrilateral::rectangleFrom3Points( mPoints.at( 0 ), mPoints.at( 1 ), point, QgsQuadrilateral::Projected );
+            break;
+        }
+        mTempRubberBand->setGeometry( mRectangle.toPolygon( ) );
+      }
+      break;
+      default:
+        break;
+    }
+  }
+}

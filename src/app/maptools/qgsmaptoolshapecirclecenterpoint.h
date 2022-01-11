@@ -1,9 +1,10 @@
 /***************************************************************************
-    qgsmaptoolshapecircle.h
+    qgmaptoolcirclecenterpoint.h  -  map tool for adding circle
+    from center and a point
     ---------------------
-    begin                : January 2022
-    copyright            : (C) Denis Rouzaud
-    email                : denis@opengis.ch
+    begin                : July 2017
+    copyright            : (C) 2017 by Loïc Bartoletti
+    email                : lbartoletti at tuxfamily dot org
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,22 +14,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLE_H
-#define QGSMAPTOOLSHAPECIRCLE_H
+#ifndef QGSMAPTOOLSHAPECIRCLECENTERPOINT_H
+#define QGSMAPTOOLSHAPECIRCLECENTERPOINT_H
 
+#include "qgsmaptoolshapecircleabstract.h"
+#include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
 
-class QgsGeometryRubberBand;
-
-class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeCircleCenterPointMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    QgsMapToolShapeCircleMetadata()
+    QgsMapToolShapeCircleCenterPointMetadata()
       : QgsMapToolShapeMetadata()
     {}
-
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -36,24 +34,15 @@ class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class QgsMapToolShapeCircle : public QgsMapToolShapeAbstract
+class APP_EXPORT QgsMapToolShapeCircleCenterPoint: public QgsMapToolShapeCircleAbstract
 {
+    Q_OBJECT
+
   public:
-    QgsMapToolShapeCircle( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
-    {}
+    QgsMapToolShapeCircleCenterPoint( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
-
-    void clean() override;
-
-  private:
-    QgsCircle mCircle;
-
-    //! The rubberband to show the geometry currently working on
-    QgsGeometryRubberBand *mTempRubberBand = nullptr;
-
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLE_H
+#endif // QGSMAPTOOLSHAPECIRCLECENTERPOINT_H

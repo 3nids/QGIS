@@ -1,9 +1,10 @@
 /***************************************************************************
-    qgsmaptoolshapecircle.h
+    qgmaptoolcircle2points.h  -  map tool for adding circle
+    from 2 points
     ---------------------
-    begin                : January 2022
-    copyright            : (C) Denis Rouzaud
-    email                : denis@opengis.ch
+    begin                : July 2017
+    copyright            : (C) 2017 by Loïc Bartoletti
+    email                : lbartoletti at tuxfamily dot org
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,22 +14,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLE_H
-#define QGSMAPTOOLSHAPECIRCLE_H
+#ifndef QGSMAPTOOLSHAPECIRCLE2POINTS_H
+#define QGSMAPTOOLSHAPECIRCLE2POINTS_H
 
+#include "qgsmaptoolshapecircleabstract.h"
+#include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
 
-class QgsGeometryRubberBand;
 
-class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeCircle2PointsMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    QgsMapToolShapeCircleMetadata()
+    QgsMapToolShapeCircle2PointsMetadata()
       : QgsMapToolShapeMetadata()
     {}
-
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -36,24 +35,15 @@ class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class QgsMapToolShapeCircle : public QgsMapToolShapeAbstract
+class APP_EXPORT QgsMapToolShapeCircle2Points : public QgsMapToolShapeCircleAbstract
 {
   public:
-    QgsMapToolShapeCircle( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
+    QgsMapToolShapeCircle2Points( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeCircleAbstract( parentTool )
     {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
-
-    void clean() override;
-
-  private:
-    QgsCircle mCircle;
-
-    //! The rubberband to show the geometry currently working on
-    QgsGeometryRubberBand *mTempRubberBand = nullptr;
-
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLE_H
+#endif // QGSMAPTOOLSHAPECIRCLE2POINTS_H

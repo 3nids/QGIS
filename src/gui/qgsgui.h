@@ -196,7 +196,7 @@ class GUI_EXPORT QgsGui : public QObject
      * Returns the registry of shape map tools
     * \since QGIS 3.24
      */
-    static QgsMapToolShapeRegistry *shapeMapToolRegistry() SIP_SKIP;
+    static QgsMapToolShapeRegistry *mapToolShapeRegistry() SIP_SKIP;
 
     /**
      * Returns the global history provider registry, used for tracking history providers.

@@ -1,34 +1,32 @@
 /***************************************************************************
-    qgsmaptoolshapecircle.h
+    qgsmaptoolshapecircle3tangents.h  -  map tool for adding circle
+    from 3 tangents
     ---------------------
-    begin                : January 2022
-    copyright            : (C) Denis Rouzaud
-    email                : denis@opengis.ch
+    begin                : July 2017
+    copyright            : (C) 2017 by Loïc Bartoletti
+    email                : lbartoletti at tuxfamily dot org
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLE_H
-#define QGSMAPTOOLSHAPECIRCLE_H
+#ifndef QGSMAPTOOLSHAPECIRCLE3TANGENTS_H
+#define QGSMAPTOOLSHAPECIRCLE3TANGENTS_H
 
+#include "qgspointlocator.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgsmaptoolshaperegistry.h"
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
 
-class QgsGeometryRubberBand;
-
-class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeCircle3TangentsMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    QgsMapToolShapeCircleMetadata()
+    QgsMapToolShapeCircle3TangentsMetadata()
       : QgsMapToolShapeMetadata()
     {}
-
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -36,24 +34,20 @@ class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class QgsMapToolShapeCircle : public QgsMapToolShapeAbstract
+class QgsMapToolShapeCircle3Tangents: public QgsMapToolShapeCircleAbstract
 {
+    Q_OBJECT
+
   public:
-    QgsMapToolShapeCircle( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
-    {}
+    QgsMapToolShapeCircle3Tangents( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
-
     void clean() override;
 
-  private:
-    QgsCircle mCircle;
-
-    //! The rubberband to show the geometry currently working on
-    QgsGeometryRubberBand *mTempRubberBand = nullptr;
-
+private:
+    //! Snapped points on the segments. Useful to determine which circle to choose in case of there are two parallels
+    QVector<QgsPoint> mPosPoints;
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLE_H
+#endif // QGSMAPTOOLSHAPECIRCLE3TANGENTS_H

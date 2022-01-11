@@ -16,7 +16,7 @@
 #ifndef QGSMAPTOOLADDREGULARPOLYGON_H
 #define QGSMAPTOOLADDREGULARPOLYGON_H
 
-#include "qgsmaptooladdabstract.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgsregularpolygon.h"
 #include "qgsspinbox.h"
 #include "qgis_app.h"

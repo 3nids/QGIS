@@ -92,7 +92,7 @@ QgsRelationWidgetRegistry *QgsGui::relationWidgetRegistry()
   return instance()->mRelationEditorRegistry;
 }
 
-QgsMapToolShapeRegistry *QgsGui::shapeMapToolRegistry()
+QgsMapToolShapeRegistry *QgsGui::mapToolShapeRegistry()
 {
   return instance()->mShapeMapToolRegistry;
 }

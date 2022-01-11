@@ -14,41 +14,19 @@
  ***************************************************************************/
 
 #include "qgsmaptoolshapecircleabstract.h"
-#include "qgscompoundcurve.h"
-#include "qgscurvepolygon.h"
-#include "qgsgeometryrubberband.h"
-#include "qgsgeometryutils.h"
-#include "qgslinestring.h"
-#include "qgsmapcanvas.h"
-#include "qgspoint.h"
-#include "qgisapp.h"
-#include "qgssnapindicator.h"
+#include "qgsmaptoolcapture.h"
 
-QgsMapToolShapeCircleAbstract::QgsMapToolShapeCircleAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddAbstract( parentTool, canvas, mode )
+void QgsMapToolShapeCircleAbstract::clean()
 {
-  mToolName = tr( "Add circle" );
+  mCircle = QgsCircle();
+  QgsMapToolShapeAbstract::clean();
 }
 
-void QgsMapToolShapeCircleAbstract::deactivate()
+void QgsMapToolShapeCircleAbstract::addCircleToParentTool()
 {
-  if ( !mParentTool || mCircle.isEmpty() )
-  {
-    return;
-  }
-
   mParentTool->clearCurve();
 
   std::unique_ptr<QgsCircularString> lineString( mCircle.toCircularString() );
 
   mParentTool->addCurve( lineString.release() );
-  clean();
-
-  QgsMapToolCapture::deactivate();
-}
-
-void QgsMapToolShapeCircleAbstract::clean()
-{
-  QgsMapToolAddAbstract::clean();
-  mCircle = QgsCircle();
 }

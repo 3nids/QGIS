@@ -1,9 +1,10 @@
 /***************************************************************************
-    qgsmaptoolshapecircle.h
+    qgmaptoolellipseextent.h  -  map tool for adding ellipse
+    from extent
     ---------------------
-    begin                : January 2022
-    copyright            : (C) Denis Rouzaud
-    email                : denis@opengis.ch
+    begin                : July 2017
+    copyright            : (C) 2017 by Loïc Bartoletti
+    email                : lbartoletti at tuxfamily dot org
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,22 +14,19 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLE_H
-#define QGSMAPTOOLSHAPECIRCLE_H
+#ifndef QGSMAPTOOLSHAPEELLIPSEEXTENT_H
+#define QGSMAPTOOLSHAPEELLIPSEEXTENT_H
 
+#include "qgsmaptoolshapeellipseabstract.h"
+#include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
 
-class QgsGeometryRubberBand;
-
-class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
+class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
 {
   public:
-    QgsMapToolShapeCircleMetadata()
+    Metadata()
       : QgsMapToolShapeMetadata()
     {}
-
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -36,24 +34,15 @@ class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class QgsMapToolShapeCircle : public QgsMapToolShapeAbstract
+class APP_EXPORT QgsMapToolShapeEllipseExtent: public QgsMapToolShapeEllipseAbstract
 {
+    Q_OBJECT
+
   public:
-    QgsMapToolShapeCircle( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
-    {}
+    QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
-
-    void clean() override;
-
-  private:
-    QgsCircle mCircle;
-
-    //! The rubberband to show the geometry currently working on
-    QgsGeometryRubberBand *mTempRubberBand = nullptr;
-
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLE_H
+#endif // QGSMAPTOOLSHAPEELLIPSEEXTENT_H

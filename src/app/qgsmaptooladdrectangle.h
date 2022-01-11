@@ -16,7 +16,7 @@
 #ifndef QGSMAPTOOLADDRECTANGLE_H
 #define QGSMAPTOOLADDRECTANGLE_H
 
-#include "qgsmaptooladdabstract.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgspolygon.h"
 #include "qgsquadrilateral.h"
 #include "qgis_app.h"

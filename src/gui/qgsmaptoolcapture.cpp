@@ -373,6 +373,9 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
 {
   mStartNewCurve = true;
 
+  if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && mCurrentShapeMapTool )
+    mCurrentShapeMapTool->deactivate();
+
   switch ( technique )
   {
     case QgsMapToolCapture::CaptureTechnique::StraightSegments:
@@ -395,20 +398,32 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
     mTempRubberBand->setStringType( mLineDigitizingType );
 
   mCurrentCaptureTechnique = technique;
+
+  if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool )
+    mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
 void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapTool )
 {
-  // TODO cancel former shape
-
-  mCurrentShapeMapTool->deleteLater();
+  if ( mCurrentShapeMapTool )
+  {
+    if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
+      mCurrentShapeMapTool->deactivate();
+    mCurrentShapeMapTool->deleteLater();
+  }
 
   mCurrentShapeMapTool = shapeMapTool->factory( this );
+
+  if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
+    mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
 void QgsMapToolCapture::cadCanvasMoveEvent( QgsMapMouseEvent *e )
 {
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer() );
+
   QgsMapToolAdvancedDigitizing::cadCanvasMoveEvent( e );
+
   const QgsPointXY point = e->mapPoint();
 
   mSnapIndicator->setMatch( e->mapPointMatch() );
@@ -428,7 +443,7 @@ void QgsMapToolCapture::cadCanvasMoveEvent( QgsMapMouseEvent *e )
         mTempRubberBand->setRubberBandGeometryType( mCaptureMode == CapturePolygon ? QgsWkbTypes::PolygonGeometry : QgsWkbTypes::LineGeometry );
       }
 
-      mCurrentShapeMapTool->cadCanvasMoveEvent( e );
+      mCurrentShapeMapTool->cadCanvasMoveEvent( e, vlayer );
       return;
     }
   }
@@ -861,9 +876,33 @@ void QgsMapToolCapture::undo( bool isAutoRepeat )
 
 void QgsMapToolCapture::keyPressEvent( QKeyEvent *e )
 {
+  if ( mCurrentCaptureTechnique == Shape && mCurrentShapeMapTool )
+  {
+    mCurrentShapeMapTool->keyPressEvent( e );
+    if ( e->isAccepted() )
+      return;
+  }
+
+  // this is backwards, but we can't change now without breaking api because
+  // forever QgsMapTools have had to explicitly mark events as ignored in order to
+  // indicate that they've consumed the event and that the default behavior should not
+  // be applied..!
+  // see QgsMapCanvas::keyPressEvent
+  e->accept();
+
   if ( e->key() == Qt::Key_Backspace || e->key() == Qt::Key_Delete )
   {
-    undo( e->isAutoRepeat() );
+    if ( mCurrentCaptureTechnique == Shape && mCurrentShapeMapTool )
+    {
+      if ( !e->isAutoRepeat() )
+      {
+        mCurrentShapeMapTool->undo();
+      }
+    }
+    else
+    {
+      undo( e->isAutoRepeat() );
+    }
 
     // Override default shortcut management in MapCanvas
     e->ignore();

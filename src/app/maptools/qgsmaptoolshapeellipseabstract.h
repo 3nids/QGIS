@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptoolshapecircleabstract.h  -  map tool for adding circle
+    qgsmaptoolshapeellipseabstract.h  -  map tool for adding ellipse
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,41 +13,34 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLEABSTRACT_H
-#define QGSMAPTOOLSHAPECIRCLEABSTRACT_H
+#ifndef QGSMAPTOOLSHAPEELLIPSEABSTRACT_H
+#define QGSMAPTOOLSHAPEELLIPSEABSTRACT_H
 
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
+#include "qgsellipse.h"
+#include "qgssettingsregistrycore.h"
 #include "qgis_app.h"
-#include "qgsmaptoolshaperegistry.h"
-#include "qgspointlocator.h"
 
+class QgsGeometryRubberBand;
+class QgsSnapIndicator;
 
-
-struct EdgesOnlyFilter : public QgsPointLocator::MatchFilter
-{
-  bool acceptMatch( const QgsPointLocator::Match &m ) override { return m.hasEdge(); }
-};
-
-
-class APP_EXPORT QgsMapToolShapeCircleAbstract: public QgsMapToolShapeAbstract
+class APP_EXPORT QgsMapToolShapeEllipseAbstract: public QgsMapToolShapeAbstract
 {
     Q_OBJECT
-
   public:
-    QgsMapToolShapeCircleAbstract( QgsMapToolCapture *parentTool ) : QgsMapToolShapeAbstract( parentTool ) {}
+    QgsMapToolShapeEllipseAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
 
-    virtual ~QgsMapToolShapeCircleAbstract() = default;
-
+    void deactivate() override;
     void clean() override;
 
   protected:
+    explicit QgsMapToolShapeEllipseAbstract( QgsMapCanvas *canvas ) = delete; //forbidden
 
-    void addCircleToParentTool();
+    //! Ellipse
+    QgsEllipse mEllipse;
 
-    //! Circle
-    QgsCircle mCircle;
-
+    //! convenient method to return the number of segments
+    unsigned int segments( ) { return QgsSettingsRegistryCore::settingsDigitizingOffsetQuadSeg.value() * 12; }
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLEABSTRACT_H
+#endif // QGSMAPTOOLSHAPEELLIPSEABSTRACT_H

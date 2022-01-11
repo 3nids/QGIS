@@ -157,28 +157,6 @@ set(QGIS_APP_SRCS
   qgsundowidget.cpp
   qgsmapthemes.cpp
   qgshandlebadlayers.cpp
-  qgsmaptooladdabstract.cpp
-  qgsmaptooladdcircularstring.cpp
-  qgsmaptoolcircularstringcurvepoint.cpp
-  qgsmaptoolcircularstringradius.cpp
-  qgsmaptoolcircle2points.cpp
-  qgsmaptoolcircle3points.cpp
-  qgsmaptoolcircle3tangents.cpp
-  qgsmaptoolcircle2tangentspoint.cpp
-  qgsmaptoolcirclecenterpoint.cpp
-  qgsmaptooladdellipse.cpp
-  qgsmaptoolellipsefoci.cpp
-  qgsmaptoolellipseextent.cpp
-  qgsmaptoolellipsecenterpoint.cpp
-  qgsmaptoolellipsecenter2points.cpp
-  qgsmaptooladdrectangle.cpp
-  qgsmaptooladdregularpolygon.cpp
-  qgsmaptoolrectanglecenter.cpp
-  qgsmaptoolrectangleextent.cpp
-  qgsmaptoolrectangle3points.cpp
-  qgsmaptoolregularpolygon2points.cpp
-  qgsmaptoolregularpolygoncenterpoint.cpp
-  qgsmaptoolregularpolygoncentercorner.cpp
 
   browser/qgsinbuiltdataitemproviders.cpp
 
@@ -225,6 +203,25 @@ set(QGIS_APP_SRCS
 
   maptools/qgsappmaptools.cpp
   maptools/qgsmaptoolshapecircleabstract.cpp
+  maptools/qgsmaptoolshapecircularstringabstract.cpp
+  maptools/qgsmaptoolshapeellipseabstract.cpp
+
+  maptools/qgsmaptoolshapecircle2points.cpp
+  maptools/qgsmaptoolshapecircle2tangentspoint.cpp
+  maptools/qgsmaptoolshapecircle3points.cpp
+  maptools/qgsmaptoolshapecircle3tangents.cpp
+  maptools/qgsmaptoolshapecirclecenterpoint.cpp
+  maptools/qgsmaptoolshapecircularstringradius.cpp
+#  maptools/qgsmaptoolshapeellipsecenter2points.cpp
+#  maptools/qgsmaptoolshapeellipsecenterpoint.cpp
+#  maptools/qgsmaptoolshapeellipseextent.cpp
+#  maptools/qgsmaptoolshapeellipsefoci.cpp
+#  maptools/qgsmaptoolshaperectangle3points.cpp
+#  maptools/qgsmaptoolshaperectanglecenter.cpp
+#  maptools/qgsmaptoolshaperectangleextent.cpp
+#  maptools/qgsmaptoolshaperegularpolygon2points.cpp
+#  maptools/qgsmaptoolshaperegularpolygoncentercorner.cpp
+#  maptools/qgsmaptoolshaperegularpolygoncenterpoint.cpp
 
   options/qgsadvancedoptions.cpp
   options/qgscodeeditoroptions.cpp

@@ -1,34 +1,32 @@
 /***************************************************************************
-    qgsmaptoolshapecircle.h
+    qgsmaptoolshapeellipsecenter2points.h  -  map tool for adding ellipse
+    from center and 2 points
     ---------------------
-    begin                : January 2022
-    copyright            : (C) Denis Rouzaud
-    email                : denis@opengis.ch
+    begin                : July 2017
+    copyright            : (C) 2017 by Loïc Bartoletti
+    email                : lbartoletti at tuxfamily dot org
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
+ *   the Free Software Foundation; either version 3 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLSHAPECIRCLE_H
-#define QGSMAPTOOLSHAPECIRCLE_H
+#ifndef QGSMAPTOOLSHAPEELLIPSECENTER2POINTS_H
+#define QGSMAPTOOLSHAPEELLIPSECENTER2POINTS_H
 
+#include "qgsmaptoolshapeellipseabstract.h"
+#include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
-#include "qgsmaptoolshapeabstract.h"
-#include "qgscircle.h"
 
-class QgsGeometryRubberBand;
-
-class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
+class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
 {
   public:
-    QgsMapToolShapeCircleMetadata()
+    Metadata()
       : QgsMapToolShapeMetadata()
     {}
-
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -36,24 +34,15 @@ class QgsMapToolShapeCircleMetadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class QgsMapToolShapeCircle : public QgsMapToolShapeAbstract
+class APP_EXPORT QgsMapToolShapeEllipseCenter2Points: public QgsMapToolShapeEllipseAbstract
 {
+    Q_OBJECT
+
   public:
-    QgsMapToolShapeCircle( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
-    {}
+    QgsMapToolShapeEllipseCenter2Points( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
-
-    void clean() override;
-
-  private:
-    QgsCircle mCircle;
-
-    //! The rubberband to show the geometry currently working on
-    QgsGeometryRubberBand *mTempRubberBand = nullptr;
-
 };
 
-#endif // QGSMAPTOOLSHAPECIRCLE_H
+#endif // QGSMAPTOOLSHAPEELLIPSECENTER2POINTS_H
