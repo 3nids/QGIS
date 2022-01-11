@@ -24,7 +24,7 @@
 
 QgsMapToolCircleCenterPoint::QgsMapToolCircleCenterPoint( QgsMapToolCapture *parentTool,
     QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddCircle( parentTool, canvas, mode )
+  : QgsMapToolShapeCircleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add circle by a center point and another point" );
 }

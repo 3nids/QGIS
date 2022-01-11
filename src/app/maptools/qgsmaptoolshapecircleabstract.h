@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdcircle.h  -  map tool for adding circle
+    qgsmaptoolshapecircleabstract.h  -  map tool for adding circle
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,8 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLADDCIRCLE_H
-#define QGSMAPTOOLADDCIRCLE_H
+#ifndef QGSMAPTOOLSHAPECIRCLEABSTRACT_H
+#define QGSMAPTOOLSHAPECIRCLEABSTRACT_H
 
 #include "qgsmaptooladdabstract.h"
 #include "qgscircle.h"
@@ -25,22 +25,22 @@ struct EdgesOnlyFilter : public QgsPointLocator::MatchFilter
   bool acceptMatch( const QgsPointLocator::Match &m ) override { return m.hasEdge(); }
 };
 
-class APP_EXPORT QgsMapToolAddCircle: public QgsMapToolAddAbstract
+class APP_EXPORT QgsMapToolShapeCircleAbstract: public QgsMapToolAddAbstract
 {
     Q_OBJECT
 
   public:
-    QgsMapToolAddCircle( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeCircleAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
 
     void deactivate() override;
     void clean() override;
 
   protected:
-    explicit QgsMapToolAddCircle( QgsMapCanvas *canvas ) = delete; //forbidden
+    explicit QgsMapToolShapeCircleAbstract( QgsMapCanvas *canvas ) = delete; //forbidden
 
     //! Circle
     QgsCircle mCircle;
 
 };
 
-#endif // QGSMAPTOOLADDCIRCLE_H
+#endif // QGSMAPTOOLSHAPECIRCLEABSTRACT_H

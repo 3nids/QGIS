@@ -19,15 +19,30 @@
 
 #include "qgsmaptooladdcircle.h"
 #include "qgis_app.h"
+#include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT QgsMapToolCircle2Points: public QgsMapToolAddCircle
+
+class APP_EXPORT QgsMapToolShapeCircle2PointsMetadata : public QgsMapToolShapeMetadata
 {
-    Q_OBJECT
-
   public:
-    QgsMapToolCircle2Points( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeCircleMetadata()
+      : QgsMapToolShapeMetadata()
+    {}
+    QString id() const override;
+    QString name() const override;
+    QIcon icon() const override;
+    QgsMapToolShapeRegistry::ShapeCategory category() const override;
+    QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
+};
 
-    void cadCanvasReleaseEvent( QgsMapMouseEvent *e ) override;
+class APP_EXPORT QgsMapToolCircle2Points : public QgsMapToolShapeCircleAbstract
+{
+  public:
+    QgsMapToolCircle2Points( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeCircleAbstract( parentTool )
+    {}
+
+    void cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e ) override;
 };
 

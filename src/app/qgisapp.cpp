@@ -304,6 +304,7 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsmapoverviewcanvas.h"
 #include "qgsmapsettings.h"
 #include "qgsmaptip.h"
+#include "qgsmaptoolshapecircle.h"
 #include "qgsmbtiles.h"
 #include "qgsmenuheader.h"
 #include "qgsmergeattributesdialog.h"
@@ -361,6 +362,7 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsreadwritecontext.h"
 #include "qgsrectangle.h"
 #include "qgsreport.h"
+#include "qgsmaptoolshaperegistry.h"
 #include "qgsscalevisibilitydialog.h"
 #include "qgsgroupwmsdatadialog.h"
 #include "qgsselectbyformdialog.h"
@@ -1430,6 +1432,9 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
   registerMapLayerPropertiesFactory( new QgsPointCloudElevationPropertiesWidgetFactory( this ) );
   registerMapLayerPropertiesFactory( new QgsAnnotationItemPropertiesWidgetFactory( this ) );
   registerMapLayerPropertiesFactory( new QgsLayerTreeGroupPropertiesWidgetFactory( this ) );
+
+  // TODO
+  QgsGui::shapeMapToolRegistry()->addMapTool( new QgsMapToolShapeCircleMetadata() );
 
   activateDeactivateLayerRelatedActions( nullptr ); // after members were created
 
@@ -3387,10 +3392,12 @@ void QgisApp::createToolBars()
   digitizeMenu->addAction( mActionDigitizeWithSegment );
   digitizeMenu->addAction( mActionDigitizeWithCurve );
   digitizeMenu->addAction( mActionStreamDigitize );
+  digitizeMenu->addAction( mActionDigitizeShape );
   QActionGroup *actionGroup = new QActionGroup( digitizeMenu );
   actionGroup->addAction( mActionDigitizeWithSegment );
   actionGroup->addAction( mActionDigitizeWithCurve );
   actionGroup->addAction( mActionStreamDigitize );
+  actionGroup->addAction( mActionDigitizeShape );
   mActionStreamDigitize->setShortcut( tr( "R", "Keyboard shortcut: toggle stream digitizing" ) );
 
   digitizeMenu->addSeparator();
@@ -10423,6 +10430,9 @@ void QgisApp::setCaptureTechnique( QAction *captureTechniqueActionTriggered )
   {
     technique = QgsMapToolCapture::CaptureTechnique::Shape;
     mDigitizeModeToolButton->setDefaultAction( mActionDigitizeShape );
+
+    // TODO
+
   }
   else
   {
@@ -10482,7 +10492,11 @@ void QgisApp::enableDigitizeTechniqueActions( bool enable, QAction *triggeredFro
   for ( QgsMapToolCapture *tool : tools )
   {
     if ( tool->supportsTechnique( technique ) )
+    {
       tool->setCurrentCaptureTechnique( technique );
+      if ( technique == QgsMapToolCapture::CaptureTechnique::Shape )
+        tool->setCurrentShapeMapTool( new QgsMapToolShapeCircleMetadata() ); // TODO !!
+    }
   }
 }
 

@@ -33,6 +33,8 @@
 #include "qgsadvanceddigitizingdockwidget.h"
 #include "qgsproject.h"
 #include "qgsmaptoolcapturerubberband.h"
+#include "qgsmaptoolshapeabstract.h"
+#include "qgsmaptoolshaperegistry.h"
 
 #include <QAction>
 #include <QCursor>
@@ -395,12 +397,41 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
   mCurrentCaptureTechnique = technique;
 }
 
+void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapTool )
+{
+  // TODO cancel former shape
+
+  mCurrentShapeMapTool->deleteLater();
+
+  mCurrentShapeMapTool = shapeMapTool->factory( this );
+}
+
 void QgsMapToolCapture::cadCanvasMoveEvent( QgsMapMouseEvent *e )
 {
   QgsMapToolAdvancedDigitizing::cadCanvasMoveEvent( e );
   const QgsPointXY point = e->mapPoint();
 
   mSnapIndicator->setMatch( e->mapPointMatch() );
+
+  if ( mCurrentCaptureTechnique == Shape )
+  {
+    if ( !mCurrentShapeMapTool )
+    {
+      emit messageEmitted( tr( "Cannot capture a shape without a shape tool defined" ), Qgis::MessageLevel::Warning );
+    }
+    else
+    {
+      if ( !mTempRubberBand )
+      {
+        mTempRubberBand.reset( createCurveRubberBand() );
+        mTempRubberBand->setStringType( mLineDigitizingType );
+        mTempRubberBand->setRubberBandGeometryType( mCaptureMode == CapturePolygon ? QgsWkbTypes::PolygonGeometry : QgsWkbTypes::LineGeometry );
+      }
+
+      mCurrentShapeMapTool->cadCanvasMoveEvent( e );
+      return;
+    }
+  }
 
   const QgsPoint mapPoint = QgsPoint( point );
 
@@ -839,6 +870,9 @@ void QgsMapToolCapture::keyPressEvent( QKeyEvent *e )
   }
   else if ( e->key() == Qt::Key_Escape )
   {
+    if ( mCurrentShapeMapTool )
+      mCurrentShapeMapTool->clean();
+
     stopCapturing();
 
     // Override default shortcut management in MapCanvas
@@ -1109,7 +1143,6 @@ void QgsMapToolCapture::updateExtraSnapLayer()
 }
 
 
-
 void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
 {
   QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer() );
@@ -1178,6 +1211,29 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
   // LINE AND POLYGON CAPTURING
   else if ( mode() == CaptureLine || mode() == CapturePolygon )
   {
+    bool digitizingFinished = false;
+
+    if ( mCurrentCaptureTechnique == Shape )
+    {
+      if ( !mCurrentShapeMapTool )
+      {
+        emit messageEmitted( tr( "Cannot capture a shape without a shape tool defined" ), Qgis::MessageLevel::Warning );
+      }
+      else
+      {
+        if ( !mTempRubberBand )
+        {
+          mTempRubberBand.reset( createCurveRubberBand() );
+          mTempRubberBand->setStringType( mLineDigitizingType );
+          mTempRubberBand->setRubberBandGeometryType( mCaptureMode == CapturePolygon ? QgsWkbTypes::PolygonGeometry : QgsWkbTypes::LineGeometry );
+        }
+
+        digitizingFinished = mCurrentShapeMapTool->cadCanvasReleaseEvent( e, vlayer );
+        if ( digitizingFinished )
+          mCurrentShapeMapTool->clean();
+      }
+    }
+
     //add point to list and to rubber band
     if ( e->button() == Qt::LeftButton )
     {
@@ -1214,7 +1270,10 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
       {
         closePolygon();
       }
+    }
 
+    if ( digitizingFinished )
+    {
       QgsGeometry g;
 
       //does compoundcurve contain circular strings?

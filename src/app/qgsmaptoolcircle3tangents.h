@@ -18,9 +18,9 @@
 #define QGSMAPTOOLCIRCLE3TANGENTS_H
 
 #include "qgspointlocator.h"
-#include "qgsmaptooladdcircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
 
-class QgsMapToolCircle3Tangents: public QgsMapToolAddCircle
+class QgsMapToolCircle3Tangents: public QgsMapToolShapeCircleAbstract
 {
     Q_OBJECT
 

@@ -161,7 +161,6 @@ set(QGIS_APP_SRCS
   qgsmaptooladdcircularstring.cpp
   qgsmaptoolcircularstringcurvepoint.cpp
   qgsmaptoolcircularstringradius.cpp
-  qgsmaptooladdcircle.cpp
   qgsmaptoolcircle2points.cpp
   qgsmaptoolcircle3points.cpp
   qgsmaptoolcircle3tangents.cpp
@@ -225,6 +224,7 @@ set(QGIS_APP_SRCS
   locator/qgslocatoroptionswidget.cpp
 
   maptools/qgsappmaptools.cpp
+  maptools/qgsmaptoolshapecircleabstract.cpp
 
   options/qgsadvancedoptions.cpp
   options/qgscodeeditoroptions.cpp

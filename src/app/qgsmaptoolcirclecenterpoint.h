@@ -17,10 +17,10 @@
 #ifndef QGSMAPTOOLCIRCLECENTERPOINT_H
 #define QGSMAPTOOLCIRCLECENTERPOINT_H
 
-#include "qgsmaptooladdcircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgis_app.h"
 
-class APP_EXPORT QgsMapToolCircleCenterPoint: public QgsMapToolAddCircle
+class APP_EXPORT QgsMapToolCircleCenterPoint: public QgsMapToolShapeCircleAbstract
 {
     Q_OBJECT
 

@@ -1,0 +1,67 @@
+/***************************************************************************
+    qgsmaptoolshapeabstract.h  -  base class for map tools digitizing shapes
+    ---------------------
+    begin                : January 2022
+    copyright            : (C) Denis Rouzaud
+    email                : denis@opengis.ch
+ ***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef QGSMAPTOOLSHAPEABSTRACT_H
+#define QGSMAPTOOLSHAPEABSTRACT_H
+
+// no bindings for now, not stable yet
+#define SIP_NO_FILE
+
+#include "qgis_gui.h"
+
+#include <QString>
+#include <QIcon>
+
+class QgsMapToolCapture;
+class QgsMapMouseEvent;
+class QgsVectorLayer;
+
+/**
+ * \ingroup gui
+ * QgsMapToolShapeAbstract is a base class for shape map tools to be use in QgsMapToolCapture
+ * \since QGIS 3.24
+ */
+class GUI_EXPORT QgsMapToolShapeAbstract
+    : public QObject
+   {
+     Q_OBJECT
+   public:
+     //! Constructor
+  QgsMapToolShapeAbstract(QgsMapToolCapture* parentTool )
+    : mParentTool(parentTool)
+  {
+    Q_ASSERT(parentTool);
+  }
+
+      virtual ~QgsMapToolShapeAbstract() = default;
+
+      //! Called for a mouse release event
+      //! Must return true if the digitization has ended and the geometry is correctly set
+      virtual bool cadCanvasReleaseEvent(QgsMapMouseEvent* e, const QgsVectorLayer* layer ) = 0;
+
+  //! Called for a mouse move event
+      virtual void cadCanvasMoveEvent(QgsMapMouseEvent* e ) = 0;
+
+  //! Called to clean the map tool (after canceling the operation or when the digitization has finished)
+  virtual void clean() = 0;
+
+protected:
+      QgsMapToolCapture* mParentTool = nullptr;
+
+};
+
+
+
+#endif // QGSMAPTOOLSHAPEABSTRACT_H

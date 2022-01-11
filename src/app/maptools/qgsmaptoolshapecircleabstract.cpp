@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdcircle.cpp  -  map tool for adding circle
+    qgsmaptoolshapecircleabstract.cpp  -  map tool for adding circle
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgsmaptooladdcircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgscompoundcurve.h"
 #include "qgscurvepolygon.h"
 #include "qgsgeometryrubberband.h"
@@ -24,13 +24,13 @@
 #include "qgisapp.h"
 #include "qgssnapindicator.h"
 
-QgsMapToolAddCircle::QgsMapToolAddCircle( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
+QgsMapToolShapeCircleAbstract::QgsMapToolShapeCircleAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
   : QgsMapToolAddAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add circle" );
 }
 
-void QgsMapToolAddCircle::deactivate()
+void QgsMapToolShapeCircleAbstract::deactivate()
 {
   if ( !mParentTool || mCircle.isEmpty() )
   {
@@ -47,7 +47,7 @@ void QgsMapToolAddCircle::deactivate()
   QgsMapToolCapture::deactivate();
 }
 
-void QgsMapToolAddCircle::clean()
+void QgsMapToolShapeCircleAbstract::clean()
 {
   QgsMapToolAddAbstract::clean();
   mCircle = QgsCircle();

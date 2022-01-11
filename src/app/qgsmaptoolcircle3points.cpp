@@ -24,7 +24,7 @@
 
 QgsMapToolCircle3Points::QgsMapToolCircle3Points( QgsMapToolCapture *parentTool,
     QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddCircle( parentTool, canvas, mode )
+  : QgsMapToolShapeCircleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add circle from 3 points" );
 }

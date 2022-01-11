@@ -18,12 +18,12 @@
 #define QGSMAPTOOLCIRCLE2TANGENTSPOINT_H
 
 #include "qgspointlocator.h"
-#include "qgsmaptooladdcircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qspinbox.h"
 
 class QSpinBox;
 
-class QgsMapToolCircle2TangentsPoint: public QgsMapToolAddCircle
+class QgsMapToolCircle2TangentsPoint: public QgsMapToolShapeCircleAbstract
 {
     Q_OBJECT
 

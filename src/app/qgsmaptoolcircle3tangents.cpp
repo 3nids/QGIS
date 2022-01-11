@@ -29,7 +29,7 @@
 
 QgsMapToolCircle3Tangents::QgsMapToolCircle3Tangents( QgsMapToolCapture *parentTool,
     QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddCircle( parentTool, canvas, mode )
+  : QgsMapToolShapeCircleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add circle from 3 tangents" );
 }
@@ -144,5 +144,5 @@ void QgsMapToolCircle3Tangents::cadCanvasMoveEvent( QgsMapMouseEvent *e )
 void QgsMapToolCircle3Tangents::clean( )
 {
   mPosPoints.clear();
-  QgsMapToolAddCircle::clean();
+  QgsMapToolShapeCircleAbstract::clean();
 }

@@ -1,10 +1,9 @@
 /***************************************************************************
-    qgmaptoolcircle2points.cpp  -  map tool for adding circle
-    from 2 points
+    qgsmaptoolshapecircle.cpp
     ---------------------
-    begin                : July 2017
-    copyright            : (C) 2017 by Loïc Bartoletti
-    email                : lbartoletti at tuxfamily dot org
+    begin                : January 2022
+    copyright            : (C) Denis Rouzaud
+    email                : denis@opengis.ch
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -14,42 +13,43 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgsmaptoolcircle2points.h"
-#include "qgsgeometryrubberband.h"
-#include "qgsmapcanvas.h"
-#include "qgspoint.h"
-#include "qgsmapmouseevent.h"
-#include "qgssnapindicator.h"
+
+#include "qgsmaptoolshapecircle.h"
 #include "qgsapplication.h"
+#include "qgsmaptoolcapturerubberband.h"
+#include "qgsmapmouseevent.h"
+#include "qgsmaptoolcapture.h"
 
 
-QString QgsMapToolShapeCircle2PointsMetadata::id() const
+
+
+QString QgsMapToolShapeCircleMetadata::id() const
 {
-  return QStringLiteral( "circle2points" );
+  return QStringLiteral("circle2points");
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeCircleMetadata::name() const
 {
   return QObject::tr( "Circle from 2 points" );
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeCircleMetadata::icon() const
 {
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircleMetadata::category() const
 {
   return QgsMapToolShapeRegistry::ShapeCategory::Circle;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeCircleMetadata::factory(QgsMapToolCapture* parentTool) const
 {
-  return new QgsMapToolCircle2Points( parentTool );
+  return new QgsMapToolShapeCircle(parentTool);
 }
 
 
-void QgsMapToolCircle2Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
+bool QgsMapToolShapeCircle::cadCanvasReleaseEvent(QgsMapMouseEvent *e, const QgsVectorLayer *layer)
 {
   if ( e->button() == Qt::LeftButton )
   {
@@ -78,9 +78,9 @@ void QgsMapToolCircle2Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const 
   return false;
 }
 
-void QgsMapToolCircle2Points::cadCanvasMoveEvent( QgsMapMouseEvent *e )
+void QgsMapToolShapeCircle::cadCanvasMoveEvent(QgsMapMouseEvent *e)
 {
-  if ( mPoints.count() == 0 )
+  if (mPoints.count() == 0 )
     return;
 
   mCircle = QgsCircle::from2Points( mPoints.at( 0 ), mParentTool->mapPoint( *e ) );
@@ -96,4 +96,5 @@ void QgsMapToolShapeCircle::clean()
   }
 
   mPoints.clear();
+
 }

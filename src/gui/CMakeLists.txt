@@ -289,6 +289,7 @@ set(QGIS_GUI_SRCS
   locator/qgslocatorwidget.cpp
 
   maptools/qgsmaptoolcapturelayergeometry.cpp
+  maptools/qgsmaptoolshaperegistry.cpp
 
   mesh/qgsmeshlayerproperties.cpp
   mesh/qgsrenderermeshpropertieswidget.cpp
@@ -1117,7 +1118,9 @@ set(QGIS_GUI_HDRS
 
   locator/qgslocatorwidget.h
 
+  maptools/qgsmaptoolshapeabstract.h
   maptools/qgsmaptoolcapturelayergeometry.h
+  maptools/qgsmaptoolshaperegistry.h
 
   mesh/qgsmeshlayerproperties.h
   mesh/qgsrenderermeshpropertieswidget.h

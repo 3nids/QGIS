@@ -17,10 +17,10 @@
 #ifndef QGSMAPTOOLCIRCLE3POINTS_H
 #define QGSMAPTOOLCIRCLE3POINTS_H
 
-#include "qgsmaptooladdcircle.h"
+#include "qgsmaptoolshapecircleabstract.h"
 #include "qgis_app.h"
 
-class APP_EXPORT QgsMapToolCircle3Points: public QgsMapToolAddCircle
+class APP_EXPORT QgsMapToolCircle3Points: public QgsMapToolShapeCircleAbstract
 {
     Q_OBJECT
 

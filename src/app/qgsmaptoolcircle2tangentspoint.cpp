@@ -33,7 +33,7 @@
 
 QgsMapToolCircle2TangentsPoint::QgsMapToolCircle2TangentsPoint( QgsMapToolCapture *parentTool,
     QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddCircle( parentTool, canvas, mode )
+  : QgsMapToolShapeCircleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add circle from 2 tangents and a point" );
 }
