@@ -98,7 +98,7 @@ void QgsMapToolShapeRegistry::setupToolbar( QToolBar *toolbar ) const
       mainButton = new QToolButton( toolbar );
       mainButton->setPopupMode( QToolButton::MenuButtonPopup );
       toolbar->addWidget( mainButton );
-      QObject::connect( mainButton, &QToolButton::triggered, [ = ]( QAction * action )
+      QObject::connect( mainButton, &QToolButton::triggered, mainButton, [ = ]( QAction * action )
       {
         QString id = action->data().toString();
         const QgsMapToolShapeMetadata *md = mapToolMetadata( id );
@@ -108,7 +108,8 @@ void QgsMapToolShapeRegistry::setupToolbar( QToolBar *toolbar ) const
           settingMapToolShapeCurrent.setValue( md->id() );
           mainButton->setDefaultAction( action );
         }
-        for ( const QAction *mtAction : mainButton->actions() )
+        const QList<QAction *> constActions = mainButton->actions();
+        for ( const QAction *mtAction : constActions )
           action->setChecked( mtAction == action );
       } );
 

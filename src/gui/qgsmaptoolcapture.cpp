@@ -35,6 +35,7 @@
 #include "qgsmaptoolcapturerubberband.h"
 #include "qgsmaptoolshapeabstract.h"
 #include "qgsmaptoolshaperegistry.h"
+#include "qgsgui.h"
 
 #include <QAction>
 #include <QCursor>
@@ -398,6 +399,9 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
     mTempRubberBand->setStringType( mLineDigitizingType );
 
   mCurrentCaptureTechnique = technique;
+
+  if ( !mCurrentShapeMapTool )
+    mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
 
   if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
@@ -1257,8 +1261,12 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
     if ( mCurrentCaptureTechnique == Shape )
     {
       if ( !mCurrentShapeMapTool )
+        mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
+
+      if ( !mCurrentShapeMapTool )
       {
         emit messageEmitted( tr( "Cannot capture a shape without a shape tool defined" ), Qgis::MessageLevel::Warning );
+        return;
       }
       else
       {
@@ -1274,42 +1282,46 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
           mCurrentShapeMapTool->clean();
       }
     }
-
-    //add point to list and to rubber band
-    if ( e->button() == Qt::LeftButton )
+    else // i.e. not shape
     {
-      const int error = addVertex( e->mapPoint(), e->mapPointMatch() );
-      if ( error == 2 )
+      //add point to list and to rubber band
+      if ( e->button() == Qt::LeftButton )
       {
-        //problem with coordinate transformation
-        emit messageEmitted( tr( "Cannot transform the point to the layers coordinate system" ), Qgis::MessageLevel::Warning );
-        return;
+        const int error = addVertex( e->mapPoint(), e->mapPointMatch() );
+        if ( error == 2 )
+        {
+          //problem with coordinate transformation
+          emit messageEmitted( tr( "Cannot transform the point to the layers coordinate system" ), Qgis::MessageLevel::Warning );
+          return;
+        }
+
+        startCapturing();
       }
-
-      startCapturing();
-    }
-    else if ( e->button() == Qt::RightButton )
-    {
-      // End of string
-      deleteTempRubberBand();
-
-      //lines: bail out if there are not at least two vertices
-      if ( mode() == CaptureLine && size() < 2 )
+      else if ( e->button() == Qt::RightButton )
       {
-        stopCapturing();
-        return;
-      }
+        // End of string
+        deleteTempRubberBand();
 
-      //polygons: bail out if there are not at least two vertices
-      if ( mode() == CapturePolygon && size() < 3 )
-      {
-        stopCapturing();
-        return;
-      }
+        //lines: bail out if there are not at least two vertices
+        if ( mode() == CaptureLine && size() < 2 )
+        {
+          stopCapturing();
+          return;
+        }
 
-      if ( mode() == CapturePolygon || e->modifiers() == Qt::ShiftModifier )
-      {
-        closePolygon();
+        //polygons: bail out if there are not at least two vertices
+        if ( mode() == CapturePolygon && size() < 3 )
+        {
+          stopCapturing();
+          return;
+        }
+
+        if ( mode() == CapturePolygon || e->modifiers() == Qt::ShiftModifier )
+        {
+          closePolygon();
+        }
+
+        digitizingFinished = true;
       }
     }
 
