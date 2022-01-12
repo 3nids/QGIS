@@ -204,7 +204,7 @@ set(QGIS_APP_SRCS
   maptools/qgsappmaptools.cpp
   maptools/qgsmaptoolshapecircleabstract.cpp
   maptools/qgsmaptoolshapecircularstringabstract.cpp
-  maptools/qgsmaptoolshapeellipseabstract.cpp
+#  maptools/qgsmaptoolshapeellipseabstract.cpp
 
   maptools/qgsmaptoolshapecircle2points.cpp
   maptools/qgsmaptoolshapecircle2tangentspoint.cpp

@@ -25,7 +25,9 @@ QgsSettingsRegistryGui::QgsSettingsRegistryGui()
   : QgsSettingsRegistry()
 {
   addSettingsEntry( &settingsRespectScreenDPI );
-  addSettingsEntry( &QgsMapToolShapeRegistry::settingMapToolShapeDefault );
+
+  addSettingsEntry( &QgsMapToolShapeRegistry::settingMapToolShapeDefaultForShape );
+  addSettingsEntry( &QgsMapToolShapeRegistry::settingMapToolShapeCurrent );
 
   QgsApplication::settingsRegistryCore()->addSubRegistry( this );
 }

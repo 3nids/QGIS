@@ -22,11 +22,6 @@
 #include "qgisapp.h"
 #include "qgssnapindicator.h"
 
-QgsMapToolShapeEllipseAbstract::QgsMapToolShapeEllipseAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddAbstract( parentTool, canvas, mode )
-{
-  mToolName = tr( "Add ellipse" );
-}
 
 void QgsMapToolShapeEllipseAbstract::deactivate()
 {

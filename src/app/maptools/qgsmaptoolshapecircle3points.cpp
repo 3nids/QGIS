@@ -35,7 +35,7 @@ QString QgsMapToolShapeCircle3PointsMetadata::name() const
 
 QIcon QgsMapToolShapeCircle3PointsMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle3Points.svg" ) );
 }
 
 QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle3PointsMetadata::category() const

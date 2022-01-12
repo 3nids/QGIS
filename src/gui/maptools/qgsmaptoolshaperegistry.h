@@ -37,21 +37,22 @@ class QToolBar;
  */
 class GUI_EXPORT QgsMapToolShapeRegistry
 {
-  Q_GADGET
+    Q_GADGET
   public:
 
-  static const inline QgsSettingsEntryString settingMapToolShapeDefault = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape" ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/current" ), QgsSettings::Gui, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
 
-  //! List of different shapes
-  enum class ShapeCategory
-  {
-   Curve, //!< Curve
-   Circle,//!< Circle
-   Ellipse,//!< Ellipse
-   Rectangle,//!< Rectangle
-   RegularyPolygon,//!< RegularyPolygon
-  };
-  Q_ENUM( ShapeCategory )
+    //! List of different shapes
+    enum class ShapeCategory
+    {
+      Curve, //!< Curve
+      Circle,//!< Circle
+      Ellipse,//!< Ellipse
+      Rectangle,//!< Rectangle
+      RegularyPolygon,//!< RegularyPolygon
+    };
+    Q_ENUM( ShapeCategory )
 
     /**
      * Constructor
@@ -63,30 +64,28 @@ class GUI_EXPORT QgsMapToolShapeRegistry
     /**
      * Adds a new shape map tool
      */
-    void addMapTool(QgsMapToolShapeMetadata *mapTool SIP_TRANSFER );
+    void addMapTool( QgsMapToolShapeMetadata *mapTool SIP_TRANSFER );
 
     /**
      * Removes a registered relation widget with given \a widgetType
      */
-    void removeMapTool( const QString &mapToolId );
+    void removeMapTool( const QString &id );
+
+    //! Returns the map tool metadata for the gin \a id
+    QgsMapToolShapeMetadata *mapToolMetadata( const QString &id ) const;
 
     /**
-     * Returns the map tool at the given \a mapToolId for the given \a parentTool
+     * Constructs the map tool at the given \a id for the given \a parentTool
      */
-    QgsMapToolShapeAbstract* mapTool(const QString &mapToolId , QgsMapToolCapture *parentTool);
-
-    /**
-     * Returns a list of names of registered shape map tools
-     */
-    QStringList mapToolNames() const;
+    QgsMapToolShapeAbstract *mapTool( const QString &id, QgsMapToolCapture *parentTool ) const SIP_FACTORY;
 
     //! Setup the toolbar by setting the buttons and menu
-    void setupToolbar(QToolBar* toolbar);
+    void setupToolbar( QToolBar *toolbar ) const ;
 
 
   private:
 
-    QMap<QString, QgsMapToolShapeMetadata *> mMapTools;
+    QList<QgsMapToolShapeMetadata *> mMapTools;
 
 };
 
@@ -97,25 +96,25 @@ class GUI_EXPORT QgsMapToolShapeRegistry
  */
 class GUI_EXPORT QgsMapToolShapeMetadata
 {
-public:
-  //! Constructor
-  QgsMapToolShapeMetadata() = default;
+  public:
+    //! Constructor
+    QgsMapToolShapeMetadata() = default;
 
-  virtual ~QgsMapToolShapeMetadata() = default;
+    virtual ~QgsMapToolShapeMetadata() = default;
 
-  //! Unique ID for the shape map tool
-  virtual QString id() const = 0;
+    //! Unique ID for the shape map tool
+    virtual QString id() const = 0;
 
-  //! Translated readable name
-  virtual QString name() const = 0;
+    //! Translated readable name
+    virtual QString name() const = 0;
 
-  //! Icon to be displayed in the toolbar
-  virtual QIcon icon() const = 0;
+    //! Icon to be displayed in the toolbar
+    virtual QIcon icon() const = 0;
 
-  virtual QgsMapToolShapeRegistry::ShapeCategory category() const = 0;
+    virtual QgsMapToolShapeRegistry::ShapeCategory category() const = 0;
 
-  //! Creates the shape map tool for the given \a parentTool
-  virtual QgsMapToolShapeAbstract* factory(QgsMapToolCapture* parentlTool) const = 0;
+    //! Creates the shape map tool for the given \a parentTool
+    virtual QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentlTool ) const = 0;
 };
 
 

@@ -39,7 +39,7 @@ QString QgsMapToolShapeCircle3TangentsMetadata::name() const
 
 QIcon QgsMapToolShapeCircle3TangentsMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle3Tangents.svg" ) );
 }
 
 QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle3TangentsMetadata::category() const

@@ -40,7 +40,7 @@ QString QgsMapToolShapeCircularStringRadiusMetadata::name() const
 
 QIcon QgsMapToolShapeCircularStringRadiusMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircularStringRadius.svg" ) );
 }
 
 QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircularStringRadiusMetadata::category() const

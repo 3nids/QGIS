@@ -45,7 +45,7 @@ QString QgsMapToolShapeCircle2TangentsPointMetadata::name() const
 
 QIcon QgsMapToolShapeCircle2TangentsPointMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2TangentsPoint.svg" ) );
 }
 
 QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle2TangentsPointMetadata::category() const
@@ -63,8 +63,10 @@ QgsMapToolShapeCircle2TangentsPoint::~QgsMapToolShapeCircle2TangentsPoint()
   deleteRadiusSpinBox();
 }
 
-bool QgsMapToolShapeCircle2TangentsPoint::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer* layer )
+bool QgsMapToolShapeCircle2TangentsPoint::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
+  Q_UNUSED( layer )
+
   EdgesOnlyFilter filter;
   const QgsPointLocator::Match match = mParentTool->canvas()->snappingUtils()->snapToMap( mParentTool->mapPoint( *e ), &filter );
 

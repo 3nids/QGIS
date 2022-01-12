@@ -34,7 +34,7 @@ QString QgsMapToolShapeCircleCenterPointMetadata::name() const
 
 QIcon QgsMapToolShapeCircleCenterPointMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircleCenterPoint.svg" ) );
 }
 
 QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircleCenterPointMetadata::category() const

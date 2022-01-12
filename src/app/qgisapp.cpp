@@ -447,16 +447,16 @@ Q_GUI_EXPORT extern int qt_defaultDpiX();
 #include "qgsmaptoolshapecircle3tangents.h"
 #include "qgsmaptoolshapecircle2tangentspoint.h"
 #include "qgsmaptoolshapecirclecenterpoint.h"
-#include "qgsmaptoolshapeellipsecenter2points.h"
-#include "qgsmaptoolshapeellipsecenterpoint.h"
-#include "qgsmaptoolshapeellipseextent.h"
-#include "qgsmaptoolshapeellipsefoci.h"
-#include "qgsmaptoolshaperectanglecenter.h"
-#include "qgsmaptoolshaperectangleextent.h"
-#include "qgsmaptoolshaperectangle3points.h"
-#include "qgsmaptoolshaperegularpolygon2points.h"
-#include "qgsmaptoolshaperegularpolygoncenterpoint.h"
-#include "qgsmaptoolshaperegularpolygoncentercorner.h"
+//#include "qgsmaptoolshapeellipsecenter2points.h"
+//#include "qgsmaptoolshapeellipsecenterpoint.h"
+//#include "qgsmaptoolshapeellipseextent.h"
+//#include "qgsmaptoolshapeellipsefoci.h"
+//#include "qgsmaptoolshaperectanglecenter.h"
+//#include "qgsmaptoolshaperectangleextent.h"
+//#include "qgsmaptoolshaperectangle3points.h"
+//#include "qgsmaptoolshaperegularpolygon2points.h"
+//#include "qgsmaptoolshaperegularpolygoncenterpoint.h"
+//#include "qgsmaptoolshaperegularpolygoncentercorner.h"
 
 #ifdef ENABLE_MODELTEST
 #include "modeltest.h"
@@ -1467,7 +1467,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterPointMetadata() );
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterCornerMetadata() );
 
-  QgsGui::mapToolShapeRegistry()->setupToolbar(mShapeDigitizeToolBar);
+  QgsGui::mapToolShapeRegistry()->setupToolbar( mShapeDigitizeToolBar );
 
   activateDeactivateLayerRelatedActions( nullptr ); // after members were created
 
@@ -2740,24 +2740,6 @@ void QgisApp::createActions()
   connect( mActionCopyLayer, &QAction::triggered, this, &QgisApp::copyLayer );
   connect( mActionPasteLayer, &QAction::triggered, this, &QgisApp::pasteLayer );
   connect( mActionAddFeature, &QAction::triggered, this, &QgisApp::addFeature );
-  connect( mActionCircularStringCurvePoint, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::CircularStringCurvePoint ) ); } );
-  connect( mActionCircularStringRadius, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::CircularStringRadius ) ); } );
-  connect( mActionCircle2Points, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Circle2Points ), true ); } );
-  connect( mActionCircle3Points, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Circle3Points ), true ); } );
-  connect( mActionCircle3Tangents, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Circle3Tangents ), true ); } );
-  connect( mActionCircle2TangentsPoint, &QAction::triggered, this, [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Circle2TangentsPoint ), true ); } );
-  connect( mActionCircleCenterPoint, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::CircleCenterPoint ), true ); } );
-  connect( mActionEllipseCenter2Points, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::EllipseCenter2Points ), true ); } );
-  connect( mActionEllipseCenterPoint, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::EllipseCenterPoint ), true ); } );
-  connect( mActionEllipseExtent, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::EllipseExtent ), true ); } );
-  connect( mActionEllipseFoci, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::EllipseFoci ), true ); } );
-  connect( mActionRectangleCenterPoint, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::RectangleCenterPoint ), true ); } );
-  connect( mActionRectangleExtent, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::RectangleExtent ), true ); } );
-  connect( mActionRectangle3PointsDistance, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Rectangle3PointsDistance ), true ); } );
-  connect( mActionRectangle3PointsProjected, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::Rectangle3PointsProjected ), true ); } );
-  connect( mActionRegularPolygon2Points, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::RegularPolygon2Points ), true ); } );
-  connect( mActionRegularPolygonCenterPoint, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::RegularPolygonCenterPoint ), true ); } );
-  connect( mActionRegularPolygonCenterCorner, &QAction::triggered, this,  [ = ] { setMapTool( mMapTools->mapTool( QgsAppMapTools::RegularPolygonCenterCorner ), true ); } );
 
   connect( mActionMoveFeature, &QAction::triggered, this, &QgisApp::moveFeature );
   connect( mActionMoveFeatureCopy, &QAction::triggered, this, &QgisApp::moveFeatureCopy );
@@ -4564,24 +4546,6 @@ void QgisApp::setupCanvasTools()
   mMapTools->mapTool( QgsAppMapTools::SvgAnnotation )->setAction( mActionSvgAnnotation );
   mMapTools->mapTool( QgsAppMapTools::Annotation )->setAction( mActionAnnotation );
   mMapTools->mapTool( QgsAppMapTools::AddFeature )->setAction( mActionAddFeature );
-  mMapTools->mapTool( QgsAppMapTools::CircularStringCurvePoint )->setAction( mActionCircularStringCurvePoint );
-  mMapTools->mapTool( QgsAppMapTools::CircularStringRadius )->setAction( mActionCircularStringRadius );
-  mMapTools->mapTool( QgsAppMapTools::Circle2Points )->setAction( mActionCircle2Points );
-  mMapTools->mapTool( QgsAppMapTools::Circle3Points )->setAction( mActionCircle3Points );
-  mMapTools->mapTool( QgsAppMapTools::Circle3Tangents )->setAction( mActionCircle3Tangents );
-  mMapTools->mapTool( QgsAppMapTools::Circle2TangentsPoint )->setAction( mActionCircle2TangentsPoint );
-  mMapTools->mapTool( QgsAppMapTools::CircleCenterPoint )->setAction( mActionCircleCenterPoint );
-  mMapTools->mapTool( QgsAppMapTools::EllipseCenter2Points )->setAction( mActionEllipseCenter2Points );
-  mMapTools->mapTool( QgsAppMapTools::EllipseCenterPoint )->setAction( mActionEllipseCenterPoint );
-  mMapTools->mapTool( QgsAppMapTools::EllipseExtent )->setAction( mActionEllipseExtent );
-  mMapTools->mapTool( QgsAppMapTools::EllipseFoci )->setAction( mActionEllipseFoci );
-  mMapTools->mapTool( QgsAppMapTools::RectangleCenterPoint )->setAction( mActionRectangleCenterPoint );
-  mMapTools->mapTool( QgsAppMapTools::RectangleExtent )->setAction( mActionRectangleExtent );
-  mMapTools->mapTool( QgsAppMapTools::Rectangle3PointsDistance )->setAction( mActionRectangle3PointsDistance );
-  mMapTools->mapTool( QgsAppMapTools::Rectangle3PointsProjected )->setAction( mActionRectangle3PointsProjected );
-  mMapTools->mapTool( QgsAppMapTools::RegularPolygon2Points )->setAction( mActionRegularPolygon2Points );
-  mMapTools->mapTool( QgsAppMapTools::RegularPolygonCenterPoint )->setAction( mActionRegularPolygonCenterPoint );
-  mMapTools->mapTool( QgsAppMapTools::RegularPolygonCenterCorner )->setAction( mActionRegularPolygonCenterCorner );
   mMapTools->mapTool( QgsAppMapTools::MoveFeature )->setAction( mActionMoveFeature );
   mMapTools->mapTool( QgsAppMapTools::MoveFeatureCopy )->setAction( mActionMoveFeatureCopy );
   mMapTools->mapTool( QgsAppMapTools::RotateFeature )->setAction( mActionRotateFeature );
@@ -10528,7 +10492,10 @@ void QgisApp::enableDigitizeTechniqueActions( bool enable, QAction *triggeredFro
     {
       tool->setCurrentCaptureTechnique( technique );
       if ( technique == QgsMapToolCapture::CaptureTechnique::Shape )
-        tool->setCurrentShapeMapTool( new QgsMapToolShapeCircleMetadata() ); // TODO !!
+      {
+        QgsMapToolShapeMetadata *md = QgsGui::mapToolShapeRegistry()->mapToolMetadata( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value() );
+        tool->setCurrentShapeMapTool( md );
+      }
     }
   }
 }

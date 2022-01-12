@@ -28,14 +28,14 @@ class APP_EXPORT QgsMapToolShapeEllipseAbstract: public QgsMapToolShapeAbstract
 {
     Q_OBJECT
   public:
-    QgsMapToolShapeEllipseAbstract( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeEllipseAbstract( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeAbstract( parentTool )
+    {}
 
     void deactivate() override;
     void clean() override;
 
   protected:
-    explicit QgsMapToolShapeEllipseAbstract( QgsMapCanvas *canvas ) = delete; //forbidden
-
     //! Ellipse
     QgsEllipse mEllipse;
 

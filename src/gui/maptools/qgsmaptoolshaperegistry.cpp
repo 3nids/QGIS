@@ -38,65 +38,95 @@ void QgsMapToolShapeRegistry::addMapTool( QgsMapToolShapeMetadata *mapTool )
   if ( !mapTool )
     return;
 
-  if ( mMapTools.contains( mapTool->id() ) )
+  if ( mapToolMetadata( mapTool->id() ) )
     return;
 
-  mMapTools.insert( mapTool->id(), mapTool );
+  mMapTools.append( mapTool );
 }
 
-void QgsMapToolShapeRegistry::removeMapTool( const QString &mapToolId )
+void QgsMapToolShapeRegistry::removeMapTool( const QString &id )
 {
-  mMapTools.remove( mapToolId );
+  QList<QgsMapToolShapeMetadata *>::iterator it = mMapTools.begin();
+  while ( it != mMapTools.end() )
+  {
+    if ( ( *it )->id() == id )
+    {
+      mMapTools.erase( it );
+    }
+    else
+    {
+      ++it;
+    }
+  }
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeRegistry::mapTool(const QString &mapToolId, QgsMapToolCapture* parentTool)
+QgsMapToolShapeMetadata *QgsMapToolShapeRegistry::mapToolMetadata( const QString &id ) const
 {
-  if (!mMapTools.contains(mapToolId))
+  for ( QgsMapToolShapeMetadata *md : std::as_const( mMapTools ) )
+  {
+    if ( md->id() == id )
+      return md;
+  }
+
+  return nullptr;
+}
+
+QgsMapToolShapeAbstract *QgsMapToolShapeRegistry::mapTool( const QString &id, QgsMapToolCapture *parentTool ) const
+{
+  QgsMapToolShapeMetadata *md = mapToolMetadata( id );
+  if ( !md )
     return nullptr;
 
-  return mMapTools.value(mapToolId)->factory(parentTool);
+  return md->factory( parentTool );
 }
 
-QStringList QgsMapToolShapeRegistry::mapToolNames() const
-{
-  return mMapTools.keys();
-}
-
-void QgsMapToolShapeRegistry::setupToolbar(QToolBar *toolbar)
+void QgsMapToolShapeRegistry::setupToolbar( QToolBar *toolbar ) const
 {
   // This will fill the tool bar with actions for each shape map tool
   // They are divided by ShapeCategory (circle, rectangle, etc)
 
-  QMap<ShapeCategory, QToolButton*> mainButtons;
+  QMap<ShapeCategory, QToolButton *> mainButtons;
 
-  QMap<QString, QgsMapToolShapeMetadata *>::const_iterator it = mMapTools.constBegin();
-  for (; it != mMapTools.constEnd(); ++it)
+  QList<QgsMapToolShapeMetadata *>::const_iterator it = mMapTools.constBegin();
+  for ( ; it != mMapTools.constEnd(); ++it )
   {
-    const QgsMapToolShapeMetadata* metadata = it.value();
+    const QgsMapToolShapeMetadata *metadata = *it;
 
     QToolButton *mainButton = nullptr;
-    if (!mainButtons.contains(metadata->category()))
+    if ( !mainButtons.contains( metadata->category() ) )
     {
-    mainButton = new QToolButton( toolbar );
-    mainButton->setPopupMode( QToolButton::MenuButtonPopup );
-    toolbar->addWidget(mainButton);
-    QObject::connect( mainButton, &QToolButton::triggered, [=](QAction *action){
-      settingMapToolShapeDefault.setValue( metadata->id(), qgsEnumValueToKey(metadata->category()) );
-      mainButton->setDefaultAction(action);
-    } );
+      mainButton = new QToolButton( toolbar );
+      mainButton->setPopupMode( QToolButton::MenuButtonPopup );
+      toolbar->addWidget( mainButton );
+      QObject::connect( mainButton, &QToolButton::triggered, [ = ]( QAction * action )
+      {
+        QString id = action->data().toString();
+        const QgsMapToolShapeMetadata *md = mapToolMetadata( id );
+        if ( md )
+        {
+          settingMapToolShapeDefaultForShape.setValue( md->id(), qgsEnumValueToKey( md->category() ) );
+          settingMapToolShapeCurrent.setValue( md->id() );
+          mainButton->setDefaultAction( action );
+        }
+        for ( const QAction *mtAction : mainButton->actions() )
+          action->setChecked( mtAction == action );
+      } );
 
-    mainButtons.insert(metadata->category(), mainButton);
+      mainButtons.insert( metadata->category(), mainButton );
     }
     else
     {
       mainButton = mainButtons[metadata->category()];
     }
 
-    QAction* action = new QAction(metadata->icon(), metadata->name(), mainButton);
-    mainButton->addAction(action);
-    if ( settingMapToolShapeDefault.value( qgsEnumValueToKey(metadata->category()) ) == metadata->id() )
-      mainButton->setDefaultAction(action);
-
+    QAction *action = new QAction( metadata->icon(), metadata->name(), mainButton );
+    action->setCheckable( true );
+    action->setData( metadata->id() );
+    mainButton->addAction( action );
+    if ( settingMapToolShapeDefaultForShape.value( qgsEnumValueToKey( metadata->category() ) ) == metadata->id() )
+      mainButton->setDefaultAction( action );
+    if ( settingMapToolShapeCurrent.value() == metadata->id() )
+      action->setChecked( true );
   }
 }
 
