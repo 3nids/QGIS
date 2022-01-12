@@ -23,9 +23,11 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
+const QString QgsMapToolShapeCircle3PointsMetadata::TOOL_ID = QStringLiteral( "circle-from-3-points" );
+
 QString QgsMapToolShapeCircle3PointsMetadata::id() const
 {
-  return QStringLiteral( "circle-from-3-points" );
+  return QgsMapToolShapeCircle3PointsMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircle3PointsMetadata::name() const
@@ -48,7 +50,7 @@ QgsMapToolShapeAbstract *QgsMapToolShapeCircle3PointsMetadata::factory( QgsMapTo
   return new QgsMapToolShapeCircle3Points( parentTool );
 }
 
-bool QgsMapToolShapeCircle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer* layer )
+bool QgsMapToolShapeCircle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
   if ( e->button() == Qt::LeftButton )
   {
@@ -72,7 +74,7 @@ bool QgsMapToolShapeCircle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, c
 
 void QgsMapToolShapeCircle3Points::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  Q_UNUSED(layer)
+  Q_UNUSED( layer )
 
   if ( !mTempRubberBand )
     return;

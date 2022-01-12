@@ -22,9 +22,11 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
+const QString QgsMapToolShapeCircleCenterPointMetadata::TOOL_ID = QStringLiteral( "circle-by-a-center-point-and-another-point" );
+
 QString QgsMapToolShapeCircleCenterPointMetadata::id() const
 {
-  return QStringLiteral( "circle-by-a-center-point-and-another-point" );
+  return QgsMapToolShapeCircleCenterPointMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircleCenterPointMetadata::name() const
@@ -75,7 +77,7 @@ bool QgsMapToolShapeCircleCenterPoint::cadCanvasReleaseEvent( QgsMapMouseEvent *
 
 void QgsMapToolShapeCircleCenterPoint::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  Q_UNUSED(layer)
+  Q_UNUSED( layer )
 
   const QgsPoint point = mParentTool->mapPoint( *e );
 

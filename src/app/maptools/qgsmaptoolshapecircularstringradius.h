@@ -45,7 +45,7 @@ class APP_EXPORT QgsMapToolShapeCircularStringRadius: public QgsMapToolShapeCirc
     Q_OBJECT
   public:
     QgsMapToolShapeCircularStringRadius( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeCircularStringAbstract(parentTool)
+      : QgsMapToolShapeCircularStringAbstract( QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID, parentTool )
       , mTemporaryEndPoint( QgsPoint() )
       , mRadius( 0.0 )
     {}

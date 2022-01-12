@@ -23,7 +23,6 @@
 
 const QString QgsMapToolShapeCircle2PointsMetadata::TOOL_ID = QStringLiteral( "circle-from-2-points" );
 
-
 QString QgsMapToolShapeCircle2PointsMetadata::id() const
 {
   return QgsMapToolShapeCircle2PointsMetadata::TOOL_ID;
@@ -75,7 +74,7 @@ bool QgsMapToolShapeCircle2Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, c
 
 void QgsMapToolShapeCircle2Points::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  Q_UNUSED(layer)
+  Q_UNUSED( layer )
 
   if ( !mTempRubberBand )
     return;

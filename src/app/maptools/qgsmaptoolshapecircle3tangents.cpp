@@ -27,9 +27,11 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
+const QString QgsMapToolShapeCircle3TangentsMetadata::TOOL_ID = QStringLiteral( "circle-from-3-tangents" );
+
 QString QgsMapToolShapeCircle3TangentsMetadata::id() const
 {
-  return QStringLiteral( "circle-from-3-tangents" );
+  return QgsMapToolShapeCircle3TangentsMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircle3TangentsMetadata::name() const
@@ -68,7 +70,7 @@ static QgsPoint getFirstPointOnParallels( const QgsPoint p1_line1, const QgsPoin
 
 bool QgsMapToolShapeCircle3Tangents::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  Q_UNUSED(layer)
+  Q_UNUSED( layer )
 
   const QgsPoint point = mParentTool->mapPoint( *e );
 

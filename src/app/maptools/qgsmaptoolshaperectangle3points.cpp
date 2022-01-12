@@ -25,9 +25,11 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
-QString QgsMapToolShapeCircle2PointsMetadata::id() const
+const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+
+QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
 {
-  return QStringLiteral( "circle2points" );
+  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircle2PointsMetadata::name() const

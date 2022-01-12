@@ -21,10 +21,10 @@
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeEllipseExtentMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeEllipseExtentMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
@@ -42,7 +42,7 @@ class APP_EXPORT QgsMapToolShapeEllipseExtent: public QgsMapToolShapeEllipseAbst
     Q_OBJECT
 
   public:
-    QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool );
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

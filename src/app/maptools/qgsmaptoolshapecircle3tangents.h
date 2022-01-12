@@ -42,13 +42,13 @@ class QgsMapToolShapeCircle3Tangents: public QgsMapToolShapeCircleAbstract
     Q_OBJECT
 
   public:
-    QgsMapToolShapeCircle3Tangents( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
+    QgsMapToolShapeCircle3Tangents( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract( QgsMapToolShapeCircle3TangentsMetadata::TOOL_ID, parentTool ) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void clean() override;
 
-private:
+  private:
     //! Snapped points on the segments. Useful to determine which circle to choose in case of there are two parallels
     QVector<QgsPoint> mPosPoints;
 };

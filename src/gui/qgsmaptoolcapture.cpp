@@ -407,6 +407,8 @@ void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMa
 {
   if ( mCurrentShapeMapTool )
   {
+    if ( mCurrentShapeMapTool->id() == shapeMapToolMetadata->id() )
+      return;
     if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
       mCurrentShapeMapTool->deactivate();
     mCurrentShapeMapTool->deleteLater();

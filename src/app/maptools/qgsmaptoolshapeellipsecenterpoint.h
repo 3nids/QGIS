@@ -21,10 +21,10 @@
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeEllipseCenterPointMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeEllipseCenterPointMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
@@ -42,7 +42,7 @@ class APP_EXPORT QgsMapToolShapeEllipseCenterPoint: public QgsMapToolShapeEllips
     Q_OBJECT
 
   public:
-    QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
+    QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract( QgsMapToolShapeEllipseCenterPointMetadata::TOOL_ID, parentTool ) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

@@ -28,8 +28,8 @@ class APP_EXPORT QgsMapToolShapeEllipseAbstract: public QgsMapToolShapeAbstract
 {
     Q_OBJECT
   public:
-    QgsMapToolShapeEllipseAbstract( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract( parentTool )
+    QgsMapToolShapeEllipseAbstract( const QString &id, QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeAbstract( id, parentTool )
     {}
 
     void deactivate() override;

@@ -32,10 +32,11 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
+const QString QgsMapToolShapeCircle2TangentsPointMetadata::TOOL_ID = QStringLiteral( "circle-from-2-tangents-1-point" );
 
 QString QgsMapToolShapeCircle2TangentsPointMetadata::id() const
 {
-  return QStringLiteral( "circle-from-2-tangents-1-point" );
+  return QgsMapToolShapeCircle2TangentsPointMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircle2TangentsPointMetadata::name() const

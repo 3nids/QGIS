@@ -28,9 +28,11 @@
 #include <cmath>
 #include "qgsapplication.h"
 
+const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+
 QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
 {
-  return QStringLiteral( "circular-string-by-radius" );
+  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
 }
 
 QString QgsMapToolShapeCircularStringRadiusMetadata::name() const

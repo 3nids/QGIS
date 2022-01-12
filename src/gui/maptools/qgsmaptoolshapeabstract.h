@@ -46,7 +46,7 @@ class GUI_EXPORT QgsMapToolShapeAbstract
     QgsMapToolShapeAbstract( const QString &id, QgsMapToolCapture *parentTool )
       : mId( id ), mParentTool( parentTool )
     {
-      Q_ASSERT( !mId.isEmpty() )
+      Q_ASSERT( !mId.isEmpty() );
       Q_ASSERT( parentTool );
     }
 
@@ -87,7 +87,7 @@ class GUI_EXPORT QgsMapToolShapeAbstract
     //! Called to undo last action (last point added)
     virtual void undo();
 
-private:
+  private:
     QString mId;
 
   protected:

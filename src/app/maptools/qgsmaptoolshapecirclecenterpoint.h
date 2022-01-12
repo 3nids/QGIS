@@ -42,7 +42,7 @@ class APP_EXPORT QgsMapToolShapeCircleCenterPoint: public QgsMapToolShapeCircleA
     Q_OBJECT
 
   public:
-    QgsMapToolShapeCircleCenterPoint( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract(parentTool) {}
+    QgsMapToolShapeCircleCenterPoint( QgsMapToolCapture *parentTool ) : QgsMapToolShapeCircleAbstract( QgsMapToolShapeCircleCenterPointMetadata::TOOL_ID, parentTool ) {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

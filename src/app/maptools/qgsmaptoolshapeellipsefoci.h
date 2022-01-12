@@ -42,7 +42,7 @@ class APP_EXPORT QgsMapToolShapeEllipseFoci: public QgsMapToolShapeEllipseAbstra
     Q_OBJECT
 
   public:
-    QgsMapToolShapeEllipseFoci( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeEllipseFoci( QgsMapToolCapture *parentTool );
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
