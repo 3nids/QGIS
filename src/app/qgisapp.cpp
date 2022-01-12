@@ -1186,8 +1186,26 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
   functionProfile( &QgisApp::createActions, this, QStringLiteral( "Create actions" ) );
   functionProfile( &QgisApp::createActionGroups, this, QStringLiteral( "Create action group" ) );
 
-  // create tools
+  // create map tools
   mMapTools = std::make_unique< QgsAppMapTools >( mMapCanvas, mAdvancedDigitizingDockWidget );
+
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircularStringRadiusMetadata() );
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2PointsMetadata() );
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle3PointsMetadata() );
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle3TangentsMetadata() );
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2TangentsPointMetadata() );
+  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircleCenterPointMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseCenter2PointsMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseCenterPointMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseExtentMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseFociMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangleCenterMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangleExtentMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangle3PointsMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangle3PointsMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygon2PointsMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterPointMetadata() );
+//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterCornerMetadata() );
 
   functionProfile( &QgisApp::createToolBars, this, QStringLiteral( "Toolbars" ) );
   functionProfile( &QgisApp::createStatusBar, this, QStringLiteral( "Status bar" ) );
@@ -1448,24 +1466,6 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
   registerMapLayerPropertiesFactory( new QgsPointCloudElevationPropertiesWidgetFactory( this ) );
   registerMapLayerPropertiesFactory( new QgsAnnotationItemPropertiesWidgetFactory( this ) );
   registerMapLayerPropertiesFactory( new QgsLayerTreeGroupPropertiesWidgetFactory( this ) );
-
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircularStringRadiusMetadata() );
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2PointsMetadata() );
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle3PointsMetadata() );
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle3TangentsMetadata() );
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2TangentsPointMetadata() );
-  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircleCenterPointMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseCenter2PointsMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseCenterPointMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseExtentMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeEllipseFociMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangleCenterMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangleExtentMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangle3PointsMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRectangle3PointsMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygon2PointsMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterPointMetadata() );
-//  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterCornerMetadata() );
 
   activateDeactivateLayerRelatedActions( nullptr ); // after members were created
 
@@ -3118,24 +3118,6 @@ void QgisApp::createActionGroups()
   mMapToolGroup->addAction( mActionMeasureAngle );
   mMapToolGroup->addAction( mActionMeasureBearing );
   mMapToolGroup->addAction( mActionAddFeature );
-  mMapToolGroup->addAction( mActionCircularStringCurvePoint );
-  mMapToolGroup->addAction( mActionCircularStringRadius );
-  mMapToolGroup->addAction( mActionCircle2Points );
-  mMapToolGroup->addAction( mActionCircle3Points );
-  mMapToolGroup->addAction( mActionCircle3Tangents );
-  mMapToolGroup->addAction( mActionCircle2TangentsPoint );
-  mMapToolGroup->addAction( mActionCircleCenterPoint );
-  mMapToolGroup->addAction( mActionEllipseCenter2Points );
-  mMapToolGroup->addAction( mActionEllipseCenterPoint );
-  mMapToolGroup->addAction( mActionEllipseExtent );
-  mMapToolGroup->addAction( mActionEllipseFoci );
-  mMapToolGroup->addAction( mActionRectangleCenterPoint );
-  mMapToolGroup->addAction( mActionRectangleExtent );
-  mMapToolGroup->addAction( mActionRectangle3PointsDistance );
-  mMapToolGroup->addAction( mActionRectangle3PointsProjected );
-  mMapToolGroup->addAction( mActionRegularPolygon2Points );
-  mMapToolGroup->addAction( mActionRegularPolygonCenterPoint );
-  mMapToolGroup->addAction( mActionRegularPolygonCenterCorner );
   mMapToolGroup->addAction( mActionMoveFeature );
   mMapToolGroup->addAction( mActionMoveFeatureCopy );
   mMapToolGroup->addAction( mActionRotateFeature );
@@ -3684,138 +3666,6 @@ void QgisApp::createToolBars()
   {
     layout->itemAt( i )->setAlignment( Qt::AlignLeft );
   }
-
-  //circular string digitize tool button
-  QToolButton *tbAddCircularString = new QToolButton( mShapeDigitizeToolBar );
-  tbAddCircularString->setPopupMode( QToolButton::MenuButtonPopup );
-  tbAddCircularString->addAction( mActionCircularStringCurvePoint );
-  tbAddCircularString->addAction( mActionCircularStringRadius );
-  QAction *defActionCircularString = mActionCircularStringCurvePoint;
-  switch ( settings.value( QStringLiteral( "UI/defaultCircularString" ), 0 ).toInt() )
-  {
-    case 0:
-      defActionCircularString = mActionCircularStringCurvePoint;
-      break;
-    case 1:
-      defActionCircularString = mActionCircularStringRadius;
-      break;
-  }
-  tbAddCircularString->setDefaultAction( defActionCircularString );
-  QAction *addCircularAction = mShapeDigitizeToolBar->insertWidget( mActionVertexTool, tbAddCircularString );
-  addCircularAction->setObjectName( QStringLiteral( "ActionAddCircularString" ) );
-  connect( tbAddCircularString, &QToolButton::triggered, this, &QgisApp::toolButtonActionTriggered );
-
-  //circle digitize tool button
-  QToolButton *tbAddCircle = new QToolButton( mShapeDigitizeToolBar );
-  tbAddCircle->setPopupMode( QToolButton::MenuButtonPopup );
-  tbAddCircle->addAction( mActionCircle2Points );
-  tbAddCircle->addAction( mActionCircle3Points );
-  tbAddCircle->addAction( mActionCircle3Tangents );
-  tbAddCircle->addAction( mActionCircle2TangentsPoint );
-  tbAddCircle->addAction( mActionCircleCenterPoint );
-  QAction *defActionCircle = mActionCircle2Points;
-  switch ( settings.value( QStringLiteral( "UI/defaultCircle" ), 0 ).toInt() )
-  {
-    case 0:
-      defActionCircle = mActionCircle2Points;
-      break;
-    case 1:
-      defActionCircle = mActionCircle3Points;
-      break;
-    case 2:
-      defActionCircle = mActionCircle3Tangents;
-      break;
-    case 3:
-      defActionCircle = mActionCircle2TangentsPoint;
-      break;
-    case 4:
-      defActionCircle = mActionCircleCenterPoint;
-      break;
-  }
-  tbAddCircle->setDefaultAction( defActionCircle );
-  QAction *addCircleAction = mShapeDigitizeToolBar->insertWidget( mActionVertexTool, tbAddCircle );
-  addCircleAction->setObjectName( QStringLiteral( "ActionAddCircle" ) );
-  connect( tbAddCircle, &QToolButton::triggered, this, &QgisApp::toolButtonActionTriggered );
-
-  //ellipse digitize tool button
-  QToolButton *tbAddEllipse = new QToolButton( mShapeDigitizeToolBar );
-  tbAddEllipse->setPopupMode( QToolButton::MenuButtonPopup );
-  tbAddEllipse->addAction( mActionEllipseCenter2Points );
-  tbAddEllipse->addAction( mActionEllipseCenterPoint );
-  tbAddEllipse->addAction( mActionEllipseExtent );
-  tbAddEllipse->addAction( mActionEllipseFoci );
-  QAction *defActionEllipse = mActionEllipseCenter2Points;
-  switch ( settings.value( QStringLiteral( "UI/defaultEllipse" ), 0 ).toInt() )
-  {
-    case 0:
-      defActionEllipse = mActionEllipseCenter2Points;
-      break;
-    case 1:
-      defActionEllipse = mActionEllipseCenterPoint;
-      break;
-    case 2:
-      defActionEllipse = mActionEllipseExtent;
-      break;
-    case 3:
-      defActionEllipse = mActionEllipseFoci;
-      break;
-  }
-  tbAddEllipse->setDefaultAction( defActionEllipse );
-  QAction *addEllipseAction = mShapeDigitizeToolBar->insertWidget( mActionVertexTool, tbAddEllipse );
-  addEllipseAction->setObjectName( QStringLiteral( "ActionAddEllipse" ) );
-  connect( tbAddEllipse, &QToolButton::triggered, this, &QgisApp::toolButtonActionTriggered );
-
-  //Rectangle digitize tool button
-  QToolButton *tbAddRectangle = new QToolButton( mShapeDigitizeToolBar );
-  tbAddRectangle->setPopupMode( QToolButton::MenuButtonPopup );
-  tbAddRectangle->addAction( mActionRectangleCenterPoint );
-  tbAddRectangle->addAction( mActionRectangleExtent );
-  tbAddRectangle->addAction( mActionRectangle3PointsDistance );
-  tbAddRectangle->addAction( mActionRectangle3PointsProjected );
-  QAction *defActionRectangle = mActionRectangleCenterPoint;
-  switch ( settings.value( QStringLiteral( "UI/defaultRectangle" ), 0 ).toInt() )
-  {
-    case 0:
-      defActionRectangle = mActionRectangleCenterPoint;
-      break;
-    case 1:
-      defActionRectangle = mActionRectangleExtent;
-      break;
-    case 2:
-      defActionRectangle = mActionRectangle3PointsDistance;
-      break;
-    case 3:
-      defActionRectangle = mActionRectangle3PointsProjected;
-      break;
-  }
-  tbAddRectangle->setDefaultAction( defActionRectangle );
-  QAction *addRectangleAction = mShapeDigitizeToolBar->insertWidget( mActionVertexTool, tbAddRectangle );
-  addRectangleAction->setObjectName( QStringLiteral( "ActionAddRectangle" ) );
-  connect( tbAddRectangle, &QToolButton::triggered, this, &QgisApp::toolButtonActionTriggered );
-
-  //Regular polygon digitize tool button
-  QToolButton *tbAddRegularPolygon = new QToolButton( mShapeDigitizeToolBar );
-  tbAddRegularPolygon->setPopupMode( QToolButton::MenuButtonPopup );
-  tbAddRegularPolygon->addAction( mActionRegularPolygon2Points );
-  tbAddRegularPolygon->addAction( mActionRegularPolygonCenterPoint );
-  tbAddRegularPolygon->addAction( mActionRegularPolygonCenterCorner );
-  QAction *defActionRegularPolygon = mActionRegularPolygon2Points;
-  switch ( settings.value( QStringLiteral( "UI/defaultRegularPolygon" ), 0 ).toInt() )
-  {
-    case 0:
-      defActionRegularPolygon = mActionRegularPolygon2Points;
-      break;
-    case 1:
-      defActionRegularPolygon = mActionRegularPolygonCenterPoint;
-      break;
-    case 2:
-      defActionRegularPolygon = mActionRegularPolygonCenterCorner;
-      break;
-  }
-  tbAddRegularPolygon->setDefaultAction( defActionRegularPolygon );
-  QAction *addRegularPolygonAction = mShapeDigitizeToolBar->insertWidget( mActionVertexTool, tbAddRegularPolygon );
-  addRegularPolygonAction->setObjectName( QStringLiteral( "ActionAddRegularPolygon" ) );
-  connect( tbAddRegularPolygon, &QToolButton::triggered, this, &QgisApp::toolButtonActionTriggered );
 
   // Cad toolbar
   mAdvancedDigitizeToolBar->insertAction( mAdvancedDigitizeToolBar->actions().at( 0 ), mAdvancedDigitizingDockWidget->enableAction() );
@@ -15275,28 +15125,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionAddToOverview->setEnabled( false );
     mActionFeatureAction->setEnabled( false );
     mActionAddFeature->setEnabled( false );
-    mActionCircularStringCurvePoint->setEnabled( false );
-    mActionCircularStringRadius->setEnabled( false );
-    mMenuCircle->setEnabled( false );
-    mActionCircle2Points->setEnabled( false );
-    mActionCircle3Points->setEnabled( false );
-    mActionCircle3Tangents->setEnabled( false );
-    mActionCircle2TangentsPoint->setEnabled( false );
-    mActionCircleCenterPoint->setEnabled( false );
-    mMenuEllipse->setEnabled( false );
-    mActionEllipseCenter2Points->setEnabled( false );
-    mActionEllipseCenterPoint->setEnabled( false );
-    mActionEllipseExtent->setEnabled( false );
-    mActionEllipseFoci->setEnabled( false );
-    mMenuRectangle->setEnabled( false );
-    mActionRectangleCenterPoint->setEnabled( false );
-    mActionRectangleExtent->setEnabled( false );
-    mActionRectangle3PointsDistance->setEnabled( false );
-    mActionRectangle3PointsProjected->setEnabled( false );
-    mMenuRegularPolygon->setEnabled( false );
-    mActionRegularPolygon2Points->setEnabled( false );
-    mActionRegularPolygonCenterPoint->setEnabled( false );
-    mActionRegularPolygonCenterCorner->setEnabled( false );
     mMenuEditGeometry->setEnabled( false );
     mActionMoveFeature->setEnabled( false );
     mActionMoveFeatureCopy->setEnabled( false );
@@ -15466,34 +15294,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
         mActionPasteFeatures->setEnabled( isEditable && canAddFeatures && !clipboard()->isEmpty() );
 
         mActionAddFeature->setEnabled( isEditable && canAddFeatures );
-
-        bool enableCircularTools;
-        bool enableShapeTools;
-        enableCircularTools = isEditable && ( canAddFeatures || canChangeGeometry )
-                              && ( vlayer->geometryType() == QgsWkbTypes::LineGeometry || vlayer->geometryType() == QgsWkbTypes::PolygonGeometry );
-        enableShapeTools = enableCircularTools;
-        mActionCircularStringCurvePoint->setEnabled( enableCircularTools );
-        mActionCircularStringRadius->setEnabled( enableCircularTools );
-        mMenuCircle->setEnabled( enableShapeTools );
-        mActionCircle2Points->setEnabled( enableShapeTools );
-        mActionCircle3Points->setEnabled( enableShapeTools );
-        mActionCircle3Tangents->setEnabled( enableShapeTools );
-        mActionCircle2TangentsPoint->setEnabled( enableShapeTools );
-        mActionCircleCenterPoint->setEnabled( enableShapeTools );
-        mMenuEllipse->setEnabled( enableShapeTools );
-        mActionEllipseCenter2Points->setEnabled( enableShapeTools );
-        mActionEllipseCenterPoint->setEnabled( enableShapeTools );
-        mActionEllipseExtent->setEnabled( enableShapeTools );
-        mActionEllipseFoci->setEnabled( enableShapeTools );
-        mMenuRectangle->setEnabled( enableShapeTools );
-        mActionRectangleCenterPoint->setEnabled( enableShapeTools );
-        mActionRectangleExtent->setEnabled( enableShapeTools );
-        mActionRectangle3PointsDistance->setEnabled( enableShapeTools );
-        mActionRectangle3PointsProjected->setEnabled( enableShapeTools );
-        mMenuRegularPolygon->setEnabled( enableShapeTools );
-        mActionRegularPolygon2Points->setEnabled( enableShapeTools );
-        mActionRegularPolygonCenterPoint->setEnabled( enableShapeTools );
-        mActionRegularPolygonCenterCorner->setEnabled( enableShapeTools );
 
         //does provider allow deleting of features?
         mActionDeleteSelected->setEnabled( isEditable && canDeleteFeatures && layerHasSelection );
@@ -15689,28 +15489,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionSaveLayerDefinition->setEnabled( true );
       mActionLayerSaveAs->setEnabled( true );
       mActionAddFeature->setEnabled( false );
-      mActionCircularStringCurvePoint->setEnabled( false );
-      mActionCircularStringRadius->setEnabled( false );
-      mMenuCircle->setEnabled( false );
-      mActionCircle2Points->setEnabled( false );
-      mActionCircle3Points->setEnabled( false );
-      mActionCircle3Tangents->setEnabled( false );
-      mActionCircle2TangentsPoint->setEnabled( false );
-      mActionCircleCenterPoint->setEnabled( false );
-      mMenuEllipse->setEnabled( false );
-      mActionEllipseCenter2Points->setEnabled( false );
-      mActionEllipseCenterPoint->setEnabled( false );
-      mActionEllipseExtent->setEnabled( false );
-      mActionEllipseFoci->setEnabled( false );
-      mMenuRectangle->setEnabled( false );
-      mActionRectangleCenterPoint->setEnabled( false );
-      mActionRectangleExtent->setEnabled( false );
-      mActionRectangle3PointsDistance->setEnabled( false );
-      mActionRectangle3PointsProjected->setEnabled( false );
-      mMenuRegularPolygon->setEnabled( false );
-      mActionRegularPolygon2Points->setEnabled( false );
-      mActionRegularPolygonCenterPoint->setEnabled( false );
-      mActionRegularPolygonCenterCorner->setEnabled( false );
       mMenuEditAttributes->setEnabled( false );
       mMenuEditGeometry->setEnabled( false );
       mActionReverseLine->setEnabled( false );
@@ -15805,8 +15583,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionSaveLayerDefinition->setEnabled( true );
       mActionLayerSaveAs->setEnabled( false );
       mActionAddFeature->setEnabled( false );
-      mActionCircularStringCurvePoint->setEnabled( false );
-      mActionCircularStringRadius->setEnabled( false );
       mActionDeleteSelected->setEnabled( false );
       mActionAddRing->setEnabled( false );
       mActionFillRing->setEnabled( false );
@@ -15887,8 +15663,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionSaveLayerDefinition->setEnabled( true );
       mActionLayerSaveAs->setEnabled( false );
       mActionAddFeature->setEnabled( false );
-      mActionCircularStringCurvePoint->setEnabled( false );
-      mActionCircularStringRadius->setEnabled( false );
       mActionDeleteSelected->setEnabled( false );
       mActionAddRing->setEnabled( false );
       mActionFillRing->setEnabled( false );
@@ -15957,8 +15731,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionSaveLayerDefinition->setEnabled( true );
       mActionLayerSaveAs->setEnabled( false );
       mActionAddFeature->setEnabled( false );
-      mActionCircularStringCurvePoint->setEnabled( false );
-      mActionCircularStringRadius->setEnabled( false );
       mActionDeleteSelected->setEnabled( false );
       mActionAddRing->setEnabled( false );
       mActionFillRing->setEnabled( false );
@@ -16028,8 +15800,6 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionSaveLayerDefinition->setEnabled( false );
       mActionLayerSaveAs->setEnabled( false );
       mActionAddFeature->setEnabled( false );
-      mActionCircularStringCurvePoint->setEnabled( false );
-      mActionCircularStringRadius->setEnabled( false );
       mActionDeleteSelected->setEnabled( false );
       mActionAddRing->setEnabled( false );
       mActionFillRing->setEnabled( false );
@@ -17148,42 +16918,6 @@ void QgisApp::toolButtonActionTriggered( QAction *action )
     settings.setEnumValue( QStringLiteral( "UI/defaultVertexTool" ), QgsVertexTool::AllLayers );
   else if ( action == mActionVertexToolActiveLayer )
     settings.setEnumValue( QStringLiteral( "UI/defaultVertexTool" ), QgsVertexTool::ActiveLayer );
-  else if ( action == mActionCircularStringCurvePoint )
-    settings.setValue( QStringLiteral( "UI/defaultCircularString" ), 0 );
-  else if ( action == mActionCircularStringRadius )
-    settings.setValue( QStringLiteral( "UI/defaultCircularString" ), 1 );
-  else if ( action == mActionCircle2Points )
-    settings.setValue( QStringLiteral( "UI/defaultCircle" ), 0 );
-  else if ( action == mActionCircle3Points )
-    settings.setValue( QStringLiteral( "UI/defaultCircle" ), 1 );
-  else if ( action == mActionCircle3Tangents )
-    settings.setValue( QStringLiteral( "UI/defaultCircle" ), 2 );
-  else if ( action == mActionCircle2TangentsPoint )
-    settings.setValue( QStringLiteral( "UI/defaultCircle" ), 3 );
-  else if ( action == mActionCircleCenterPoint )
-    settings.setValue( QStringLiteral( "UI/defaultCircle" ), 4 );
-  else if ( action == mActionEllipseCenter2Points )
-    settings.setValue( QStringLiteral( "UI/defaultEllipse" ), 0 );
-  else if ( action == mActionEllipseCenterPoint )
-    settings.setValue( QStringLiteral( "UI/defaultEllipse" ), 1 );
-  else if ( action == mActionEllipseExtent )
-    settings.setValue( QStringLiteral( "UI/defaultEllipse" ), 2 );
-  else if ( action == mActionEllipseFoci )
-    settings.setValue( QStringLiteral( "UI/defaultEllipse" ), 3 );
-  else if ( action == mActionRectangleCenterPoint )
-    settings.setValue( QStringLiteral( "UI/defaultRectangle" ), 0 );
-  else if ( action == mActionRectangleExtent )
-    settings.setValue( QStringLiteral( "UI/defaultRectangle" ), 1 );
-  else if ( action == mActionRectangle3PointsDistance )
-    settings.setValue( QStringLiteral( "UI/defaultRectangle" ), 2 );
-  else if ( action == mActionRectangle3PointsProjected )
-    settings.setValue( QStringLiteral( "UI/defaultRectangle" ), 3 );
-  else if ( action == mActionRegularPolygon2Points )
-    settings.setValue( QStringLiteral( "UI/defaultRegularPolygon" ), 0 );
-  else if ( action == mActionRegularPolygonCenterPoint )
-    settings.setValue( QStringLiteral( "UI/defaultRegularPolygon" ), 1 );
-  else if ( action == mActionRegularPolygonCenterCorner )
-    settings.setValue( QStringLiteral( "UI/defaultRegularPolygon" ), 2 );
 
   bt->setDefaultAction( action );
 }
