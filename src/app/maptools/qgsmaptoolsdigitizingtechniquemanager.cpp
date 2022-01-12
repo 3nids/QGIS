@@ -22,51 +22,68 @@
 #include "qgsmaptoolshapeabstract.h"
 #include "qgsmaptoolshaperegistry.h"
 #include "qgsgui.h"
+#include "qgsmapcanvas.h"
 
 #include <QAction>
 #include <QToolButton>
 #include <QMenu>
 
-QgsMapToolsDigitizingTechniqueManager::QgsMapToolsDigitizingTechniqueManager( QgisApp *app )
-  : QObject( app )
+QgsMapToolsDigitizingTechniqueManager::QgsMapToolsDigitizingTechniqueManager( QObject *parent )
+  : QObject( parent )
 {
+
+  mTechniqueActions =
+  {
+    { QgsMapToolCapture::CaptureTechnique::StraightSegments, QgisApp::instance()->mActionDigitizeWithSegment},
+    {QgsMapToolCapture::CaptureTechnique::CircularString, QgisApp::instance()->mActionDigitizeWithCurve},
+    {QgsMapToolCapture::CaptureTechnique::Streaming, QgisApp::instance()->mActionStreamDigitize},
+    {QgsMapToolCapture::CaptureTechnique::Shape, QgisApp::instance()->mActionDigitizeShape}
+  };
+
+  // digitize mode button
+
   mDigitizeModeToolButton = new QToolButton();
   mDigitizeModeToolButton->setPopupMode( QToolButton::MenuButtonPopup );
 
   QMenu *digitizeMenu = new QMenu( mDigitizeModeToolButton );
   QActionGroup *actionGroup = new QActionGroup( digitizeMenu );
 
-  for ( QAction *techniqueAction : { app->mActionDigitizeWithSegment, app->mActionDigitizeWithCurve, app->mActionStreamDigitize, app->mActionDigitizeShape} )
+
+  for ( const std::pair<QgsMapToolCapture::CaptureTechnique, QAction *> &techniqueAction : std::as_const( mTechniqueActions ) )
   {
-    digitizeMenu->addAction( techniqueAction );
-    actionGroup->addAction( techniqueAction );
+    digitizeMenu->addAction( techniqueAction.second );
+    actionGroup->addAction( techniqueAction.second );
+    // TODO revert to qmenu triggered?
+    connect( techniqueAction.second, &QAction::triggered, this, [ = ]( bool checked ) {setCaptureTechnique( techniqueAction.first );} );
   }
-  app->mActionStreamDigitize->setShortcut( tr( "R", "Keyboard shortcut: toggle stream digitizing" ) );
+  QgisApp::instance()->mActionStreamDigitize->setShortcut( tr( "R", "Keyboard shortcut: toggle stream digitizing" ) );
+
+// connect( digitizeMenu, &QMenu::triggered, this, &QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique );
+
 
   digitizeMenu->addSeparator();
-  digitizeMenu->addAction( app->mMapTools->streamDigitizingSettingsAction() );
+  digitizeMenu->addAction( QgisApp::instance()->mMapTools->streamDigitizingSettingsAction() );
   mDigitizeModeToolButton->setMenu( digitizeMenu );
 
-  connect( digitizeMenu, &QMenu::triggered, this, &QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique );
 
   const QgsMapToolCapture::CaptureTechnique technique = settingsDigitizingTechnique.value();
   switch ( technique )
   {
     case QgsMapToolCapture::CaptureTechnique::StraightSegments:
-      mDigitizeModeToolButton->setDefaultAction( app->mActionDigitizeWithSegment );
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeWithSegment );
       break;
     case QgsMapToolCapture::CaptureTechnique::CircularString:
-      mDigitizeModeToolButton->setDefaultAction( app->mActionDigitizeWithCurve );
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeWithCurve );
       break;
     case QgsMapToolCapture::CaptureTechnique::Streaming:
-      mDigitizeModeToolButton->setDefaultAction( app->mActionStreamDigitize );
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionStreamDigitize );
       break;
     case QgsMapToolCapture::CaptureTechnique::Shape:
-      mDigitizeModeToolButton->setDefaultAction( app->mActionDigitizeShape );
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeShape );
       break;
   }
 
-  app->mAdvancedDigitizeToolBar->insertWidget( app->mAdvancedDigitizeToolBar->actions().at( 0 ), mDigitizeModeToolButton );
+  QgisApp::instance()->mAdvancedDigitizeToolBar->insertWidget( QgisApp::instance()->mAdvancedDigitizeToolBar->actions().at( 0 ), mDigitizeModeToolButton );
 
   // Digitizing shape tools
   QMap<QgsMapToolShapeAbstract::ShapeCategory, QToolButton *> mainShapeButtons;
@@ -76,10 +93,10 @@ QgsMapToolsDigitizingTechniqueManager::QgsMapToolsDigitizingTechniqueManager( Qg
     QToolButton *mainButton = nullptr;
     if ( !mainShapeButtons.contains( metadata->category() ) )
     {
-      mainButton = new QToolButton( app->mShapeDigitizeToolBar );
+      mainButton = new QToolButton( QgisApp::instance()->mShapeDigitizeToolBar );
       mainButton->setPopupMode( QToolButton::MenuButtonPopup );
-      app->mShapeDigitizeToolBar->addWidget( mainButton );
-      QObject::connect( mainButton, &QToolButton::triggered, this, &QgsMapToolsDigitizingTechniqueManager::shapeActionTriggered );
+      QgisApp::instance()->mShapeDigitizeToolBar->addWidget( mainButton );
+      QObject::connect( mainButton, &QToolButton::triggered, this, [ = ]( QAction * action ) {shapeActionTriggered( action, mainButton );} );
 
       mainShapeButtons.insert( metadata->category(), mainButton );
     }
@@ -100,43 +117,39 @@ QgsMapToolsDigitizingTechniqueManager::QgsMapToolsDigitizingTechniqueManager( Qg
   }
 }
 
-void QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique( QAction *action )
+void QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique )
 {
-  QgsMapToolCapture::CaptureTechnique technique = QgsMapToolCapture::CaptureTechnique::StraightSegments;
-  if ( action == mActionDigitizeWithCurve )
+  switch ( technique )
   {
-    technique = QgsMapToolCapture::CaptureTechnique::CircularString;
-    mDigitizeModeToolButton->setDefaultAction( mActionDigitizeWithCurve );
-  }
-  else if ( action == mActionStreamDigitize )
-  {
-    technique = QgsMapToolCapture::CaptureTechnique::Streaming;
-    mDigitizeModeToolButton->setDefaultAction( mActionStreamDigitize );
-  }
-  else if ( action == mActionDigitizeShape )
-  {
-    technique = QgsMapToolCapture::CaptureTechnique::Shape;
-    mDigitizeModeToolButton->setDefaultAction( mActionDigitizeShape );
-  }
-  else
-  {
-    mDigitizeModeToolButton->setDefaultAction( mActionDigitizeWithSegment );
+    case QgsMapToolCapture::StraightSegments:
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeWithSegment );
+      break;
+    case QgsMapToolCapture::CircularString:
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeWithCurve );
+      break;
+    case QgsMapToolCapture::Streaming:
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionStreamDigitize );
+      break;
+    case QgsMapToolCapture::Shape:
+      mDigitizeModeToolButton->setDefaultAction( QgisApp::instance()->mActionDigitizeShape );
+      break;
   }
 
-  const QList< QgsMapToolCapture * > tools = captureTools();
+  const QList< QgsMapToolCapture * > tools = QgisApp::instance()->captureTools();
   for ( QgsMapToolCapture *tool : tools )
   {
     if ( tool->supportsTechnique( technique ) )
       tool->setCurrentCaptureTechnique( technique );
   }
 
-  QgsSettings().setEnumValue( QStringLiteral( "UI/digitizeTechnique" ), technique );
+  settingsDigitizingTechnique.setValue( technique );
+
 }
 
-void QgsMapToolsDigitizingTechniqueManager::shapeActionTriggered( QAction *action )
+void QgsMapToolsDigitizingTechniqueManager::shapeActionTriggered( QAction *action, QToolButton *mainButton )
 {
   QString id = action->data().toString();
-  const QgsMapToolShapeMetadata *md = mapToolMetadata( id );
+  const QgsMapToolShapeMetadata *md = QgsGui::mapToolShapeRegistry()->mapToolMetadata( id );
   if ( md )
   {
     settingMapToolShapeDefaultForShape.setValue( md->id(), qgsEnumValueToKey( md->category() ) );
@@ -147,22 +160,19 @@ void QgsMapToolsDigitizingTechniqueManager::shapeActionTriggered( QAction *actio
   for ( const QAction *mtAction : constActions )
     action->setChecked( mtAction == action );
 
-  // TODO make shape current technique
+  setCaptureTechnique( QgsMapToolCapture::Shape );
 }
 
 void QgsMapToolsDigitizingTechniqueManager::enableDigitizeTechniqueActions( bool enable, QAction *triggeredFromToolAction )
 {
-  if ( !mMapTools )
-    return;
-
   QgsSettings settings;
 
-  const QList< QgsMapToolCapture * > tools = captureTools();
+  const QList< QgsMapToolCapture * > tools = QgisApp::instance()->captureTools();
 
   QSet< QgsMapToolCapture::CaptureTechnique > supportedTechniques;
   for ( QgsMapToolCapture *tool : tools )
   {
-    if ( triggeredFromToolAction == tool->action() || ( !triggeredFromToolAction && mMapCanvas->mapTool() == tool ) )
+    if ( triggeredFromToolAction == tool->action() || ( !triggeredFromToolAction && QgisApp::instance()->mapCanvas()->mapTool() == tool ) )
     {
       for ( QgsMapToolCapture::CaptureTechnique technique : { QgsMapToolCapture::CaptureTechnique::StraightSegments, QgsMapToolCapture::CaptureTechnique::CircularString, QgsMapToolCapture::CaptureTechnique::Streaming, QgsMapToolCapture::CaptureTechnique::Shape } )
       {
@@ -175,14 +185,7 @@ void QgsMapToolsDigitizingTechniqueManager::enableDigitizeTechniqueActions( bool
 
   const QgsMapToolCapture::CaptureTechnique currentTechnique = settings.enumValue( QStringLiteral( "UI/digitizeTechnique" ), QgsMapToolCapture::CaptureTechnique::StraightSegments );
 
-  QList<std::pair<QgsMapToolCapture::CaptureTechnique, QAction *>> techniqueActions
-  {
-    { QgsMapToolCapture::CaptureTechnique::StraightSegments, mActionDigitizeWithSegment},
-    {QgsMapToolCapture::CaptureTechnique::CircularString, mActionDigitizeWithCurve},
-    {QgsMapToolCapture::CaptureTechnique::Streaming, mActionStreamDigitize},
-    {QgsMapToolCapture::CaptureTechnique::Shape, mActionDigitizeShape}
-  };
-  for ( const auto &techniqueAction : techniqueActions )
+  for ( const auto &techniqueAction : mTechniqueActions )
   {
     techniqueAction.second->setEnabled( enable && supportedTechniques.contains( techniqueAction.first ) );
     techniqueAction.second->setChecked( currentTechnique == techniqueAction.first && techniqueAction.second->isEnabled() );
@@ -196,7 +199,7 @@ void QgsMapToolsDigitizingTechniqueManager::enableDigitizeTechniqueActions( bool
       tool->setCurrentCaptureTechnique( currentTechnique );
       if ( currentTechnique == QgsMapToolCapture::CaptureTechnique::Shape )
       {
-        QgsMapToolShapeMetadata *md = QgsGui::mapToolShapeRegistry()->mapToolMetadata( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value() );
+        QgsMapToolShapeMetadata *md = QgsGui::mapToolShapeRegistry()->mapToolMetadata( settingMapToolShapeCurrent.value() );
         tool->setCurrentShapeMapTool( md );
       }
     }

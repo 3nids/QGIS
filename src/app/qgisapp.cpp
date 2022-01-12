@@ -833,7 +833,7 @@ void QgisApp::annotationItemTypeAdded( int id )
     mMapCanvas->setMapTool( tool->mapTool() );
     if ( qobject_cast< QgsMapToolCapture * >( tool->mapTool() ) )
     {
-      enableDigitizeTechniqueActions( checked, action );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( checked, action );
     }
 
     connect( tool->mapTool(), &QgsMapTool::deactivated, tool->mapTool(), &QObject::deleteLater );
@@ -1214,7 +1214,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
   const QList< QgsMapToolCapture * > captureTools = mMapTools->captureTools();
   for ( QgsMapToolCapture *tool : captureTools )
   {
-    connect( tool->action(), &QAction::toggled, this, [this, tool]( bool checked ) { enableDigitizeTechniqueActions( checked, tool->action() ); } );
+    connect( tool->action(), &QAction::toggled, this, [this, tool]( bool checked ) {  mDigitizingTechniqueManager->enableDigitizeTechniqueActions( checked, tool->action() ); } );
   }
 
   applyDefaultSettingsToCanvas( mMapCanvas );
@@ -15059,7 +15059,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionZoomToLayer->setEnabled( false );
 
     enableMeshEditingTools( false );
-    enableDigitizeTechniqueActions( false );
+    mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
 
     return;
   }
@@ -15196,7 +15196,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
         mActionVertexTool->setEnabled( isEditable && canChangeGeometry );
         mActionVertexToolActiveLayer->setEnabled( isEditable && canChangeGeometry );
 
-        enableDigitizeTechniqueActions( isEditable && canChangeGeometry );
+        mDigitizingTechniqueManager->enableDigitizeTechniqueActions( isEditable && canChangeGeometry );
 
         if ( vlayer->geometryType() == QgsWkbTypes::PointGeometry )
         {
@@ -15388,7 +15388,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionDiagramProperties->setEnabled( false );
 
       enableMeshEditingTools( false );
-      enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
 
       //NOTE: This check does not really add any protection, as it is called on load not on layer select/activate
       //If you load a layer with a provider and idenitfy ability then load another without, the tool would be disabled for both
@@ -15477,7 +15477,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
 
       bool canSupportEditing = mlayer->supportsEditing();
       bool isEditable = mlayer->isEditable();
@@ -15557,7 +15557,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
       enableMeshEditingTools( false );
       break;
 
@@ -15625,7 +15625,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
       enableMeshEditingTools( false );
       break;
 
@@ -15694,7 +15694,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      enableDigitizeTechniqueActions( true );
+      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( true );
       mActionToggleEditing->setEnabled( false );
       mActionToggleEditing->setChecked( true ); // always editable
       mActionUndo->setEnabled( false );

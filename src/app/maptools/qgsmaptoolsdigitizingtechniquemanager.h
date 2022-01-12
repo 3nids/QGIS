@@ -26,7 +26,7 @@
 #include <QObject>
 
 
-//class QAction;
+class QAction;
 //class QToolBar;
 class QToolButton;
 class QgisApp;
@@ -44,18 +44,20 @@ class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
     static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/current" ), QgsSettings::Gui, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
 
-    QgsMapToolsDigitizingTechniqueManager( QgisApp *app );
-
-  private:
-    void setCaptureTechnique( QAction *action );
-    void shapeActionTriggered( QAction *action );
+    QgsMapToolsDigitizingTechniqueManager( QObject *parent );
 
     /**
      * Enables the action that toggles digitizing with curve
      */
     void enableDigitizeTechniqueActions( bool enable, QAction *triggeredFromToolAction = nullptr );
 
+  private slots:
+    void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique );
+    void shapeActionTriggered( QAction *action, QToolButton *mainButton );
+
+  private:
     QToolButton *mDigitizeModeToolButton = nullptr;
+    QList<std::pair<QgsMapToolCapture::CaptureTechnique, QAction *>> mTechniqueActions;
 
     //    QHash<QString, QAction *> mActions;
 
