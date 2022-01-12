@@ -42,6 +42,17 @@ class GUI_EXPORT QgsMapToolShapeAbstract
 {
     Q_OBJECT
   public:
+    //! List of different shapes
+    enum class ShapeCategory
+    {
+      Curve, //!< Curve
+      Circle,//!< Circle
+      Ellipse,//!< Ellipse
+      Rectangle,//!< Rectangle
+      RegularyPolygon,//!< RegularyPolygon
+    };
+    Q_ENUM( ShapeCategory )
+
     //! Constructor
     QgsMapToolShapeAbstract( const QString &id, QgsMapToolCapture *parentTool )
       : mId( id ), mParentTool( parentTool )

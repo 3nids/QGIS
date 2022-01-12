@@ -45,9 +45,9 @@ QIcon QgsMapToolShapeCircularStringRadiusMetadata::icon() const
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircularStringRadius.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircularStringRadiusMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircularStringRadiusMetadata::category() const
 {
-  return QgsMapToolShapeRegistry::ShapeCategory::Curve;
+  return QgsMapToolShapeAbstract::ShapeCategory::Curve;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeCircularStringRadiusMetadata::factory( QgsMapToolCapture *parentTool ) const

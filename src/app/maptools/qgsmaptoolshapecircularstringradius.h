@@ -36,7 +36,7 @@ class APP_EXPORT QgsMapToolShapeCircularStringRadiusMetadata : public QgsMapTool
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
-    QgsMapToolShapeRegistry::ShapeCategory category() const override;
+    QgsMapToolShapeAbstract::ShapeCategory category() const override;
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 

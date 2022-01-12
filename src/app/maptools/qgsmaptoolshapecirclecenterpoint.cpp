@@ -39,9 +39,9 @@ QIcon QgsMapToolShapeCircleCenterPointMetadata::icon() const
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircleCenterPoint.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircleCenterPointMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircleCenterPointMetadata::category() const
 {
-  return QgsMapToolShapeRegistry::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeCircleCenterPointMetadata::factory( QgsMapToolCapture *parentTool ) const

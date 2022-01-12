@@ -400,8 +400,9 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
 
   mCurrentCaptureTechnique = technique;
 
-  if ( !mCurrentShapeMapTool )
-    mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
+  // TODO
+//  if ( !mCurrentShapeMapTool )
+//    mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolsDigitizingTechniqueManager::settingMapToolShapeCurrent.value(), this );
 
   if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
@@ -1260,8 +1261,9 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
 
     if ( mCurrentCaptureTechnique == Shape )
     {
-      if ( !mCurrentShapeMapTool )
-        mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
+      // TODO
+//      if ( !mCurrentShapeMapTool )
+//        mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
 
       if ( !mCurrentShapeMapTool )
       {

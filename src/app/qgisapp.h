@@ -71,6 +71,7 @@ class QgsMapLayerConfigWidgetFactory;
 class QgsMapOverviewCanvas;
 class QgsMapTip;
 class QgsMapTool;
+class QgsMapToolsDigitizingTechniqueManager;
 class QgsOptions;
 class QgsPluginLayer;
 class QgsPluginLayer;
@@ -1955,18 +1956,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     //! Enable or disable event tracing (for debugging)
     void toggleEventTracing();
 
-    /**
-     * Sets the capture technique of the current map tool
-     * \since QGIS 3.24
-     */
-    void setCaptureTechnique( QAction *captureTechniqueActionTriggered );
-
-
-    /**
-     * Enables the action that toggles digitizing with curve
-     */
-    void enableDigitizeTechniqueActions( bool enable, QAction *triggeredFromToolAction = nullptr );
-
 #ifdef HAVE_GEOREFERENCER
     void showGeoreferencer();
 #endif
@@ -2371,6 +2360,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
 
     QgisAppStyleSheet *mStyleSheetBuilder = nullptr;
 
+    QgsMapToolsDigitizingTechniqueManager *mDigitizingTechniqueManager = nullptr;
+
     // actions for menus and toolbars -----------------
 
 #ifdef Q_OS_MAC
@@ -2549,8 +2540,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QgsDockWidget *mDevToolsDock = nullptr;
     QgsDevToolsPanelWidget *mDevToolsWidget = nullptr;
 
-    QToolButton *mDigitizeModeToolButton = nullptr;
-
     //! Persistent tile scale slider
     QgsTileScaleWidget *mpTileScaleWidget = nullptr;
 
@@ -2714,6 +2703,7 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     };
     int mFreezeCount = 0;
     friend class QgsCanvasRefreshBlocker;
+    friend class QgsMapToolsDigitizingTechniqueManager;
 
     friend class TestQgisAppPython;
     friend class QgisAppInterface;

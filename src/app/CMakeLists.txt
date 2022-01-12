@@ -202,6 +202,8 @@ set(QGIS_APP_SRCS
   locator/qgslocatoroptionswidget.cpp
 
   maptools/qgsappmaptools.cpp
+  maptools/qgsmaptoolsdigitizingtechniquemanager.cpp
+
   maptools/qgsmaptoolshapecircleabstract.cpp
   maptools/qgsmaptoolshapecircularstringabstract.cpp
 #  maptools/qgsmaptoolshapeellipseabstract.cpp
@@ -243,6 +245,7 @@ set(QGIS_APP_SRCS
   pluginmanager/qgspluginitemdelegate.cpp
 
   qgssettingstree.cpp
+  qgssettingsregistryapp.cpp
   qgsvariantdelegate.cpp
   qgscrashhandler.cpp
 

@@ -18,16 +18,12 @@
 #include "qgsapplication.h"
 #include "qgssettingsregistrycore.h"
 
-#include "qgsmaptoolshaperegistry.h"
 
 
 QgsSettingsRegistryGui::QgsSettingsRegistryGui()
   : QgsSettingsRegistry()
 {
   addSettingsEntry( &settingsRespectScreenDPI );
-
-  addSettingsEntry( &QgsMapToolShapeRegistry::settingMapToolShapeDefaultForShape );
-  addSettingsEntry( &QgsMapToolShapeRegistry::settingMapToolShapeCurrent );
 
   QgsApplication::settingsRegistryCore()->addSubRegistry( this );
 }

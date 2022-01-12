@@ -42,9 +42,9 @@ QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
 {
-  return QgsMapToolShapeRegistry::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const

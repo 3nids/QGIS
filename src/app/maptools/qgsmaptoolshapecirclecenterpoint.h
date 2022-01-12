@@ -33,7 +33,7 @@ class APP_EXPORT QgsMapToolShapeCircleCenterPointMetadata : public QgsMapToolSha
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
-    QgsMapToolShapeRegistry::ShapeCategory category() const override;
+    QgsMapToolShapeAbstract::ShapeCategory category() const override;
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 

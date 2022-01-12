@@ -44,9 +44,9 @@ QIcon QgsMapToolShapeCircle3TangentsMetadata::icon() const
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle3Tangents.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle3TangentsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle3TangentsMetadata::category() const
 {
-  return QgsMapToolShapeRegistry::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeCircle3TangentsMetadata::factory( QgsMapToolCapture *parentTool ) const

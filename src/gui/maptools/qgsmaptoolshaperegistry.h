@@ -21,13 +21,13 @@
 #define SIP_NO_FILE
 
 #include "qgsabstractrelationeditorwidget.h"
+#include "qgsmaptoolshapeabstract.h"
 #include "qgis_gui.h"
-#include "qgssettingsentry.h"
 
 class QgsMapToolShapeMetadata;
-class QgsMapToolShapeAbstract;
 class QgsMapToolCapture;
 class QToolBar;
+class QToolButton;
 
 
 /**
@@ -39,20 +39,6 @@ class GUI_EXPORT QgsMapToolShapeRegistry
 {
     Q_GADGET
   public:
-
-    static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/current" ), QgsSettings::Gui, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
-
-    //! List of different shapes
-    enum class ShapeCategory
-    {
-      Curve, //!< Curve
-      Circle,//!< Circle
-      Ellipse,//!< Ellipse
-      Rectangle,//!< Rectangle
-      RegularyPolygon,//!< RegularyPolygon
-    };
-    Q_ENUM( ShapeCategory )
 
     /**
      * Constructor
@@ -71,6 +57,9 @@ class GUI_EXPORT QgsMapToolShapeRegistry
      */
     void removeMapTool( const QString &id );
 
+    //! Returns the list of map tools
+    QList<QgsMapToolShapeMetadata *> mapToolMetadatas() const {return mMapTools;}
+
     //! Returns the map tool metadata for the gin \a id
     QgsMapToolShapeMetadata *mapToolMetadata( const QString &id ) const;
 
@@ -79,13 +68,21 @@ class GUI_EXPORT QgsMapToolShapeRegistry
      */
     QgsMapToolShapeAbstract *mapTool( const QString &id, QgsMapToolCapture *parentTool ) const SIP_FACTORY;
 
-    //! Setup the toolbar by setting the buttons and menu
-    void setupToolbar( QToolBar *toolbar ) const ;
+    /**
+     * Setups the toolbar by setting the buttons and menu
+     * The toolbar will be used later to enable/disable the tools
+     */
+//    static void setToolbar( QToolBar *toolBar ) ;
+
+//    //! Checks the corresponding action of the default shape toolbar
+//    void enableDefaultShapeTool();
 
 
   private:
 
     QList<QgsMapToolShapeMetadata *> mMapTools;
+
+//    QHash<QString, QAction *> mActions;
 
 };
 
@@ -111,7 +108,7 @@ class GUI_EXPORT QgsMapToolShapeMetadata
     //! Icon to be displayed in the toolbar
     virtual QIcon icon() const = 0;
 
-    virtual QgsMapToolShapeRegistry::ShapeCategory category() const = 0;
+    virtual QgsMapToolShapeAbstract::ShapeCategory category() const = 0;
 
     //! Creates the shape map tool for the given \a parentTool
     virtual QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentlTool ) const = 0;

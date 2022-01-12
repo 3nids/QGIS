@@ -49,9 +49,9 @@ QIcon QgsMapToolShapeCircle2TangentsPointMetadata::icon() const
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2TangentsPoint.svg" ) );
 }
 
-QgsMapToolShapeRegistry::ShapeCategory QgsMapToolShapeCircle2TangentsPointMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2TangentsPointMetadata::category() const
 {
-  return QgsMapToolShapeRegistry::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeCircle2TangentsPointMetadata::factory( QgsMapToolCapture *parentTool ) const
