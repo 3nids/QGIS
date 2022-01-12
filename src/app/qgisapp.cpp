@@ -1467,8 +1467,6 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterPointMetadata() );
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterCornerMetadata() );
 
-  QgsGui::mapToolShapeRegistry()->setupToolbar( mShapeDigitizeToolBar );
-
   activateDeactivateLayerRelatedActions( nullptr ); // after members were created
 
   connect( QgsGui::mapLayerActionRegistry(), &QgsMapLayerActionRegistry::changed, this, &QgisApp::refreshActionFeatureAction );
@@ -3439,6 +3437,8 @@ void QgisApp::createToolBars()
   }
 
   mAdvancedDigitizeToolBar->insertWidget( mAdvancedDigitizeToolBar->actions().at( 0 ), mDigitizeModeToolButton );
+
+  QgsGui::mapToolShapeRegistry()->setupToolbar( mShapeDigitizeToolBar );
 
   QList<QAction *> toolbarMenuActions;
   // Set action names so that they can be used in customization
@@ -10470,7 +10470,7 @@ void QgisApp::enableDigitizeTechniqueActions( bool enable, QAction *triggeredFro
     }
   }
 
-  const QgsMapToolCapture::CaptureTechnique technique = settings.enumValue( QStringLiteral( "UI/digitizeTechnique" ), QgsMapToolCapture::CaptureTechnique::StraightSegments );
+  const QgsMapToolCapture::CaptureTechnique currentTechnique = settings.enumValue( QStringLiteral( "UI/digitizeTechnique" ), QgsMapToolCapture::CaptureTechnique::StraightSegments );
 
   QList<std::pair<QgsMapToolCapture::CaptureTechnique, QAction *>> techniqueActions
   {
@@ -10479,19 +10479,19 @@ void QgisApp::enableDigitizeTechniqueActions( bool enable, QAction *triggeredFro
     {QgsMapToolCapture::CaptureTechnique::Streaming, mActionStreamDigitize},
     {QgsMapToolCapture::CaptureTechnique::Shape, mActionDigitizeShape}
   };
-
   for ( const auto &techniqueAction : techniqueActions )
   {
     techniqueAction.second->setEnabled( enable && supportedTechniques.contains( techniqueAction.first ) );
-    techniqueAction.second->setChecked( technique == techniqueAction.first && techniqueAction.second->isEnabled() );
+    techniqueAction.second->setChecked( currentTechnique == techniqueAction.first && techniqueAction.second->isEnabled() );
   }
+
 
   for ( QgsMapToolCapture *tool : tools )
   {
-    if ( tool->supportsTechnique( technique ) )
+    if ( tool->supportsTechnique( currentTechnique ) )
     {
-      tool->setCurrentCaptureTechnique( technique );
-      if ( technique == QgsMapToolCapture::CaptureTechnique::Shape )
+      tool->setCurrentCaptureTechnique( currentTechnique );
+      if ( currentTechnique == QgsMapToolCapture::CaptureTechnique::Shape )
       {
         QgsMapToolShapeMetadata *md = QgsGui::mapToolShapeRegistry()->mapToolMetadata( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value() );
         tool->setCurrentShapeMapTool( md );

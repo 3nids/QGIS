@@ -25,8 +25,8 @@
 #include "qgisapp.h"
 #include "qgsmaptoolcapture.h"
 
-QgsMapToolShapeCircularStringAbstract::QgsMapToolShapeCircularStringAbstract(QgsMapToolCapture *parentTool)
-  : QgsMapToolShapeAbstract( parentTool )
+QgsMapToolShapeCircularStringAbstract::QgsMapToolShapeCircularStringAbstract(const QString &id, QgsMapToolCapture *parentTool)
+  : QgsMapToolShapeAbstract( id, parentTool )
   , mShowCenterPointRubberBand( false )
 {}
 

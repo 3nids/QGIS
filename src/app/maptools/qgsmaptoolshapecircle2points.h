@@ -28,6 +28,9 @@ class APP_EXPORT QgsMapToolShapeCircle2PointsMetadata : public QgsMapToolShapeMe
     QgsMapToolShapeCircle2PointsMetadata()
       : QgsMapToolShapeMetadata()
     {}
+
+    static const QString TOOL_ID;
+
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
@@ -39,7 +42,7 @@ class APP_EXPORT QgsMapToolShapeCircle2Points : public QgsMapToolShapeCircleAbst
 {
   public:
     QgsMapToolShapeCircle2Points( QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeCircleAbstract( parentTool )
+      : QgsMapToolShapeCircleAbstract( QgsMapToolShapeCircle2PointsMetadata::TOOL_ID, parentTool )
     {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

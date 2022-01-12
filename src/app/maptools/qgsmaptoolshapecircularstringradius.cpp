@@ -62,6 +62,8 @@ void QgsMapToolShapeCircularStringRadius::deactivate()
 
 bool QgsMapToolShapeCircularStringRadius::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
+  Q_UNUSED( layer )
+
   const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
@@ -105,7 +107,10 @@ bool QgsMapToolShapeCircularStringRadius::cadCanvasReleaseEvent( QgsMapMouseEven
     if ( !( mPoints.size() % 2 ) )
       mPoints.removeLast();
     addCurveToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeCircularStringRadius::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )

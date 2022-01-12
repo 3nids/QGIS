@@ -35,7 +35,7 @@ class APP_EXPORT QgsMapToolShapeCircleAbstract: public QgsMapToolShapeAbstract
     Q_OBJECT
 
   public:
-    QgsMapToolShapeCircleAbstract( QgsMapToolCapture *parentTool ) : QgsMapToolShapeAbstract( parentTool ) {}
+    QgsMapToolShapeCircleAbstract( const QString &id, QgsMapToolCapture *parentTool ) : QgsMapToolShapeAbstract( id, parentTool ) {}
 
     virtual ~QgsMapToolShapeCircleAbstract() = default;
 

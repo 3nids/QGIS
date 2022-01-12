@@ -43,13 +43,16 @@ class GUI_EXPORT QgsMapToolShapeAbstract
     Q_OBJECT
   public:
     //! Constructor
-    QgsMapToolShapeAbstract( QgsMapToolCapture *parentTool )
-      : mParentTool( parentTool )
+    QgsMapToolShapeAbstract( const QString &id, QgsMapToolCapture *parentTool )
+      : mId( id ), mParentTool( parentTool )
     {
+      Q_ASSERT( !mId.isEmpty() )
       Q_ASSERT( parentTool );
     }
 
     virtual ~QgsMapToolShapeAbstract() = default;
+
+    QString id() const {return mId;}
 
     /**
      * Called for a mouse release event
@@ -84,6 +87,9 @@ class GUI_EXPORT QgsMapToolShapeAbstract
     //! Called to undo last action (last point added)
     virtual void undo();
 
+private:
+    QString mId;
+
   protected:
     QgsMapToolCapture *mParentTool = nullptr;
 
@@ -91,6 +97,7 @@ class GUI_EXPORT QgsMapToolShapeAbstract
     QgsPointSequence mPoints;
 
     QgsGeometryRubberBand *mTempRubberBand = nullptr;
+
 };
 
 

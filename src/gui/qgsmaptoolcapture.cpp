@@ -403,7 +403,7 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
-void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapTool )
+void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapToolMetadata )
 {
   if ( mCurrentShapeMapTool )
   {
@@ -412,7 +412,7 @@ void QgsMapToolCapture::setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMa
     mCurrentShapeMapTool->deleteLater();
   }
 
-  mCurrentShapeMapTool = shapeMapTool->factory( this );
+  mCurrentShapeMapTool = shapeMapToolMetadata->factory( this );
 
   if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );

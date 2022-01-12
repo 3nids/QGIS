@@ -27,6 +27,9 @@ class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
     Metadata()
       : QgsMapToolShapeMetadata()
     {}
+
+    static const QString TOOL_ID;
+
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;

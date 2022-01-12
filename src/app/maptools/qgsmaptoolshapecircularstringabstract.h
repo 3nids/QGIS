@@ -26,7 +26,7 @@ class APP_EXPORT QgsMapToolShapeCircularStringAbstract: public QgsMapToolShapeAb
 {
     Q_OBJECT
   public:
-    QgsMapToolShapeCircularStringAbstract( QgsMapToolCapture *parentTool );
+    QgsMapToolShapeCircularStringAbstract( const QString &id, QgsMapToolCapture *parentTool );
     ~QgsMapToolShapeCircularStringAbstract() override;
 
     void keyPressEvent( QKeyEvent *e ) override;

@@ -112,7 +112,7 @@ class GUI_EXPORT QgsMapToolCapture : public QgsMapToolAdvancedDigitizing
      * \see QgsMapToolShapeRegistry
      * \since QGIS 3.24
      */
-    void setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapTool SIP_TRANSFER );
+    void setCurrentShapeMapTool(QgsMapToolShapeMetadata *shapeMapToolMetadata SIP_TRANSFER );
 
     void activate() override;
     void deactivate() override;

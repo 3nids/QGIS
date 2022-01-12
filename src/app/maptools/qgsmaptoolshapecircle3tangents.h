@@ -27,6 +27,9 @@ class APP_EXPORT QgsMapToolShapeCircle3TangentsMetadata : public QgsMapToolShape
     QgsMapToolShapeCircle3TangentsMetadata()
       : QgsMapToolShapeMetadata()
     {}
+
+    static const QString TOOL_ID;
+
     QString id() const override;
     QString name() const override;
     QIcon icon() const override;
