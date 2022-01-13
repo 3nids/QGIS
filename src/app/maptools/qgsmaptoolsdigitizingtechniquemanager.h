@@ -21,7 +21,7 @@
 #include "qgis_app.h"
 #include "qgssettingsentry.h"
 #include "qgsmaptoolcapture.h"
-
+#include "qgsmaptoolshapeabstract.h"
 
 #include <QWidgetAction>
 
@@ -65,18 +65,19 @@ class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
     void setupCanvasTools();
 
   public slots:
-    void enableDigitizingTechnique( bool enabled, QAction *triggeredFromToolAction = nullptr );
+    void enableDigitizingTechniqueActions( bool enabled, QAction *triggeredFromToolAction = nullptr );
 
 
   private slots:
-    void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique );
-    void shapeActionTriggered( QAction *action, QToolButton *mainButton );
+    void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique, bool setShapeTool = true );
+    void setShapeTool( const QString &shapeToolId );
 
   private:
     QgsAppMapTools *mMapTools = nullptr;
 
-    QHash<QgsMapToolCapture::CaptureTechnique, QAction *> mTechniqueActions;
+    QMap<QgsMapToolCapture::CaptureTechnique, QAction *> mTechniqueActions;
     QHash<QString, QAction *> mShapeActions;
+    QMap<QgsMapToolShapeAbstract::ShapeCategory, QToolButton *> mShapeCategoryButtons;
 
     QToolButton *mDigitizeModeToolButton = nullptr;
     QgsStreamDigitizingSettingsAction *mStreamDigitizingSettingsAction = nullptr;

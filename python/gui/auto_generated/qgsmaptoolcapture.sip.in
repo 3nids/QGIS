@@ -77,14 +77,6 @@ Sets the current capture if it is supported by the map tool
 .. versionadded:: 3.24
 %End
 
-    void setCurrentShapeMapTool( QgsMapToolShapeMetadata *shapeMapTool /Transfer/ );
-%Docstring
-Sets the current shape tool
-
-.. seealso:: :py:class:`QgsMapToolShapeRegistry`
-
-.. versionadded:: 3.24
-%End
 
     virtual void activate();
 
