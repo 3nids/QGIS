@@ -112,7 +112,7 @@ void QgsMapToolsDigitizingTechniqueManager::setupToolBars()
       shapeButton->setMenu( new QMenu( ) );
 
       QgisApp::instance()->mShapeDigitizeToolBar->addWidget( shapeButton );
-      QObject::connect( shapeButton, &QToolButton::triggered, this, [ = ]( QAction * ) {setShapeTool( metadata->id() );} );
+      QObject::connect( shapeButton, &QToolButton::triggered, this, [ = ]( QAction * action ) {setShapeTool( action->data().toString() );} );
 
       mShapeCategoryButtons.insert( metadata->category(), shapeButton );
     }

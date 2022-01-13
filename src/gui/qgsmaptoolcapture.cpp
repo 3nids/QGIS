@@ -424,14 +424,14 @@ void QgsMapToolCapture::setCurrentShapeMapTool( const QgsMapToolShapeMetadata *s
 {
   if ( mCurrentShapeMapTool )
   {
-    if ( mCurrentShapeMapTool->id() == shapeMapToolMetadata->id() )
+    if ( shapeMapToolMetadata && mCurrentShapeMapTool->id() == shapeMapToolMetadata->id() )
       return;
     if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
       mCurrentShapeMapTool->deactivate();
     mCurrentShapeMapTool->deleteLater();
   }
 
-  mCurrentShapeMapTool = shapeMapToolMetadata->factory( this );
+  mCurrentShapeMapTool = shapeMapToolMetadata ? shapeMapToolMetadata->factory( this ) : nullptr;
 
   if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && isActive() )
   {
