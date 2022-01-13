@@ -52,14 +52,14 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseExtentMetadata::factory( QgsMapTo
 }
 
 
-QgsMapToolShapeEllipseExtent::QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool)
+QgsMapToolShapeEllipseExtent::QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool )
   : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseExtentMetadata::TOOL_ID, parentTool )
 {
 }
 
 bool QgsMapToolShapeEllipseExtent::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
   {
@@ -68,21 +68,22 @@ bool QgsMapToolShapeEllipseExtent::cadCanvasReleaseEvent( QgsMapMouseEvent *e, c
 
     if ( !mTempRubberBand )
     {
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
       mTempRubberBand->show();
     }
   }
   else if ( e->button() == Qt::RightButton )
   {
-    release( e );
+    addEllipseToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeEllipseExtent::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  mSnapIndicator->setMatch( e->mapPointMatch() );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( mTempRubberBand )
   {
@@ -90,7 +91,7 @@ void QgsMapToolShapeEllipseExtent::cadCanvasMoveEvent( QgsMapMouseEvent *e, cons
     {
       case 1:
       {
-        if ( qgsDoubleNear( mCanvas->rotation(), 0.0 ) )
+        if ( qgsDoubleNear( mParentTool->canvas()->rotation(), 0.0 ) )
         {
           mEllipse = QgsEllipse::fromExtent( mPoints.at( 0 ), point );
           mTempRubberBand->setGeometry( mEllipse.toPolygon( segments() ) );

@@ -32,10 +32,11 @@ class APP_EXPORT QgsMapToolShapeEllipseAbstract: public QgsMapToolShapeAbstract
       : QgsMapToolShapeAbstract( id, parentTool )
     {}
 
-    void deactivate() override;
     void clean() override;
 
   protected:
+    void addEllipseToParentTool();
+
     //! Ellipse
     QgsEllipse mEllipse;
 

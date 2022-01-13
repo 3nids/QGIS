@@ -32,7 +32,7 @@ class APP_EXPORT QgsMapToolShapeCircularStringAbstract: public QgsMapToolShapeAb
     void keyPressEvent( QKeyEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
 
-    void activate(const QgsPoint &lastCapturedMapPoint) override;
+    void activate( const QgsPoint &lastCapturedMapPoint ) override;
 
     void clean() override;
 
@@ -54,8 +54,6 @@ class APP_EXPORT QgsMapToolShapeCircularStringAbstract: public QgsMapToolShapeAb
     void createCenterPointRubberBand();
     void updateCenterPointRubberBand( const QgsPoint &pt );
     void removeCenterPointRubberBand();
-    //! Layer type which will be used for rubberband
-    QgsWkbTypes::GeometryType mLayerType = QgsWkbTypes::LineGeometry;
 };
 
 #endif // QGSMAPTOOLSHAPECIRCULARSTRINGABSTRACT_H

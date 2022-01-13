@@ -25,7 +25,7 @@
 #include "qgisapp.h"
 #include "qgsmaptoolcapture.h"
 
-QgsMapToolShapeCircularStringAbstract::QgsMapToolShapeCircularStringAbstract(const QString &id, QgsMapToolCapture *parentTool)
+QgsMapToolShapeCircularStringAbstract::QgsMapToolShapeCircularStringAbstract( const QString &id, QgsMapToolCapture *parentTool )
   : QgsMapToolShapeAbstract( id, parentTool )
   , mShowCenterPointRubberBand( false )
 {}
@@ -46,7 +46,7 @@ void QgsMapToolShapeCircularStringAbstract::keyPressEvent( QKeyEvent *e )
     createCenterPointRubberBand();
     e->accept();
   }
-  else if (e)
+  else if ( e )
   {
     e->ignore();
   }
@@ -91,27 +91,29 @@ void QgsMapToolShapeCircularStringAbstract::keyReleaseEvent( QKeyEvent *e )
     mShowCenterPointRubberBand = false;
     e->accept();
   }
-  else if (e)
+  else if ( e )
   {
     e->ignore();
   }
 }
 
-void QgsMapToolShapeCircularStringAbstract::activate(const QgsPoint &lastCapturedMapPoint)
+void QgsMapToolShapeCircularStringAbstract::activate( const QgsPoint &lastCapturedMapPoint )
 {
-    if ( mPoints.isEmpty() && !lastCapturedMapPoint.isEmpty() )
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( mParentTool->layer() );
+
+  if ( mPoints.isEmpty() && !lastCapturedMapPoint.isEmpty() )
+  {
+    mPoints.append( lastCapturedMapPoint );
+    if ( !mTempRubberBand )
     {
-      mPoints.append( lastCapturedMapPoint );
-      if ( !mTempRubberBand )
-      {
-        mTempRubberBand = mParentTool->createGeometryRubberBand( mLayerType, true );
-        mTempRubberBand->show();
-      }
-      QgsCircularString *c = new QgsCircularString();
-      QgsPointSequence rubberBandPoints = mPoints;
-      rubberBandPoints.append( lastCapturedMapPoint );
-      c->setPoints( rubberBandPoints );
-      mTempRubberBand->setGeometry( c );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( vlayer->geometryType(), true );
+      mTempRubberBand->show();
+    }
+    QgsCircularString *c = new QgsCircularString();
+    QgsPointSequence rubberBandPoints = mPoints;
+    rubberBandPoints.append( lastCapturedMapPoint );
+    c->setPoints( rubberBandPoints );
+    mTempRubberBand->setGeometry( c );
   }
 }
 

@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdregularpolygon.cpp  -  map tool for adding regular polygon
+    qgsmaptoolshaperegularpolygonabstract.cpp  -  map tool for adding regular polygon
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,22 +13,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgsmaptooladdregularpolygon.h"
+#include "qgsmaptoolshaperegularpolygonabstract.h"
 #include "qgsgeometryrubberband.h"
 #include "qgsgeometryutils.h"
 #include "qgsmapcanvas.h"
 #include "qgspoint.h"
 #include "qgisapp.h"
-#include "qgsstatusbar.h"
-#include "qgssnapindicator.h"
+#include "qgsmaptoolcapture.h"
 
-QgsMapToolAddRegularPolygon::QgsMapToolAddRegularPolygon( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddAbstract( parentTool, canvas, mode )
+QgsMapToolShapeRegularPolygonAbstract::QgsMapToolShapeRegularPolygonAbstract(const QString &id, QgsMapToolCapture *parentTool )
+  : QgsMapToolShapeAbstract( id, parentTool )
 {
-  mToolName = tr( "Add regular polygon" );
 }
 
-void QgsMapToolAddRegularPolygon::createNumberSidesSpinBox()
+void QgsMapToolShapeRegularPolygonAbstract::createNumberSidesSpinBox()
 {
   deleteNumberSidesSpinBox();
   mNumberSidesSpinBox = std::make_unique<QgsSpinBox>();
@@ -39,7 +37,7 @@ void QgsMapToolAddRegularPolygon::createNumberSidesSpinBox()
   QgisApp::instance()->addUserInputWidget( mNumberSidesSpinBox.get() );
 }
 
-void QgsMapToolAddRegularPolygon::deleteNumberSidesSpinBox()
+void QgsMapToolShapeRegularPolygonAbstract::deleteNumberSidesSpinBox()
 {
   if ( mNumberSidesSpinBox )
   {
@@ -47,7 +45,7 @@ void QgsMapToolAddRegularPolygon::deleteNumberSidesSpinBox()
   }
 }
 
-void QgsMapToolAddRegularPolygon::deactivate()
+void QgsMapToolShapeRegularPolygonAbstract::addRegularPolygonToParentTool()
 {
   if ( !mParentTool || mRegularPolygon.isEmpty() )
   {
@@ -60,7 +58,7 @@ void QgsMapToolAddRegularPolygon::deactivate()
   for ( const QgsPoint &point : std::as_const( mPoints ) )
   {
     if ( QgsWkbTypes::hasZ( point.wkbType() ) &&
-         point.z() != defaultZValue() )
+         point.z() != mParentTool->defaultZValue() )
     {
       ls->dropZValue();
       ls->addZValue( point.z() );
@@ -69,19 +67,16 @@ void QgsMapToolAddRegularPolygon::deactivate()
   }
 
   mParentTool->addCurve( ls.release() );
-  clean();
-
-  QgsMapToolCapture::deactivate();
 }
 
-void QgsMapToolAddRegularPolygon::clean()
+void QgsMapToolShapeRegularPolygonAbstract::clean()
 {
-  QgsMapToolAddAbstract::clean();
-
   if ( mNumberSidesSpinBox )
   {
     deleteNumberSidesSpinBox();
   }
 
   mRegularPolygon = QgsRegularPolygon();
+
+  QgsMapToolShapeAbstract::clean();
 }

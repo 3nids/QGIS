@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdregularpolygon.h  -  map tool for adding regular polygon
+    qgsmaptoolshaperegularpolygonabstract.h  -  map tool for adding regular polygon
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,28 +13,27 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLADDREGULARPOLYGON_H
-#define QGSMAPTOOLADDREGULARPOLYGON_H
+#ifndef QGSMAPTOOLSHAPEREGULARPOLYGONABSTRACT_H
+#define QGSMAPTOOLSHAPEREGULARPOLYGONABSTRACT_H
 
-#include "qgsmaptoolshapecircleabstract.h"
+#include "qgsmaptoolshapeabstract.h"
 #include "qgsregularpolygon.h"
 #include "qgsspinbox.h"
 #include "qgis_app.h"
 
 class QSpinBox;
 
-class APP_EXPORT QgsMapToolAddRegularPolygon: public QgsMapToolAddAbstract
+class APP_EXPORT QgsMapToolShapeRegularPolygonAbstract: public QgsMapToolShapeAbstract
 {
     Q_OBJECT
 
   public:
-    QgsMapToolAddRegularPolygon( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeRegularPolygonAbstract(const QString &id, QgsMapToolCapture *parentTool);
 
-    void deactivate() override;
     void clean() override;
 
   protected:
-    explicit QgsMapToolAddRegularPolygon( QgsMapCanvas *canvas ) = delete; //forbidden
+    void addRegularPolygonToParentTool();
 
     std::unique_ptr<QgsSpinBox> mNumberSidesSpinBox;
     int mNumberSides = 6;
@@ -48,4 +47,4 @@ class APP_EXPORT QgsMapToolAddRegularPolygon: public QgsMapToolAddAbstract
     QgsRegularPolygon mRegularPolygon;
 };
 
-#endif // QGSMAPTOOLADDREGULARPOLYGON_H
+#endif // QGSMAPTOOLSHAPEREGULARPOLYGONABSTRACT_H

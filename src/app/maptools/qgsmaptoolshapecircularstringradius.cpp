@@ -117,8 +117,6 @@ bool QgsMapToolShapeCircularStringRadius::cadCanvasReleaseEvent( QgsMapMouseEven
 
 void QgsMapToolShapeCircularStringRadius::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  Q_UNUSED( layer )
-
   if ( !mPoints.isEmpty() )
   {
     recalculateTempRubberBand( e->mapPoint() );
@@ -134,7 +132,8 @@ void QgsMapToolShapeCircularStringRadius::recalculateRubberBand()
     const int rubberBandSize = mPoints.size() - ( mPoints.size() + 1 ) % 2;
     cString->setPoints( mPoints.mid( 0, rubberBandSize ) );
     delete mRubberBand;
-    mRubberBand = mParentTool->createGeometryRubberBand( mLayerType );
+    QgsVectorLayer *layer = qobject_cast<QgsVectorLayer *>( mParentTool->layer() );
+    mRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType() );
     mRubberBand->setGeometry( cString );
     mRubberBand->show();
   }
@@ -165,7 +164,8 @@ void QgsMapToolShapeCircularStringRadius::recalculateTempRubberBand( const QgsPo
   QgsCircularString *cString = new QgsCircularString();
   cString->setPoints( rubberBandPoints );
   delete mTempRubberBand;
-  mTempRubberBand = mParentTool->createGeometryRubberBand( mLayerType, true );
+  QgsVectorLayer *layer = qobject_cast<QgsVectorLayer *>( mParentTool->layer() );
+  mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
   mTempRubberBand->setGeometry( cString );
   mTempRubberBand->show();
 }

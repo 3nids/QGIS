@@ -15,33 +15,25 @@
 
 #include "qgsmaptoolshapeellipseabstract.h"
 #include "qgsgeometryrubberband.h"
-#include "qgsgeometryutils.h"
 #include "qgslinestring.h"
-#include "qgsmapcanvas.h"
-#include "qgspoint.h"
-#include "qgisapp.h"
-#include "qgssnapindicator.h"
+#include "qgsmaptoolcapture.h"
 
 
-void QgsMapToolShapeEllipseAbstract::deactivate()
+void QgsMapToolShapeEllipseAbstract::addEllipseToParentTool()
 {
   if ( !mParentTool || mEllipse.isEmpty() )
-  {
     return;
-  }
 
   mParentTool->clearCurve();
 
   std::unique_ptr<QgsLineString> ls( mEllipse.toLineString( segments() ) );
 
   mParentTool->addCurve( ls.release() );
-  clean();
 
-  QgsMapToolCapture::deactivate();
 }
 
 void QgsMapToolShapeEllipseAbstract::clean()
 {
-  QgsMapToolAddAbstract::clean();
   mEllipse = QgsEllipse();
+  QgsMapToolShapeAbstract::clean();
 }

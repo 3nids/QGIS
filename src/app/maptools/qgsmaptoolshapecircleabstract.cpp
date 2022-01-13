@@ -24,6 +24,9 @@ void QgsMapToolShapeCircleAbstract::clean()
 
 void QgsMapToolShapeCircleAbstract::addCircleToParentTool()
 {
+  if ( !mParentTool || mCircle.isEmpty() )
+    return;
+
   mParentTool->clearCurve();
 
   std::unique_ptr<QgsCircularString> lineString( mCircle.toCircularString() );

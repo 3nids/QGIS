@@ -17,14 +17,14 @@
 #ifndef QGSMAPTOOLSHAPEREGULARPOLYGON2POINTS_H
 #define QGSMAPTOOLSHAPEREGULARPOLYGON2POINTS_H
 
-#include "qgsmaptooladdregularpolygon.h"
+#include "qgsmaptoolshaperegularpolygonabstract.h"
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeRegularPolygon2PointsMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeRegularPolygon2PointsMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
@@ -37,12 +37,15 @@ class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class APP_EXPORT QgsMapToolShapeRegularPolygon2Points: public QgsMapToolAddRegularPolygon
+class APP_EXPORT QgsMapToolShapeRegularPolygon2Points: public QgsMapToolShapeRegularPolygonAbstract
 {
     Q_OBJECT
 
   public:
-    QgsMapToolShapeRegularPolygon2Points( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeRegularPolygon2Points( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeRegularPolygonAbstract( QgsMapToolShapeRegularPolygon2PointsMetadata::TOOL_ID, parentTool )
+    {}
+
     ~QgsMapToolShapeRegularPolygon2Points() override;
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

@@ -42,7 +42,9 @@ class APP_EXPORT QgsMapToolShapeEllipseCenter2Points: public QgsMapToolShapeElli
     Q_OBJECT
 
   public:
-    QgsMapToolShapeEllipseCenter2Points( QgsMapToolCapture *parentTool ) : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseCenter2PointsMetadata::TOOL_ID, parentTool ) {}
+    QgsMapToolShapeEllipseCenter2Points( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseCenter2PointsMetadata::TOOL_ID, parentTool )
+    {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

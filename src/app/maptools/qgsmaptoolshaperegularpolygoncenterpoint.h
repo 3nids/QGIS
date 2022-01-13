@@ -17,14 +17,14 @@
 #ifndef QGSMAPTOOLSHAPEREGULARPOLYGONCENTERPOINT_H
 #define QGSMAPTOOLSHAPEREGULARPOLYGONCENTERPOINT_H
 
-#include "qgsmaptooladdregularpolygon.h"
+#include "qgsmaptoolshaperegularpolygonabstract.h"
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeRegularPolygonCenterPointMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeRegularPolygonCenterPointMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
@@ -37,12 +37,14 @@ class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class APP_EXPORT QgsMapToolShapeRegularPolygonCenterPoint: public QgsMapToolAddRegularPolygon
+class APP_EXPORT QgsMapToolShapeRegularPolygonCenterPoint: public QgsMapToolShapeRegularPolygonAbstract
 {
     Q_OBJECT
 
   public:
-    QgsMapToolShapeRegularPolygonCenterPoint( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeRegularPolygonCenterPoint( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeRegularPolygonAbstract( QgsMapToolShapeRegularPolygonCenterPointMetadata::TOOL_ID, parentTool )
+    {}
     ~QgsMapToolShapeRegularPolygonCenterPoint() override;
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

@@ -32,9 +32,9 @@ QString QgsMapToolShapeRectangle3PointsMetadata::id() const
 {
   switch ( mCreateMode )
   {
-    case Distance:
+    case CreateMode::Distance:
       return QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_DISTANCE;
-    case Projected:
+    case CreateMode::Projected:
       return QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_PROJECTED;
   }
 }
@@ -43,9 +43,9 @@ QString QgsMapToolShapeRectangle3PointsMetadata::name() const
 {
   switch ( mCreateMode )
   {
-    case Distance:
+    case CreateMode::Distance:
       return QObject::tr( "Rectangle from 3 points (distance)" );
-    case Projected:
+    case CreateMode::Projected:
       return QObject::tr( "Rectangle from 3 points (projected)" );
   }
 }
@@ -54,9 +54,9 @@ QIcon QgsMapToolShapeRectangle3PointsMetadata::icon() const
 {
   switch ( mCreateMode )
   {
-    case Distance:
+    case CreateMode::Distance:
       return QgsApplication::getThemeIcon( QStringLiteral( "/mActionRectangle3PointsDistance.svg" ) );
-    case Projected:
+    case CreateMode::Projected:
       return QgsApplication::getThemeIcon( QStringLiteral( "/mActionRectangle3PointsProjected.svg" ) );
   }
 
@@ -70,38 +70,29 @@ QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeRectangle3PointsMetadata::
 
 QgsMapToolShapeAbstract *QgsMapToolShapeRectangle3PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeRectangle3Points( parentTool );
+  return new QgsMapToolShapeRectangle3Points( id(), mCreateMode, parentTool );
 }
 
-QgsMapToolShapeRectangle3Points::QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool, CreateMode createMode )
-  : QgsMapToolShapeRectangleAbstract( QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID, parentTool ),
+QgsMapToolShapeRectangle3Points::QgsMapToolShapeRectangle3Points( const QString &id, QgsMapToolShapeRectangle3PointsMetadata::CreateMode createMode, QgsMapToolCapture *parentTool )
+  : QgsMapToolShapeRectangleAbstract( id, parentTool ),
     mCreateMode( createMode )
 {
-  mToolName = tr( "Add rectangle from 3 points" );
 }
+
 
 bool QgsMapToolShapeRectangle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  QgsPoint point = mapPoint( *e );
-
-  if ( !currentVectorLayer() )
-  {
-    notifyNotVectorLayer();
-    clean();
-    stopCapturing();
-    e->ignore();
-    return;
-  }
+  QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
   {
     bool is3D = false;
-    QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mCanvas->currentLayer() );
+    QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mParentTool->canvas()->currentLayer() );
     if ( currentLayer )
       is3D = QgsWkbTypes::hasZ( currentLayer->wkbType() );
 
     if ( is3D && !point.is3D() )
-      point.addZValue( defaultZValue() );
+      point.addZValue( mParentTool->defaultZValue() );
 
     if ( mPoints.size() < 2 )
     {
@@ -110,26 +101,27 @@ bool QgsMapToolShapeRectangle3Points::cadCanvasReleaseEvent( QgsMapMouseEvent *e
 
     if ( !mPoints.isEmpty() && !mTempRubberBand )
     {
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
       mTempRubberBand->show();
     }
     if ( mPoints.size() == 3 )
     {
       delete mTempRubberBand;
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true ); // recreate rubberband for polygon
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true ); // recreate rubberband for polygon
     }
   }
   else if ( e->button() == Qt::RightButton )
   {
-    release( e );
+    addRectangleToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeRectangle3Points::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  QgsPoint point = mapPoint( *e );
-
-  mSnapIndicator->setMatch( e->mapPointMatch() );
+  QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( mTempRubberBand )
   {
@@ -146,19 +138,19 @@ void QgsMapToolShapeRectangle3Points::cadCanvasMoveEvent( QgsMapMouseEvent *e, c
       case 2:
       {
         bool is3D = false;
-        QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mCanvas->currentLayer() );
+        QgsVectorLayer *currentLayer = qobject_cast<QgsVectorLayer *>( mParentTool->canvas()->currentLayer() );
         if ( currentLayer )
           is3D = QgsWkbTypes::hasZ( currentLayer->wkbType() );
 
         if ( is3D && !point.is3D() )
-          point.addZValue( defaultZValue() );
+          point.addZValue( mParentTool->defaultZValue() );
 
         switch ( mCreateMode )
         {
-          case DistanceMode:
+          case QgsMapToolShapeRectangle3PointsMetadata::CreateMode::Distance:
             mRectangle = QgsQuadrilateral::rectangleFrom3Points( mPoints.at( 0 ), mPoints.at( 1 ), point, QgsQuadrilateral::Distance );
             break;
-          case ProjectedMode:
+          case QgsMapToolShapeRectangle3PointsMetadata::CreateMode::Projected:
             mRectangle = QgsQuadrilateral::rectangleFrom3Points( mPoints.at( 0 ), mPoints.at( 1 ), point, QgsQuadrilateral::Projected );
             break;
         }

@@ -52,7 +52,7 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenterPointMetadata::factory( Qgs
 
 bool QgsMapToolShapeEllipseCenterPoint::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
   {
@@ -61,21 +61,22 @@ bool QgsMapToolShapeEllipseCenterPoint::cadCanvasReleaseEvent( QgsMapMouseEvent 
 
     if ( !mTempRubberBand )
     {
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
       mTempRubberBand->show();
     }
   }
   else if ( e->button() == Qt::RightButton )
   {
-    release( e );
+    addEllipseToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeEllipseCenterPoint::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  mSnapIndicator->setMatch( e->mapPointMatch() );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( mTempRubberBand )
   {

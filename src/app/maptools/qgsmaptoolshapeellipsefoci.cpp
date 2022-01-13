@@ -58,16 +58,7 @@ QgsMapToolShapeEllipseFoci::QgsMapToolShapeEllipseFoci( QgsMapToolCapture *paren
 
 bool QgsMapToolShapeEllipseFoci::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  if ( !currentVectorLayer() )
-  {
-    notifyNotVectorLayer();
-    clean();
-    stopCapturing();
-    e->ignore();
-    return;
-  }
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
   {
@@ -76,21 +67,22 @@ bool QgsMapToolShapeEllipseFoci::cadCanvasReleaseEvent( QgsMapMouseEvent *e, con
 
     if ( !mTempRubberBand )
     {
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
       mTempRubberBand->show();
     }
   }
   else if ( e->button() == Qt::RightButton )
   {
-    release( e );
+    addEllipseToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeEllipseFoci::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  mSnapIndicator->setMatch( e->mapPointMatch() );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( mTempRubberBand )
   {

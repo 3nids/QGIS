@@ -27,52 +27,36 @@
 
 #include <memory>
 
-const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+const QString QgsMapToolShapeRectangleCenterMetadata::TOOL_ID = QStringLiteral( "rectangle-from-center-and-a-point" );
 
-QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
+QString QgsMapToolShapeRectangleCenterMetadata::id() const
 {
-  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
+  return QgsMapToolShapeRectangleCenterMetadata::TOOL_ID;
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeRectangleCenterMetadata::name() const
 {
-  return QObject::tr( "Circle from 2 points" );
+  return QObject::tr( "Rectangle from center and a point" );
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeRectangleCenterMetadata::icon() const
 {
   return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
 }
 
-QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeRectangleCenterMetadata::category() const
 {
   return QgsMapToolShapeAbstract::ShapeCategory::Circle;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeRectangleCenterMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeCircle2Points( parentTool );
-}
-
-QgsMapToolShapeRectangleCenter::QgsMapToolShapeRectangleCenter( QgsMapToolCapture *parentTool,
-                                                              )
-  : QgsMapToolShapeRectangleAbstract( parentTool, canvas, mode )
-{
-  mToolName = tr( "Add rectangle from center and a point" );
+  return new QgsMapToolShapeRectangleCenter( parentTool );
 }
 
 bool QgsMapToolShapeRectangleCenter::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  if ( !currentVectorLayer() )
-  {
-    notifyNotVectorLayer();
-    clean();
-    stopCapturing();
-    e->ignore();
-    return;
-  }
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( e->button() == Qt::LeftButton )
   {
@@ -81,23 +65,23 @@ bool QgsMapToolShapeRectangleCenter::cadCanvasReleaseEvent( QgsMapMouseEvent *e,
 
     if ( !mTempRubberBand )
     {
-      mTempRubberBand = createGeometryRubberBand( mLayerType, true );
+      mTempRubberBand = mParentTool->createGeometryRubberBand( layer->geometryType(), true );
       mTempRubberBand->show();
     }
   }
   else if ( e->button() == Qt::RightButton )
   {
     mPoints.append( point );
-
-    release( e );
+    addRectangleToParentTool();
+    return true;
   }
+
+  return false;
 }
 
 void QgsMapToolShapeRectangleCenter::cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
-  const QgsPoint point = mapPoint( *e );
-
-  mSnapIndicator->setMatch( e->mapPointMatch() );
+  const QgsPoint point = mParentTool->mapPoint( *e );
 
   if ( mTempRubberBand )
   {

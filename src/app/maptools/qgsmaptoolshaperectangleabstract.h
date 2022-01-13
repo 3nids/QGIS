@@ -27,13 +27,13 @@ class APP_EXPORT QgsMapToolShapeRectangleAbstract: public QgsMapToolShapeAbstrac
 
   public:
     QgsMapToolShapeRectangleAbstract( const QString &id, QgsMapToolCapture *parentTool )
-      : QgsMapToolShapeAbstract(id, parentTool)
+      : QgsMapToolShapeAbstract( id, parentTool )
     {}
 
-    void deactivate( ) override;
     void clean() override;
 
   protected:
+    void addRectangleToParentTool();
 
     //! Rectangle
     QgsQuadrilateral mRectangle;

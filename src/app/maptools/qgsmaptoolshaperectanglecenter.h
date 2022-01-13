@@ -21,10 +21,10 @@
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeRectangleCenterMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeRectangleCenterMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
@@ -42,7 +42,9 @@ class APP_EXPORT QgsMapToolShapeRectangleCenter: public QgsMapToolShapeRectangle
     Q_OBJECT
 
   public:
-    QgsMapToolShapeRectangleCenter( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeRectangleCenter( QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeRectangleAbstract( QgsMapToolShapeRectangleCenterMetadata::TOOL_ID, parentTool )
+    {}
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

@@ -19,14 +19,12 @@
 #include "qgslinestring.h"
 #include "qgspolygon.h"
 #include "qgsgeometryrubberband.h"
-#include "qgsgeometryutils.h"
-#include "qgsmapcanvas.h"
 #include "qgspoint.h"
 #include "qgisapp.h"
-#include "qgssnapindicator.h"
+#include "qgsmaptoolcapture.h"
 
 
-void QgsMapToolShapeRectangleAbstract::deactivate( )
+void QgsMapToolShapeRectangleAbstract::addRectangleToParentTool( )
 {
   if ( !mParentTool || !mRectangle.isValid() )
   {
@@ -40,7 +38,7 @@ void QgsMapToolShapeRectangleAbstract::deactivate( )
   for ( const QgsPoint &point : std::as_const( mPoints ) )
   {
     if ( QgsWkbTypes::hasZ( point.wkbType() ) &&
-         point.z() != defaultZValue() )
+         point.z() != mParentTool->defaultZValue() )
     {
       lineString->dropZValue();
       lineString->addZValue( point.z() );
@@ -49,13 +47,10 @@ void QgsMapToolShapeRectangleAbstract::deactivate( )
   }
 
   mParentTool->addCurve( lineString.release() );
-  clean();
-
-  QgsMapToolCapture::deactivate();
 }
 
 void QgsMapToolShapeRectangleAbstract::clean()
 {
-  QgsMapToolAddAbstract::clean();
   mRectangle = QgsQuadrilateral();
+  QgsMapToolShapeAbstract::clean();
 }
