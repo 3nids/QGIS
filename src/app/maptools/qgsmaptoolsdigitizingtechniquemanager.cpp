@@ -244,7 +244,7 @@ void QgsMapToolsDigitizingTechniqueManager::enableDigitizingTechniqueActions( bo
   QHash<QString, QAction *>::const_iterator sit = mShapeActions.constBegin();
   for ( ; sit != mShapeActions.constEnd(); ++ sit )
   {
-    sit.value()->setEnabled( enabled && currentTechnique == QgsMapToolCapture::CaptureTechnique::Shape &&  supportedTechniques.contains( QgsMapToolCapture::CaptureTechnique::Shape ) );
+    sit.value()->setEnabled( enabled && supportedTechniques.contains( QgsMapToolCapture::CaptureTechnique::Shape ) );
     sit.value()->setChecked( sit.value()->isEnabled() && sit.key() == currentShapeToolId );
   }
 

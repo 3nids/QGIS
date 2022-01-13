@@ -69,7 +69,7 @@ class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
 
 
   private slots:
-    void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique, bool setShapeTool = true );
+    void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique, bool alsoSetShapeTool = true );
     void setShapeTool( const QString &shapeToolId );
 
   private:

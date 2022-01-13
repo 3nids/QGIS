@@ -114,6 +114,9 @@ void QgsMapToolCapture::activate()
 
   mCanvas->snappingUtils()->addExtraSnapLayer( mExtraSnapLayer );
   QgsMapToolAdvancedDigitizing::activate();
+
+  if ( mCurrentCaptureTechnique == Shape && mCurrentShapeMapTool )
+    mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
 void QgsMapToolCapture::deactivate()
@@ -124,6 +127,10 @@ void QgsMapToolCapture::deactivate()
   mSnapIndicator->setMatch( QgsPointLocator::Match() );
 
   mCanvas->snappingUtils()->removeExtraSnapLayer( mExtraSnapLayer );
+
+  if ( mCurrentCaptureTechnique == Shape && mCurrentShapeMapTool )
+    mCurrentShapeMapTool->deactivate();
+
   QgsMapToolAdvancedDigitizing::deactivate();
 }
 
@@ -403,11 +410,7 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
 
   mCurrentCaptureTechnique = technique;
 
-  // TODO
-//  if ( !mCurrentShapeMapTool )
-//    mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolsDigitizingTechniqueManager::settingMapToolShapeCurrent.value(), this );
-
-  if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool )
+  if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool && isActive() )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
@@ -424,7 +427,7 @@ void QgsMapToolCapture::setCurrentShapeMapTool( const QgsMapToolShapeMetadata *s
 
   mCurrentShapeMapTool = shapeMapToolMetadata->factory( this );
 
-  if ( mCurrentCaptureTechnique == CaptureTechnique::Shape )
+  if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && isActive() )
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
 }
 
@@ -1264,10 +1267,6 @@ void QgsMapToolCapture::cadCanvasReleaseEvent( QgsMapMouseEvent *e )
 
     if ( mCurrentCaptureTechnique == Shape )
     {
-      // TODO
-//      if ( !mCurrentShapeMapTool )
-//        mCurrentShapeMapTool = QgsGui::mapToolShapeRegistry()->mapTool( QgsMapToolShapeRegistry::settingMapToolShapeCurrent.value(), this );
-
       if ( !mCurrentShapeMapTool )
       {
         emit messageEmitted( tr( "Cannot capture a shape without a shape tool defined" ), Qgis::MessageLevel::Warning );
