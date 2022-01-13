@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdrectangle.h  -  map tool for adding rectangle
+    qgsmaptoolshaperectangleabstract.h  -  map tool for adding rectangle
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,29 +13,30 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSMAPTOOLADDRECTANGLE_H
-#define QGSMAPTOOLADDRECTANGLE_H
+#ifndef QGSMAPTOOLSHAPERECTANGLEABSTRACT_H
+#define QGSMAPTOOLSHAPERECTANGLEABSTRACT_H
 
 #include "qgsmaptoolshapecircleabstract.h"
 #include "qgspolygon.h"
 #include "qgsquadrilateral.h"
 #include "qgis_app.h"
 
-class APP_EXPORT QgsMapToolAddRectangle: public QgsMapToolAddAbstract
+class APP_EXPORT QgsMapToolShapeRectangleAbstract: public QgsMapToolShapeAbstract
 {
     Q_OBJECT
 
   public:
-    QgsMapToolAddRectangle( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode = CaptureLine );
+    QgsMapToolShapeRectangleAbstract( const QString &id, QgsMapToolCapture *parentTool )
+      : QgsMapToolShapeAbstract(id, parentTool)
+    {}
 
     void deactivate( ) override;
     void clean() override;
 
   protected:
-    explicit QgsMapToolAddRectangle( QgsMapCanvas *canvas ) = delete; //forbidden
 
     //! Rectangle
     QgsQuadrilateral mRectangle;
 };
 
-#endif // QGSMAPTOOLADDRECTANGLE_H
+#endif // QGSMAPTOOLSHAPERECTANGLEABSTRACT_H

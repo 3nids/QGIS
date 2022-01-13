@@ -25,36 +25,56 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
-const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+const QString QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_DISTANCE = QStringLiteral( "rectangle-from-3-points-distance" );
+const QString QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_PROJECTED = QStringLiteral( "rectangle-from-3-points-projected" );
 
-QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
+QString QgsMapToolShapeRectangle3PointsMetadata::id() const
 {
-  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
+  switch ( mCreateMode )
+  {
+    case Distance:
+      return QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_DISTANCE;
+    case Projected:
+      return QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID_PROJECTED;
+  }
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeRectangle3PointsMetadata::name() const
 {
-  return QObject::tr( "Circle from 2 points" );
+  switch ( mCreateMode )
+  {
+    case Distance:
+      return QObject::tr( "Rectangle from 3 points (distance)" );
+    case Projected:
+      return QObject::tr( "Rectangle from 3 points (projected)" );
+  }
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeRectangle3PointsMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  switch ( mCreateMode )
+  {
+    case Distance:
+      return QgsApplication::getThemeIcon( QStringLiteral( "/mActionRectangle3PointsDistance.svg" ) );
+    case Projected:
+      return QgsApplication::getThemeIcon( QStringLiteral( "/mActionRectangle3PointsProjected.svg" ) );
+  }
+
+  return QIcon();
 }
 
-QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeRectangle3PointsMetadata::category() const
 {
-  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Rectangle;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeRectangle3PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeCircle2Points( parentTool );
+  return new QgsMapToolShapeRectangle3Points( parentTool );
 }
 
-QgsMapToolShapeRectangle3Points::QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CreateMode createMode, CaptureMode mode )
-  : QgsMapToolAddRectangle( parentTool, canvas, mode ),
+QgsMapToolShapeRectangle3Points::QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool, CreateMode createMode )
+  : QgsMapToolShapeRectangleAbstract( QgsMapToolShapeRectangle3PointsMetadata::TOOL_ID, parentTool ),
     mCreateMode( createMode )
 {
   mToolName = tr( "Add rectangle from 3 points" );

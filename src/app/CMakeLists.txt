@@ -206,7 +206,8 @@ set(QGIS_APP_SRCS
 
   maptools/qgsmaptoolshapecircleabstract.cpp
   maptools/qgsmaptoolshapecircularstringabstract.cpp
-#  maptools/qgsmaptoolshapeellipseabstract.cpp
+  maptools/qgsmaptoolshapeellipseabstract.cpp
+  maptools/qgsmaptoolshaperectangleabstract.h
 
   maptools/qgsmaptoolshapecircle2points.cpp
   maptools/qgsmaptoolshapecircle2tangentspoint.cpp
@@ -214,10 +215,10 @@ set(QGIS_APP_SRCS
   maptools/qgsmaptoolshapecircle3tangents.cpp
   maptools/qgsmaptoolshapecirclecenterpoint.cpp
   maptools/qgsmaptoolshapecircularstringradius.cpp
-#  maptools/qgsmaptoolshapeellipsecenter2points.cpp
-#  maptools/qgsmaptoolshapeellipsecenterpoint.cpp
-#  maptools/qgsmaptoolshapeellipseextent.cpp
-#  maptools/qgsmaptoolshapeellipsefoci.cpp
+  maptools/qgsmaptoolshapeellipsecenter2points.cpp
+  maptools/qgsmaptoolshapeellipsecenterpoint.cpp
+  maptools/qgsmaptoolshapeellipseextent.cpp
+  maptools/qgsmaptoolshapeellipsefoci.cpp
 #  maptools/qgsmaptoolshaperectangle3points.cpp
 #  maptools/qgsmaptoolshaperectanglecenter.cpp
 #  maptools/qgsmaptoolshaperectangleextent.cpp

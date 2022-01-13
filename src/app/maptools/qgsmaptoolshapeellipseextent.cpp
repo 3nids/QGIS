@@ -61,15 +61,6 @@ bool QgsMapToolShapeEllipseExtent::cadCanvasReleaseEvent( QgsMapMouseEvent *e, c
 {
   const QgsPoint point = mapPoint( *e );
 
-  if ( !currentVectorLayer() )
-  {
-    notifyNotVectorLayer();
-    clean();
-    stopCapturing();
-    e->ignore();
-    return;
-  }
-
   if ( e->button() == Qt::LeftButton )
   {
     if ( mPoints.empty() )

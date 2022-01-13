@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgsmaptooladdrectangle.h  -  map tool for adding rectangle
+    qgsmaptoolshaperectangleabstract.h  -  map tool for adding rectangle
     ---------------------
     begin                : July 2017
     copyright            : (C) 2017
@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgsmaptooladdrectangle.h"
+#include "qgsmaptoolshaperectangleabstract.h"
 #include "qgscompoundcurve.h"
 #include "qgscurvepolygon.h"
 #include "qgslinestring.h"
@@ -25,13 +25,8 @@
 #include "qgisapp.h"
 #include "qgssnapindicator.h"
 
-QgsMapToolAddRectangle::QgsMapToolAddRectangle( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolAddAbstract( parentTool, canvas, mode )
-{
-  mToolName = tr( "Add rectangle" );
-}
 
-void QgsMapToolAddRectangle::deactivate( )
+void QgsMapToolShapeRectangleAbstract::deactivate( )
 {
   if ( !mParentTool || !mRectangle.isValid() )
   {
@@ -59,7 +54,7 @@ void QgsMapToolAddRectangle::deactivate( )
   QgsMapToolCapture::deactivate();
 }
 
-void QgsMapToolAddRectangle::clean()
+void QgsMapToolShapeRectangleAbstract::clean()
 {
   QgsMapToolAddAbstract::clean();
   mRectangle = QgsQuadrilateral();

@@ -50,23 +50,9 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenterPointMetadata::factory( Qgs
 }
 
 
-QgsMapToolShapeEllipseCenterPoint::QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool )
-  : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseCenterPointMetadata::TOOL_ID, parentTool )
-{
-}
-
 bool QgsMapToolShapeEllipseCenterPoint::cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer )
 {
   const QgsPoint point = mapPoint( *e );
-
-  if ( !currentVectorLayer() )
-  {
-    notifyNotVectorLayer();
-    clean();
-    stopCapturing();
-    e->ignore();
-    return;
-  }
 
   if ( e->button() == Qt::LeftButton )
   {

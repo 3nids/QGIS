@@ -17,18 +17,19 @@
 #ifndef QGSMAPTOOLSHAPERECTANGLE3POINTS_H
 #define QGSMAPTOOLSHAPERECTANGLE3POINTS_H
 
-#include "qgsmaptooladdrectangle.h"
+#include "qgsmaptoolshaperectangleabstract.h"
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeRectangle3PointsMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeRectangle3PointsMetadata()
       : QgsMapToolShapeMetadata()
     {}
 
-    static const QString TOOL_ID;
+    static const QString TOOL_ID_PROJECTED;
+    static const QString TOOL_ID_DISTANCE;
 
     QString id() const override;
     QString name() const override;
@@ -37,17 +38,19 @@ class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
     QgsMapToolShapeAbstract *factory( QgsMapToolCapture *parentTool ) const override;
 };
 
-class APP_EXPORT QgsMapToolShapeRectangle3Points: public QgsMapToolAddRectangle
+class APP_EXPORT QgsMapToolShapeRectangle3Points: public QgsMapToolShapeRectangleAbstract
 {
     Q_OBJECT
 
   public:
-    enum CreateMode
+    enum class CreateMode
     {
-      DistanceMode,
-      ProjectedMode,
+      Distance,
+      Projected,
     };
-    QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool, QgsMapCanvas *canvas, CreateMode createMode, CaptureMode mode = CaptureLine );
+    Q_ENUM( CreateMode )
+
+    QgsMapToolShapeRectangle3Points( QgsMapToolCapture *parentTool, CreateMode createMode );
 
     bool cadCanvasReleaseEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;
     void cadCanvasMoveEvent( QgsMapMouseEvent *e, const QgsVectorLayer *layer ) override;

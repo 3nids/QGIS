@@ -55,8 +55,8 @@ QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapTo
 }
 
 QgsMapToolShapeRectangleCenter::QgsMapToolShapeRectangleCenter( QgsMapToolCapture *parentTool,
- )
-  : QgsMapToolAddRectangle( parentTool, canvas, mode )
+                                                              )
+  : QgsMapToolShapeRectangleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add rectangle from center and a point" );
 }

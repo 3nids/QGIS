@@ -53,8 +53,8 @@ QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapTo
 }
 
 QgsMapToolShapeRectangleExtent::QgsMapToolShapeRectangleExtent( QgsMapToolCapture *parentTool,
- )
-  : QgsMapToolAddRectangle( parentTool, canvas, mode )
+                                                              )
+  : QgsMapToolShapeRectangleAbstract( parentTool, canvas, mode )
 {
   mToolName = tr( "Add rectangle from extent" );
 }
