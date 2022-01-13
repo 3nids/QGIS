@@ -385,7 +385,10 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
   mStartNewCurve = true;
 
   if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && mCurrentShapeMapTool )
+  {
     mCurrentShapeMapTool->deactivate();
+    clean();
+  }
 
   switch ( technique )
   {
@@ -411,7 +414,10 @@ void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
   mCurrentCaptureTechnique = technique;
 
   if ( technique == CaptureTechnique::Shape && mCurrentShapeMapTool && isActive() )
+  {
+    clean();
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
+  }
 }
 
 void QgsMapToolCapture::setCurrentShapeMapTool( const QgsMapToolShapeMetadata *shapeMapToolMetadata )
@@ -428,7 +434,10 @@ void QgsMapToolCapture::setCurrentShapeMapTool( const QgsMapToolShapeMetadata *s
   mCurrentShapeMapTool = shapeMapToolMetadata->factory( this );
 
   if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && isActive() )
+  {
+    clean();
     mCurrentShapeMapTool->activate( mCaptureLastPoint );
+  }
 }
 
 void QgsMapToolCapture::cadCanvasMoveEvent( QgsMapMouseEvent *e )
@@ -460,72 +469,74 @@ void QgsMapToolCapture::cadCanvasMoveEvent( QgsMapMouseEvent *e )
       return;
     }
   }
-
-  const QgsPoint mapPoint = QgsPoint( point );
-
-  if ( mCaptureMode != CapturePoint && mTempRubberBand && mCapturing )
+  else
   {
-    bool hasTrace = false;
+    const QgsPoint mapPoint = QgsPoint( point );
 
-    if ( mCurrentCaptureTechnique == CaptureTechnique::Streaming )
+    if ( mCaptureMode != CapturePoint && mTempRubberBand && mCapturing )
     {
-      if ( !mCaptureCurve.isEmpty() )
+      bool hasTrace = false;
+
+      if ( mCurrentCaptureTechnique == CaptureTechnique::Streaming )
       {
-        const QgsPoint prevPoint = mCaptureCurve.curveAt( mCaptureCurve.nCurves() - 1 )->endPoint();
-        if ( QgsPointXY( toCanvasCoordinates( toMapCoordinates( layer(), prevPoint ) ) ).distance( toCanvasCoordinates( point ) ) < mStreamingToleranceInPixels )
-          return;
-      }
-
-      mAllowAddingStreamingPoints = true;
-      addVertex( mapPoint );
-      mAllowAddingStreamingPoints = false;
-    }
-    else if ( tracingEnabled() && mCaptureCurve.numPoints() != 0 )
-    {
-      // Store the intermediate point for circular string to retrieve after tracing mouse move if
-      // the digitizing type is circular and the temp rubber band is effectivly circular and if this point is existing
-      // Store an empty point if the digitizing type is linear ot the point is not existing (curve not complete)
-      if ( mLineDigitizingType == QgsWkbTypes::CircularString &&
-           mTempRubberBand->stringType() == QgsWkbTypes::CircularString &&
-           mTempRubberBand->curveIsComplete() )
-        mCircularItermediatePoint = mTempRubberBand->pointFromEnd( 1 );
-      else if ( mLineDigitizingType == QgsWkbTypes::LineString ||
-                !mTempRubberBand->curveIsComplete() )
-        mCircularItermediatePoint = QgsPoint();
-
-      hasTrace = tracingMouseMove( e );
-
-      if ( !hasTrace )
-      {
-        // Restore the temp rubber band
-        mTempRubberBand->reset( mCaptureMode == CapturePolygon ? QgsWkbTypes::PolygonGeometry : QgsWkbTypes::LineGeometry, mLineDigitizingType, mCaptureFirstPoint );
-        mTempRubberBand->addPoint( mCaptureLastPoint );
-        if ( !mCircularItermediatePoint.isEmpty() )
+        if ( !mCaptureCurve.isEmpty() )
         {
-          mTempRubberBand->movePoint( mCircularItermediatePoint );
-          mTempRubberBand->addPoint( mCircularItermediatePoint );
+          const QgsPoint prevPoint = mCaptureCurve.curveAt( mCaptureCurve.nCurves() - 1 )->endPoint();
+          if ( QgsPointXY( toCanvasCoordinates( toMapCoordinates( layer(), prevPoint ) ) ).distance( toCanvasCoordinates( point ) ) < mStreamingToleranceInPixels )
+            return;
+        }
+
+        mAllowAddingStreamingPoints = true;
+        addVertex( mapPoint );
+        mAllowAddingStreamingPoints = false;
+      }
+      else if ( tracingEnabled() && mCaptureCurve.numPoints() != 0 )
+      {
+        // Store the intermediate point for circular string to retrieve after tracing mouse move if
+        // the digitizing type is circular and the temp rubber band is effectivly circular and if this point is existing
+        // Store an empty point if the digitizing type is linear ot the point is not existing (curve not complete)
+        if ( mLineDigitizingType == QgsWkbTypes::CircularString &&
+             mTempRubberBand->stringType() == QgsWkbTypes::CircularString &&
+             mTempRubberBand->curveIsComplete() )
+          mCircularItermediatePoint = mTempRubberBand->pointFromEnd( 1 );
+        else if ( mLineDigitizingType == QgsWkbTypes::LineString ||
+                  !mTempRubberBand->curveIsComplete() )
+          mCircularItermediatePoint = QgsPoint();
+
+        hasTrace = tracingMouseMove( e );
+
+        if ( !hasTrace )
+        {
+          // Restore the temp rubber band
+          mTempRubberBand->reset( mCaptureMode == CapturePolygon ? QgsWkbTypes::PolygonGeometry : QgsWkbTypes::LineGeometry, mLineDigitizingType, mCaptureFirstPoint );
+          mTempRubberBand->addPoint( mCaptureLastPoint );
+          if ( !mCircularItermediatePoint.isEmpty() )
+          {
+            mTempRubberBand->movePoint( mCircularItermediatePoint );
+            mTempRubberBand->addPoint( mCircularItermediatePoint );
+          }
         }
       }
-    }
 
-    if ( mCurrentCaptureTechnique != CaptureTechnique::Streaming && !hasTrace )
-    {
-      if ( mCaptureCurve.numPoints() > 0 )
+      if ( mCurrentCaptureTechnique != CaptureTechnique::Streaming && !hasTrace )
       {
-        const QgsPoint mapPt = mCaptureLastPoint;
-
-        if ( mTempRubberBand )
+        if ( mCaptureCurve.numPoints() > 0 )
         {
+          const QgsPoint mapPt = mCaptureLastPoint;
+
+          if ( mTempRubberBand )
+          {
+            mTempRubberBand->movePoint( mapPoint );
+            mTempRubberBand->movePoint( 0, mapPt );
+          }
+
+          // fix existing rubber band after tracing - the last point may have been moved if using offset
+          if ( mRubberBand->numberOfVertices() )
+            mRubberBand->movePoint( mapPt );
+        }
+        else if ( mTempRubberBand )
           mTempRubberBand->movePoint( mapPoint );
-          mTempRubberBand->movePoint( 0, mapPt );
-        }
-
-        // fix existing rubber band after tracing - the last point may have been moved if using offset
-        if ( mRubberBand->numberOfVertices() )
-          mRubberBand->movePoint( mapPt );
       }
-      else if ( mTempRubberBand )
-        mTempRubberBand->movePoint( mapPoint );
     }
   }
 } // mouseMoveEvent
