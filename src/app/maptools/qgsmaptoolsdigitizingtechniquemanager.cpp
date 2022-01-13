@@ -64,7 +64,6 @@ void QgsMapToolsDigitizingTechniqueManager::setupToolBars()
   {
     digitizeMenu->addAction( it.value() );
     actionGroup->addAction( it.value() );
-    // TODO revert to qmenu triggered?
     connect( it.value(), &QAction::triggered, this, [ = ]( bool checked )
     {
       Q_UNUSED( checked );
@@ -72,8 +71,6 @@ void QgsMapToolsDigitizingTechniqueManager::setupToolBars()
     } );
   }
   QgisApp::instance()->mActionStreamDigitize->setShortcut( tr( "R", "Keyboard shortcut: toggle stream digitizing" ) );
-
-// connect( digitizeMenu, &QMenu::triggered, this, &QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique );
 
   mStreamDigitizingSettingsAction = new QgsStreamDigitizingSettingsAction( QgisApp::instance() );
 
@@ -126,10 +123,15 @@ void QgsMapToolsDigitizingTechniqueManager::setupToolBars()
     action->setCheckable( true );
     action->setData( metadata->id() );
     shapeMenu->addAction( action );
-    if ( settingMapToolShapeDefaultForShape.value( qgsEnumValueToKey( metadata->category() ) ) == metadata->id() )
+    QString defaultToolId = settingMapToolShapeDefaultForShape.value( qgsEnumValueToKey( metadata->category() ) );
+    if ( defaultToolId.isEmpty() )
+    {
+      // if no default tool for category, take the first one
+      defaultToolId = metadata->id();
+      settingMapToolShapeDefaultForShape.setValue( metadata->id(), qgsEnumValueToKey( metadata->category() ) );
+    }
+    if ( defaultToolId == metadata->id() )
       shapeButton->setDefaultAction( action );
-    if ( settingMapToolShapeCurrent.value() == metadata->id() )
-      action->setChecked( true );
 
     mShapeActions.insert( metadata->id(), action );
   }
