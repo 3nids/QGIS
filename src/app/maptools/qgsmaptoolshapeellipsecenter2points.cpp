@@ -24,31 +24,31 @@
 #include <memory>
 #include "qgsapplication.h"
 
-const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+const QString QgsMapToolShapeEllipseCenter2PointsMetadata::TOOL_ID = QStringLiteral( "ellipse-center-2-points" );
 
-QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
+QString QgsMapToolShapeEllipseCenter2PointsMetadata::id() const
 {
-  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
+  return QgsMapToolShapeEllipseCenter2PointsMetadata::TOOL_ID;
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeEllipseCenter2PointsMetadata::name() const
 {
-  return QObject::tr( "Circle from 2 points" );
+  return QObject::tr( "Ellipse from center and 2 points" );
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeEllipseCenter2PointsMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionEllipseCenter2Points.svg" ) );
 }
 
-QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeEllipseCenter2PointsMetadata::category() const
 {
-  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Ellipse;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenter2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeCircle2Points( parentTool );
+  return new QgsMapToolShapeEllipseCenter2Points( parentTool );
 }
 
 QgsMapToolShapeEllipseCenter2Points::QgsMapToolShapeEllipseCenter2Points( QgsMapToolCapture *parentTool,

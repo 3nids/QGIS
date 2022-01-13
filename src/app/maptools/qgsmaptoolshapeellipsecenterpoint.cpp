@@ -22,36 +22,35 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
-const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+const QString QgsMapToolShapeEllipseCenterPointMetadata::TOOL_ID = QStringLiteral( "ellipse-center-point" );
 
-QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
+QString QgsMapToolShapeEllipseCenterPointMetadata::id() const
 {
-  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
+  return QgsMapToolShapeEllipseCenterPointMetadata::TOOL_ID;
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeEllipseCenterPointMetadata::name() const
 {
-  return QObject::tr( "Circle from 2 points" );
+  return QObject::tr( "Ellipse from center and a point" );
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeEllipseCenterPointMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionEllipseCenterPoint.svg" ) );
 }
 
-QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeEllipseCenterPointMetadata::category() const
 {
-  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Ellipse;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenterPointMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeCircle2Points( parentTool );
+  return new QgsMapToolShapeEllipseCenterPoint( parentTool );
 }
 
 
-QgsMapToolShapeEllipseCenterPoint::QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CaptureMode mode )
+QgsMapToolShapeEllipseCenterPoint::QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool )
   : QgsMapToolShapeEllipseAbstract( parentTool, canvas, mode )
 {
 }

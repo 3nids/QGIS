@@ -21,10 +21,10 @@
 #include "qgis_app.h"
 #include "qgsmaptoolshaperegistry.h"
 
-class APP_EXPORT Metadata : public QgsMapToolShapeMetadata
+class APP_EXPORT QgsMapToolShapeEllipseFociMetadata : public QgsMapToolShapeMetadata
 {
   public:
-    Metadata()
+    QgsMapToolShapeEllipseFociMetadata()
       : QgsMapToolShapeMetadata()
     {}
 

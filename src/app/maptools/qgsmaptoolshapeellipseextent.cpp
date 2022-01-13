@@ -24,31 +24,31 @@
 #include "qgsmaptoolcapture.h"
 #include "qgsapplication.h"
 
-const QString QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID = QStringLiteral( "circular-string-by-radius" );
+const QString QgsMapToolShapeEllipseExtentMetadata::TOOL_ID = QStringLiteral( "ellipse-from-extent" );
 
-QString QgsMapToolShapeCircularStringRadiusMetadata::id() const
+QString QgsMapToolShapeEllipseExtentMetadata::id() const
 {
-  return QgsMapToolShapeCircularStringRadiusMetadata::TOOL_ID;
+  return QgsMapToolShapeEllipseExtentMetadata::TOOL_ID;
 }
 
-QString QgsMapToolShapeCircle2PointsMetadata::name() const
+QString QgsMapToolShapeEllipseExtentMetadata::name() const
 {
-  return QObject::tr( "Circle from 2 points" );
+  return QObject::tr( "Ellipse from Extent" );
 }
 
-QIcon QgsMapToolShapeCircle2PointsMetadata::icon() const
+QIcon QgsMapToolShapeEllipseExtentMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionEllipseExtent.svg" ) );
 }
 
-QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeCircle2PointsMetadata::category() const
+QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeEllipseExtentMetadata::category() const
 {
-  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Ellipse;
 }
 
-QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapToolCapture *parentTool ) const
+QgsMapToolShapeAbstract *QgsMapToolShapeEllipseExtentMetadata::factory( QgsMapToolCapture *parentTool ) const
 {
-  return new QgsMapToolShapeCircle2Points( parentTool );
+  return new QgsMapToolShapeEllipseExtent( parentTool );
 }
 
 
