@@ -833,7 +833,7 @@ void QgisApp::annotationItemTypeAdded( int id )
     mMapCanvas->setMapTool( tool->mapTool() );
     if ( qobject_cast< QgsMapToolCapture * >( tool->mapTool() ) )
     {
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( checked, action );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( checked, action );
     }
 
     connect( tool->mapTool(), &QgsMapTool::deactivated, tool->mapTool(), &QObject::deleteLater );
@@ -1189,6 +1189,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
 
   // create map tools
   mMapTools = std::make_unique< QgsAppMapTools >( mMapCanvas, mAdvancedDigitizingDockWidget );
+  mDigitizingTechniqueManager = new QgsMapToolsDigitizingTechniqueManager( mMapTools.get(), this );
 
   QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircularStringRadiusMetadata() );
   QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2PointsMetadata() );
@@ -1208,14 +1209,10 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterPointMetadata() );
 //  QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeRegularPolygonCenterCornerMetadata() );
 
+
   functionProfile( &QgisApp::createToolBars, this, QStringLiteral( "Toolbars" ) );
   functionProfile( &QgisApp::createStatusBar, this, QStringLiteral( "Status bar" ) );
   functionProfile( &QgisApp::setupCanvasTools, this, QStringLiteral( "Create canvas tools" ) );
-  const QList< QgsMapToolCapture * > captureTools = mMapTools->captureTools();
-  for ( QgsMapToolCapture *tool : captureTools )
-  {
-    connect( tool->action(), &QAction::toggled, this, [this, tool]( bool checked ) {  mDigitizingTechniqueManager->enableDigitizeTechniqueActions( checked, tool->action() ); } );
-  }
 
   applyDefaultSettingsToCanvas( mMapCanvas );
 
@@ -1900,6 +1897,7 @@ QgisApp::~QgisApp()
   delete mInternalClipboard;
   delete mQgisInterface;
   delete mStyleSheetBuilder;
+  delete mDigitizingTechniqueManager;
 
   if ( QgsMapTool *tool = mMapCanvas->mapTool() )
     mMapCanvas->unsetMapTool( tool );
@@ -3382,7 +3380,7 @@ void QgisApp::createToolBars()
            static_cast< void ( QgsDoubleSpinBox::* )( double ) >( &QgsDoubleSpinBox::valueChanged ),
   this, [ = ]( double v ) { mTracer->setOffset( v ); } );
 
-  mDigitizingTechniqueManager = new QgsMapToolsDigitizingTechniqueManager( this );
+  mDigitizingTechniqueManager->setupToolBars();
 
 
   QList<QAction *> toolbarMenuActions;
@@ -4396,6 +4394,8 @@ void QgisApp::setupCanvasTools()
 
   //ensure that non edit tool is initialized or we will get crashes in some situations
   mNonEditMapTool = mMapTools->mapTool( QgsAppMapTools::Pan );
+
+  mDigitizingTechniqueManager->setupCanvasTools();
 }
 
 void QgisApp::createOverview()
@@ -15059,7 +15059,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
     mActionZoomToLayer->setEnabled( false );
 
     enableMeshEditingTools( false );
-    mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
+    mDigitizingTechniqueManager->enableDigitizingTechnique( false );
 
     return;
   }
@@ -15196,7 +15196,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
         mActionVertexTool->setEnabled( isEditable && canChangeGeometry );
         mActionVertexToolActiveLayer->setEnabled( isEditable && canChangeGeometry );
 
-        mDigitizingTechniqueManager->enableDigitizeTechniqueActions( isEditable && canChangeGeometry );
+        mDigitizingTechniqueManager->enableDigitizingTechnique( isEditable && canChangeGeometry );
 
         if ( vlayer->geometryType() == QgsWkbTypes::PointGeometry )
         {
@@ -15388,7 +15388,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionDiagramProperties->setEnabled( false );
 
       enableMeshEditingTools( false );
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( false );
 
       //NOTE: This check does not really add any protection, as it is called on load not on layer select/activate
       //If you load a layer with a provider and idenitfy ability then load another without, the tool would be disabled for both
@@ -15477,7 +15477,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( false );
 
       bool canSupportEditing = mlayer->supportsEditing();
       bool isEditable = mlayer->isEditable();
@@ -15557,7 +15557,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( false );
       enableMeshEditingTools( false );
       break;
 
@@ -15625,7 +15625,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( false );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( false );
       enableMeshEditingTools( false );
       break;
 
@@ -15694,7 +15694,7 @@ void QgisApp::activateDeactivateLayerRelatedActions( QgsMapLayer *layer )
       mActionLabeling->setEnabled( false );
       mActionDiagramProperties->setEnabled( false );
       mActionIdentify->setEnabled( true );
-      mDigitizingTechniqueManager->enableDigitizeTechniqueActions( true );
+      mDigitizingTechniqueManager->enableDigitizingTechnique( true );
       mActionToggleEditing->setEnabled( false );
       mActionToggleEditing->setChecked( true ); // always editable
       mActionUndo->setEnabled( false );

@@ -23,17 +23,32 @@
 #include "qgsmaptoolcapture.h"
 
 
-#include <QObject>
+#include <QWidgetAction>
 
+
+class QgsSpinBox;
+class QgsAppMapTools;
 
 class QAction;
-//class QToolBar;
 class QToolButton;
-class QgisApp;
+
 
 #ifdef _MSC_VER
 template class CORE_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique> SIP_SKIP;
 #endif
+
+class APP_EXPORT QgsStreamDigitizingSettingsAction: public QWidgetAction
+{
+    Q_OBJECT
+
+  public:
+
+    QgsStreamDigitizingSettingsAction( QWidget *parent = nullptr );
+    ~QgsStreamDigitizingSettingsAction() override;
+
+  private:
+    QgsSpinBox *mStreamToleranceSpinBox = nullptr;
+};
 
 class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
 {
@@ -44,22 +59,27 @@ class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
     static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/current" ), QgsSettings::Gui, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
 
-    QgsMapToolsDigitizingTechniqueManager( QObject *parent );
+    QgsMapToolsDigitizingTechniqueManager( QgsAppMapTools *mapTools, QObject *parent );
+    ~QgsMapToolsDigitizingTechniqueManager();
+    void setupToolBars();
+    void setupCanvasTools();
 
-    /**
-     * Enables the action that toggles digitizing with curve
-     */
-    void enableDigitizeTechniqueActions( bool enable, QAction *triggeredFromToolAction = nullptr );
+  public slots:
+    void enableDigitizingTechnique( bool enabled, QAction *triggeredFromToolAction = nullptr );
+
 
   private slots:
     void setCaptureTechnique( QgsMapToolCapture::CaptureTechnique technique );
     void shapeActionTriggered( QAction *action, QToolButton *mainButton );
 
   private:
-    QToolButton *mDigitizeModeToolButton = nullptr;
-    QList<std::pair<QgsMapToolCapture::CaptureTechnique, QAction *>> mTechniqueActions;
+    QgsAppMapTools *mMapTools = nullptr;
 
-    //    QHash<QString, QAction *> mActions;
+    QHash<QgsMapToolCapture::CaptureTechnique, QAction *> mTechniqueActions;
+    QHash<QString, QAction *> mShapeActions;
+
+    QToolButton *mDigitizeModeToolButton = nullptr;
+    QgsStreamDigitizingSettingsAction *mStreamDigitizingSettingsAction = nullptr;
 
 
 };

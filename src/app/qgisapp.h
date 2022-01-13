@@ -2360,8 +2360,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
 
     QgisAppStyleSheet *mStyleSheetBuilder = nullptr;
 
-    QgsMapToolsDigitizingTechniqueManager *mDigitizingTechniqueManager = nullptr;
-
     // actions for menus and toolbars -----------------
 
 #ifdef Q_OS_MAC
@@ -2401,6 +2399,7 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QAction *mWindowAction = nullptr;
 #endif
 
+    QgsMapToolsDigitizingTechniqueManager *mDigitizingTechniqueManager = nullptr;
     std::unique_ptr< QgsAppMapTools > mMapTools;
 
     QgsMapTool *mNonEditMapTool = nullptr;

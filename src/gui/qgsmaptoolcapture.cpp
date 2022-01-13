@@ -372,6 +372,9 @@ void QgsMapToolCapture::setStreamDigitizingEnabled( bool enable )
 
 void QgsMapToolCapture::setCurrentCaptureTechnique( CaptureTechnique technique )
 {
+  if ( mCurrentCaptureTechnique == technique )
+    return;
+
   mStartNewCurve = true;
 
   if ( mCurrentCaptureTechnique == CaptureTechnique::Shape && mCurrentShapeMapTool )
