@@ -173,7 +173,16 @@ void QgsMapToolsDigitizingTechniqueManager::setCaptureTechnique( QgsMapToolCaptu
   }
 
   if ( technique == QgsMapToolCapture::Shape && alsoSetShapeTool )
+  {
     setShapeTool( settingMapToolShapeCurrent.value() );
+  }
+  else if ( technique != QgsMapToolCapture::Shape )
+  {
+    // uncheck all the shape tools
+    QHash<QString, QAction *>::iterator sit = mShapeActions.begin();
+    for ( ; sit != mShapeActions.end(); ++ sit )
+      sit.value()->setChecked( false );
+  }
 }
 
 void QgsMapToolsDigitizingTechniqueManager::setShapeTool( const QString &shapeToolId )
@@ -245,7 +254,7 @@ void QgsMapToolsDigitizingTechniqueManager::enableDigitizingTechniqueActions( bo
   for ( ; sit != mShapeActions.constEnd(); ++ sit )
   {
     sit.value()->setEnabled( enabled && supportedTechniques.contains( QgsMapToolCapture::CaptureTechnique::Shape ) );
-    sit.value()->setChecked( sit.value()->isEnabled() && sit.key() == currentShapeToolId );
+    sit.value()->setChecked( currentTechnique == QgsMapToolCapture::CaptureTechnique::Shape && sit.value()->isEnabled() && sit.key() == currentShapeToolId );
   }
 
   for ( QgsMapToolCapture *tool : tools )
