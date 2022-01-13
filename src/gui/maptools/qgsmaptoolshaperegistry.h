@@ -26,9 +26,6 @@
 
 class QgsMapToolShapeMetadata;
 class QgsMapToolCapture;
-class QToolBar;
-class QToolButton;
-
 
 /**
  * \ingroup gui
@@ -68,21 +65,9 @@ class GUI_EXPORT QgsMapToolShapeRegistry
      */
     QgsMapToolShapeAbstract *mapTool( const QString &id, QgsMapToolCapture *parentTool ) const SIP_FACTORY;
 
-    /**
-     * Setups the toolbar by setting the buttons and menu
-     * The toolbar will be used later to enable/disable the tools
-     */
-//    static void setToolbar( QToolBar *toolBar ) ;
-
-//    //! Checks the corresponding action of the default shape toolbar
-//    void enableDefaultShapeTool();
-
-
   private:
 
     QList<QgsMapToolShapeMetadata *> mMapTools;
-
-//    QHash<QString, QAction *> mActions;
 
 };
 
