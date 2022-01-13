@@ -52,9 +52,8 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseExtentMetadata::factory( QgsMapTo
 }
 
 
-QgsMapToolShapeEllipseExtent::QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolShapeEllipseAbstract( parentTool, canvas, mode )
+QgsMapToolShapeEllipseExtent::QgsMapToolShapeEllipseExtent( QgsMapToolCapture *parentTool)
+  : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseExtentMetadata::TOOL_ID, parentTool )
 {
 }
 

@@ -52,8 +52,8 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenter2PointsMetadata::factory( Q
 }
 
 QgsMapToolShapeEllipseCenter2Points::QgsMapToolShapeEllipseCenter2Points( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CaptureMode mode )
-  : QgsMapToolShapeEllipseAbstract( parentTool, canvas, mode )
+ )
+  : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseCenter2PointsMetadata::TOOL_ID, parentTool )
 {
 }
 

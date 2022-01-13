@@ -51,7 +51,7 @@ QgsMapToolShapeAbstract *QgsMapToolShapeEllipseCenterPointMetadata::factory( Qgs
 
 
 QgsMapToolShapeEllipseCenterPoint::QgsMapToolShapeEllipseCenterPoint( QgsMapToolCapture *parentTool )
-  : QgsMapToolShapeEllipseAbstract( parentTool, canvas, mode )
+  : QgsMapToolShapeEllipseAbstract( QgsMapToolShapeEllipseCenterPointMetadata::TOOL_ID, parentTool )
 {
 }
 

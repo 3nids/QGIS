@@ -50,7 +50,7 @@ QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapTo
 }
 
 QgsMapToolShapeRegularPolygon2Points::QgsMapToolShapeRegularPolygon2Points( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CaptureMode mode )
+ )
   : QgsMapToolAddRegularPolygon( parentTool, canvas, mode )
 {
   mToolName = tr( "Add regular polygon from 2 points" );

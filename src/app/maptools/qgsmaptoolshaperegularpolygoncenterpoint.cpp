@@ -50,7 +50,7 @@ QgsMapToolShapeAbstract *QgsMapToolShapeCircle2PointsMetadata::factory( QgsMapTo
 }
 
 QgsMapToolShapeRegularPolygonCenterPoint::QgsMapToolShapeRegularPolygonCenterPoint( QgsMapToolCapture *parentTool,
-    QgsMapCanvas *canvas, CaptureMode mode )
+ )
   : QgsMapToolAddRegularPolygon( parentTool, canvas, mode )
 {
   mToolName = tr( "Add regular polygon from center and a point " );
