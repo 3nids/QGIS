@@ -34,7 +34,7 @@ class QToolButton;
 
 
 #ifdef _MSC_VER
-template class APP_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique> SIP_SKIP;
+template class APP_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>;
 #endif
 
 class APP_EXPORT QgsStreamDigitizingSettingsAction: public QWidgetAction
