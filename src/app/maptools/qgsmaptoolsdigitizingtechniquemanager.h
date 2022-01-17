@@ -33,7 +33,7 @@ class QAction;
 class QToolButton;
 
 #ifdef _MSC_VER
-extern template class CORE_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>;
+extern template class APP_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>;
 #endif
 
 class APP_EXPORT QgsStreamDigitizingSettingsAction: public QWidgetAction
