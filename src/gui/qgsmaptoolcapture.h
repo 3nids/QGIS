@@ -38,9 +38,6 @@ class QgsCurvePolygon;
 class QgsMapToolShapeAbstract;
 class QgsMapToolShapeMetadata;
 
-#ifdef _MSC_VER
-template class GUI_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique> SIP_SKIP;
-#endif
 
 /**
  * \ingroup gui
