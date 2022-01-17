@@ -23,11 +23,6 @@
 #include "qgssettingsregistry.h"
 
 
-#ifdef _MSC_VER
-#include "qgsmaptoolcapture.h"
-template class APP_EXPORT QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>;
-#endif
-
 class APP_EXPORT QgsSettingsRegistryApp : public QgsSettingsRegistry
 {
   public:
