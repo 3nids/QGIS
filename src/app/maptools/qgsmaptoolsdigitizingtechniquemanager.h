@@ -50,10 +50,14 @@ class APP_EXPORT QgsMapToolsDigitizingTechniqueManager : public QObject
 {
     Q_OBJECT
   public:
-    static const inline  QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique> settingsDigitizingTechnique = QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>( QStringLiteral( "UI/digitizeTechnique" ), QgsSettings::NoSection, QgsMapToolCapture::CaptureTechnique::StraightSegments ) SIP_SKIP;
+#ifdef _MSC_VER
+    static const inline  QgsSettingsEntryInteger settingsDigitizingTechnique = QgsSettingsEntryInteger( QStringLiteral( "digitizingTechnique" ), QgsSettings::App, static_cast<int>( QgsMapToolCapture::CaptureTechnique::StraightSegments ) ) SIP_SKIP;
+#else
+    static const inline  QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique> settingsDigitizingTechnique = QgsSettingsEntryEnumFlag<QgsMapToolCapture::CaptureTechnique>( QStringLiteral( "digitizingTechnique" ), QgsSettings::App, QgsMapToolCapture::CaptureTechnique::StraightSegments ) SIP_SKIP;
+#endif
 
-    static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/%1/default" ), QgsSettings::Gui, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "UI/shape-map-tools/current" ), QgsSettings::Gui, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString settingMapToolShapeDefaultForShape = QgsSettingsEntryString( QStringLiteral( "shape-map-tools/%1/default" ), QgsSettings::App, QString(), QObject::tr( "Default map tool for given shape category" ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString settingMapToolShapeCurrent = QgsSettingsEntryString( QStringLiteral( "shape-map-tools/current" ), QgsSettings::App, QString(), QObject::tr( "Current shape map tool" ) ) SIP_SKIP;
 
     QgsMapToolsDigitizingTechniqueManager( QgsAppMapTools *mapTools, QObject *parent );
     ~QgsMapToolsDigitizingTechniqueManager();
