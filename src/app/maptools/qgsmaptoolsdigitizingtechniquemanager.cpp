@@ -77,11 +77,7 @@ void QgsMapToolsDigitizingTechniqueManager::setupToolBars()
   digitizeMenu->addAction( mStreamDigitizingSettingsAction );
   mDigitizeModeToolButton->setMenu( digitizeMenu );
 
-#ifdef _MSC_VER
-  const QgsMapToolCapture::CaptureTechnique technique = static_cast<QgsMapToolCapture::CaptureTechnique>( settingsDigitizingTechnique.value() );
-#else
   const QgsMapToolCapture::CaptureTechnique technique = settingsDigitizingTechnique.value();
-#endif
   switch ( technique )
   {
     case QgsMapToolCapture::CaptureTechnique::StraightSegments:
@@ -228,11 +224,7 @@ void QgsMapToolsDigitizingTechniqueManager::enableDigitizingTechniqueActions( bo
   // QgisApp::captureTools returns all registered capture tools + the eventual current capture tool
   const QList< QgsMapToolCapture * > tools = QgisApp::instance()->captureTools();
 
-#ifdef _MSC_VER
-  const QgsMapToolCapture::CaptureTechnique currentTechnique = static_cast<QgsMapToolCapture::CaptureTechnique>( settingsDigitizingTechnique.value() );
-#else
   const QgsMapToolCapture::CaptureTechnique currentTechnique = settingsDigitizingTechnique.value();
-#endif
   const QString currentShapeToolId = settingMapToolShapeCurrent.value();
 
   QSet< QgsMapToolCapture::CaptureTechnique > supportedTechniques;
