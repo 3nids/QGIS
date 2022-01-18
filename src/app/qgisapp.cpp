@@ -1189,7 +1189,7 @@ QgisApp::QgisApp( QSplashScreen *splash, bool restorePlugins, bool skipBadLayers
 
   // create map tools
   mMapTools = std::make_unique< QgsAppMapTools >( mMapCanvas, mAdvancedDigitizingDockWidget );
-  mDigitizingTechniqueManager = new QgsMapToolsDigitizingTechniqueManager( mMapTools.get(), this );
+  mDigitizingTechniqueManager = new QgsMapToolsDigitizingTechniqueManager( this );
 
   QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircularStringRadiusMetadata() );
   QgsGui::mapToolShapeRegistry()->addMapTool( new QgsMapToolShapeCircle2PointsMetadata() );
@@ -1874,6 +1874,8 @@ QgisApp::QgisApp()
   mPanelMenu = new QMenu( this );
   mProgressBar = new QProgressBar( this );
   mStatusBar = new QgsStatusBar( this );
+  mMapTools = std::make_unique< QgsAppMapTools >( mMapCanvas, mAdvancedDigitizingDockWidget );
+  mDigitizingTechniqueManager = new QgsMapToolsDigitizingTechniqueManager( this );
 
   mBearingNumericFormat.reset( QgsLocalDefaultSettings::bearingFormat() );
   // More tests may need more members to be initialized
