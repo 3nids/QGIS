@@ -44,7 +44,7 @@ QIcon QgsMapToolShapeRectangleExtentMetadata::icon() const
 
 QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeRectangleExtentMetadata::category() const
 {
-  return QgsMapToolShapeAbstract::ShapeCategory::Circle;
+  return QgsMapToolShapeAbstract::ShapeCategory::Rectangle;
 }
 
 QgsMapToolShapeAbstract *QgsMapToolShapeRectangleExtentMetadata::factory( QgsMapToolCapture *parentTool ) const
