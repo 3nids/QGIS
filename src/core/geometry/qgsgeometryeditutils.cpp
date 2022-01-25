@@ -205,10 +205,7 @@ Qgis::GeometryOperationResult QgsGeometryEditUtils::addPart( QgsAbstractGeometry
           delete curve;
           curve = line;
         }
-        else
-        {
-          added = geomCollection->addGeometry( curve );
-        }
+        added = geomCollection->addGeometry( curve );
       }
       else
       {
