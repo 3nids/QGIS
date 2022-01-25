@@ -151,7 +151,10 @@ Qgis::GeometryOperationResult QgsGeometryEditUtils::addPart( QgsAbstractGeometry
       int i;
       const int n = geomCollection->numGeometries();
       for ( i = 0; i < parts->numGeometries(); i++ )
-        geomCollection->addGeometry( parts->geometryN( i )->clone() );
+      {
+        if ( !geomCollection->addGeometry( parts->geometryN( i )->clone() ) )
+          break;
+      }
 
       added = i == parts->numGeometries();
       if ( !added )
@@ -177,7 +180,10 @@ Qgis::GeometryOperationResult QgsGeometryEditUtils::addPart( QgsAbstractGeometry
       int i;
       const int n = geomCollection->numGeometries();
       for ( i = 0; i < parts->numGeometries(); i++ )
-        geomCollection->addGeometry( parts->geometryN( i )->clone() );
+      {
+        if ( !geomCollection->addGeometry( parts->geometryN( i )->clone() ) )
+          break;
+      }
 
       added = i == parts->numGeometries();
       if ( !added )
