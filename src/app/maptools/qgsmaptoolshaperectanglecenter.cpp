@@ -41,7 +41,7 @@ QString QgsMapToolShapeRectangleCenterMetadata::name() const
 
 QIcon QgsMapToolShapeRectangleCenterMetadata::icon() const
 {
-  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionCircle2Points.svg" ) );
+  return QgsApplication::getThemeIcon( QStringLiteral( "/mActionRectangleCenter.svg" ) );
 }
 
 QgsMapToolShapeAbstract::ShapeCategory QgsMapToolShapeRectangleCenterMetadata::category() const
