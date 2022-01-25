@@ -196,7 +196,7 @@ Qgis::GeometryOperationResult QgsGeometryEditUtils::addPart( QgsAbstractGeometry
     else
     {
       QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( part.release() );
-      if ( QgsWkbTypes::flatType( geom->wkbType() ) == QgsWkbTypes::MultiLineString && curve->hasCurvedSegments() )
+      if ( curve && QgsWkbTypes::flatType( geom->wkbType() ) == QgsWkbTypes::MultiLineString && curve->hasCurvedSegments() )
       {
         //need to segmentize part as multilinestring does not support curves
         QgsCurve *line = curve->segmentize();
