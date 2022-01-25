@@ -208,7 +208,7 @@ Qgis::GeometryOperationResult QgsGeometryEditUtils::addPart( QgsAbstractGeometry
   }
   else
   {
-    added = geomCollection->addGeometry( curve );
+    added = geomCollection->addGeometry( part.release() );
   }
   return added ? Qgis::GeometryOperationResult::Success : Qgis::GeometryOperationResult::InvalidInputGeometryType;
 }
