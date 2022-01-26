@@ -2340,6 +2340,7 @@ class TestQgsGeometry(unittest.TestCase):
         expec = {} # expected WKT result
         types = {} # optional geometry types for points added
         resul = {} # expected GeometryOperationResult
+        part2 = {} # optional
 
         T = 'point_add_point'
         geoms[T] = QgsGeometry.fromPointXY(QgsPointXY(0, 0))
@@ -2457,17 +2458,18 @@ class TestQgsGeometry(unittest.TestCase):
                     message += ' failed'
                 message_with_wkt = message + '\nOriginal geom: {}'.format(geoms[t].asWkt())
                 if type(parts[t]) is list:
-                    # if type(parts[t][0]) == QgsGeometry:
-                    #     self.assertEqual(geoms[t].addPartGeometry(parts[t]), expected_result, message)
                     if type(parts[t][0]) == QgsPointXY:
                         geom_type = types.get(t, QgsWkbTypes.UnknownGeometry)
                         self.assertEqual(geoms[t].addPointsXY(parts[t], geom_type), expected_result, message_with_wkt)
                     elif type(parts[t][0]) == QgsPoint:
                         self.assertEqual(geoms[t].addPoints(parts[t]), expected_result, message_with_wkt)
                     else:
-                        self.assertFalse('could not detect what Python method to use for add part', message_with_wkt)
+                        self.fail(message_with_wkt + '\n could not detect what Python method to use for add part')
                 else:
-                    self.assertEqual(geoms[t].addPart(parts[t].get().clone()), expected_result, message_with_wkt)
+                    if type(parts[t]) == QgsGeometry:
+                        self.assertEqual(geoms[t].addPartGeometry(parts[t]), expected_result, message)
+                    else:
+                        self.assertEqual(geoms[t].addPart(parts[t].get().clone()), expected_result, message_with_wkt)
 
                 if expected_result == Qgis.Success:
                     wkt = geoms[t].asWkt()
