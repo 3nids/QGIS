@@ -2345,7 +2345,7 @@ class TestQgsGeometry(unittest.TestCase):
 
         def curve():
             cs = QgsCircularString()
-            cs.setPoints( [QgsPoint( 31, 32 ), QgsPoint( 34, 36 ), QgsPoint( 37, 39 )])
+            cs.setPoints([QgsPoint(31, 32), QgsPoint(34, 36), QgsPoint(37, 39)])
             return cs.toCurveType()
 
         circle = QgsCircle(QgsPoint(10, 10), 5)
