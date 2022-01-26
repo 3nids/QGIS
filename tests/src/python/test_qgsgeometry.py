@@ -2340,7 +2340,6 @@ class TestQgsGeometry(unittest.TestCase):
         expec = {} # expected WKT result
         types = {} # optional geometry types for points added
         resul = {} # expected GeometryOperationResult
-        part2 = {} # optional
 
         T = 'point_add_point'
         geoms[T] = QgsGeometry.fromPointXY(QgsPointXY(0, 0))
