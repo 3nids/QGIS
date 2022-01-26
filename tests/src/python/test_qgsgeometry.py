@@ -2362,7 +2362,7 @@ class TestQgsGeometry(unittest.TestCase):
         expec[T] = "MultiLineString ((0 0, 1 0, 1 1, 2 1, 2 0), (3 0, 3 1))"
 
         T = 'add_point_with_more_points'
-        geoms[T] = polyline1_geom_geom
+        geoms[T] = polyline1_geom
         parts[T] = line_points[1]
         expec[T] = "MultiLineString ((0 0, 1 0, 1 1, 2 1, 2 0), (3 0, 3 1, 5 1, 5 0, 6 0))"
 
@@ -2400,12 +2400,12 @@ class TestQgsGeometry(unittest.TestCase):
         T = 'multipolygon_add_polygon'
         geoms[T] = multi_polygon1_geom
         parts[T] = polygon2_geom
-        expec[T] = multi_polygon1.asWkt()
+        expec[T] = multi_polygon1_geom.asWkt()
 
         T = 'multipolygon_add_multipolygon'
         geoms[T] = multi_polygon1_geom
         parts[T] = multi_polygon2_geom
-        expec[T] = multi_polygon1.asWkt()
+        expec[T] = multi_polygon1_geom.asWkt()
 
         T = 'polygon_add_point_with_Z'
         geoms[T] = polygon1_geom
@@ -2450,6 +2450,7 @@ class TestQgsGeometry(unittest.TestCase):
         for t in parts.keys():
             with self.subTest(t=t):
                 expected_result = resul.get(t, Qgis.GeometryOperationResult.Success)
+                geom_type = types.get(t, QgsWkbTypes.UnknownGeometry)
                 message = '\n' + t
                 if expected_result != Qgis.Success:
                     message += ' unexpectedly succeeded'
@@ -2458,7 +2459,6 @@ class TestQgsGeometry(unittest.TestCase):
                 message_with_wkt = message + '\nOriginal geom: {}'.format(geoms[t].asWkt())
                 if type(parts[t]) is list:
                     if type(parts[t][0]) == QgsPointXY:
-                        geom_type = types.get(t, QgsWkbTypes.UnknownGeometry)
                         self.assertEqual(geoms[t].addPointsXY(parts[t], geom_type), expected_result, message_with_wkt)
                     elif type(parts[t][0]) == QgsPoint:
                         self.assertEqual(geoms[t].addPoints(parts[t]), expected_result, message_with_wkt)
@@ -2468,7 +2468,7 @@ class TestQgsGeometry(unittest.TestCase):
                     if type(parts[t]) == QgsGeometry:
                         self.assertEqual(geoms[t].addPartGeometry(parts[t]), expected_result, message)
                     else:
-                        self.assertEqual(geoms[t].addPart(parts[t].get().clone()), expected_result, message_with_wkt)
+                        self.assertEqual(geoms[t].addPart(parts[t].get().clone(), geom_type), expected_result, message_with_wkt)
 
                 if expected_result == Qgis.Success:
                     wkt = geoms[t].asWkt()
