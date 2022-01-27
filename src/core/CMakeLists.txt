@@ -1777,7 +1777,7 @@ set(QGIS_CORE_PRIVATE_HDRS
   qgsfeature_p.h
   qgsfield_p.h
   qgsfields_p.h
-  qgsmaplayerlistutils_h.h
+  qgsmaplayerlistutils_p.h
   qgspolymorphicrelation_p.h
   qgsproperty_p.h
   qgsrelation_p.h
@@ -1790,9 +1790,7 @@ set(QGIS_CORE_PRIVATE_HDRS
   expression/qgsexpression_p.h
 
   externalstorage/qgssimplecopyexternalstorage_p.h
-  externalstorage/qgswebdavexternalstorage_p.
-
-  ogr/qgscplerrorhandler_p.h
+  externalstorage/qgswebdavexternalstorage_p.h
 
   proj/qgscoordinatereferencesystem_p.h
   proj/qgscoordinatetransformcontext_p.h
