@@ -46,7 +46,7 @@
 #include "qgstransactiongroup.h"
 #include "qgsvectordataprovider.h"
 #include "qgsprojectbadlayerhandler.h"
-#include "qgsmaplayerlistutils.h"
+#include "qgsmaplayerlistutils_p.h"
 #include "qgsmeshlayer.h"
 #include "qgslayoutmanager.h"
 #include "qgsbookmarkmanager.h"
