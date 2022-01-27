@@ -1440,7 +1440,7 @@ json QgsGeometry::asJsonObject( int precision ) const
 
 }
 
-QVector<QgsGeometry> QgsGeometry::coerceToType( const QgsWkbTypes::Type type, const QgsWkbTypes::Type type, double defaultZ, double defaultM ) const
+QVector<QgsGeometry> QgsGeometry::coerceToType( const QgsWkbTypes::Type type, double defaultZ, double defaultM ) const
 {
   QVector< QgsGeometry > res;
   if ( isNull() )

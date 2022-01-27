@@ -1967,7 +1967,7 @@ class CORE_EXPORT QgsGeometry
      *
      * \since QGIS 3.14
      */
-    QVector< QgsGeometry > coerceToType( QgsWkbTypes::Type type, const QgsWkbTypes::Type type, double defaultZ, double defaultM ) const;
+    QVector< QgsGeometry > coerceToType( QgsWkbTypes::Type type, double defaultZ = 0, double defaultM = 0 ) const;
 
     /**
      * Try to convert the geometry to the requested type

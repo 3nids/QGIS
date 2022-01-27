@@ -1934,7 +1934,7 @@ Exports the geometry to a GeoJSON string.
 %End
 
 
-    QVector< QgsGeometry > coerceToType( QgsWkbTypes::Type type, const QgsWkbTypes::Type type, double defaultZ, double defaultM ) const;
+    QVector< QgsGeometry > coerceToType( QgsWkbTypes::Type type, double defaultZ = 0, double defaultM = 0 ) const;
 %Docstring
 Attempts to coerce this geometry into the specified destination ``type``.
 
