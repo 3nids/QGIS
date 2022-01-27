@@ -1440,7 +1440,7 @@ json QgsGeometry::asJsonObject( int precision ) const
 
 }
 
-QVector<QgsGeometry> QgsGeometry::coerceToType( const QgsWkbTypes::Type type ) const
+QVector<QgsGeometry> QgsGeometry::coerceToType( const QgsWkbTypes::Type type, const QgsWkbTypes::Type type, double defaultZ, double defaultM ) const
 {
   QVector< QgsGeometry > res;
   if ( isNull() )
@@ -1538,11 +1538,11 @@ QVector<QgsGeometry> QgsGeometry::coerceToType( const QgsWkbTypes::Type type ) c
   // Add Z/M back, set to 0
   if ( ! newGeom.constGet()->is3D() && QgsWkbTypes::hasZ( type ) )
   {
-    newGeom.get()->addZValue( QgsSettingsRegistryCore::settingsDigitizingDefaultZValue.value() );
+    newGeom.get()->addZValue( defaultZ );
   }
   if ( ! newGeom.constGet()->isMeasure() && QgsWkbTypes::hasM( type ) )
   {
-    newGeom.get()->addMValue( QgsSettingsRegistryCore::settingsDigitizingDefaultMValue.value() );
+    newGeom.get()->addMValue( defaultM );
   }
 
   // Multi -> single
