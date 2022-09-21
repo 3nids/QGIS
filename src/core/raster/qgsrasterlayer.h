@@ -79,6 +79,7 @@ class CORE_EXPORT QgsRasterLayer : public QgsMapLayer, public QgsAbstractProfile
     Q_OBJECT
   public:
 
+    static const inline QgsSettingsEntryBool settingsRasterDefaultEarlyResampling = QgsSettingsEntryBool( QStringLiteral( "/defaultEarlyResampling" ), QgsSettings::Prefix::RASTER, false ) SIP_SKIP;
     static const inline QgsSettingsEntryDouble settingsRasterDefaultOversampling = QgsSettingsEntryDouble( QStringLiteral( "/defaultOversampling" ), QgsSettings::Prefix::RASTER, 2.0 ) SIP_SKIP;
     //! \brief Default sample size (number of pixels) for estimated statistics/histogram calculation
     static const double SAMPLE_SIZE;
