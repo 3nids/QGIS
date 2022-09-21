@@ -224,7 +224,7 @@ QgsVectorLayer::QgsVectorLayer( const QString &vectorLayerPath,
   QgsSettings settings;
   mSimplifyMethod.setSimplifyHints( QgsVectorLayer::settingsSimplifyDrawingHints.valueWithDefaultOverride(mSimplifyMethod.simplifyHints()) );
   mSimplifyMethod.setSimplifyAlgorithm( QgsVectorLayer::settingsSimplifyAlgorithm.valueWithDefaultOverride(mSimplifyMethod.simplifyAlgorithm()) );
-  mSimplifyMethod.setThreshold( settings.value( QStringLiteral( "qgis/simplifyDrawingTol" ), mSimplifyMethod.threshold() ).toFloat() );
+  mSimplifyMethod.setThreshold( QgsVectorLayer::settingsSimplifyDrawingTol.valueWithDefaultOverride(mSimplifyMethod.threshold()) );
   mSimplifyMethod.setForceLocalOptimization( settings.value( QStringLiteral( "qgis/simplifyLocal" ), mSimplifyMethod.forceLocalOptimization() ).toBool() );
   mSimplifyMethod.setMaximumScale( settings.value( QStringLiteral( "qgis/simplifyMaxScale" ), mSimplifyMethod.maximumScale() ).toFloat() );
 
