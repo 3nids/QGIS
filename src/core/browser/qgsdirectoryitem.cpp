@@ -17,6 +17,7 @@
 
 #include "qgsdirectoryitem.h"
 #include "qgssettings.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsapplication.h"
 #include "qgsdataitemprovider.h"
 #include "qgsdataitemproviderregistry.h"
@@ -190,7 +191,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
   mMonitoring = monitoring;
 
   QgsSettings settings;
-  QStringList noMonitorDirs = settings.value( QStringLiteral( "qgis/disableMonitorItemUris" ), QStringList() ).toStringList();
+  QStringList noMonitorDirs = QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue();
   QStringList alwaysMonitorDirs = settings.value( QStringLiteral( "qgis/alwaysMonitorItemUris" ), QStringList() ).toStringList();
 
   switch ( mMonitoring )
@@ -199,7 +200,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
     {
       // remove disable/always setting for this path, so that default behavior is used
       noMonitorDirs.removeAll( mDirPath );
-      settings.setValue( QStringLiteral( "qgis/disableMonitorItemUris" ), noMonitorDirs );
+      QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue( noMonitorDirs );
 
       alwaysMonitorDirs.removeAll( mDirPath );
       settings.setValue( QStringLiteral( "qgis/alwaysMonitorItemUris" ), alwaysMonitorDirs );
@@ -213,7 +214,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
       if ( !noMonitorDirs.contains( mDirPath ) )
       {
         noMonitorDirs.append( mDirPath );
-        settings.setValue( QStringLiteral( "qgis/disableMonitorItemUris" ), noMonitorDirs );
+        QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue( noMonitorDirs );
       }
 
       alwaysMonitorDirs.removeAll( mDirPath );
@@ -226,7 +227,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
     case Qgis::BrowserDirectoryMonitoring::AlwaysMonitor:
     {
       noMonitorDirs.removeAll( mDirPath );
-      settings.setValue( QStringLiteral( "qgis/disableMonitorItemUris" ), noMonitorDirs );
+      QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue( noMonitorDirs );
 
       if ( !alwaysMonitorDirs.contains( mDirPath ) )
       {
@@ -421,7 +422,7 @@ bool QgsDirectoryItem::hiddenPath( const QString &path )
 Qgis::BrowserDirectoryMonitoring QgsDirectoryItem::monitoringForPath( const QString &path )
 {
   const QgsSettings settings;
-  if ( settings.value( QStringLiteral( "qgis/disableMonitorItemUris" ), QStringList() ).toStringList().contains( path ) )
+  if ( QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue().contains( path ) )
     return Qgis::BrowserDirectoryMonitoring::NeverMonitor;
   else if ( settings.value( QStringLiteral( "qgis/alwaysMonitorItemUris" ), QStringList() ).toStringList().contains( path ) )
     return Qgis::BrowserDirectoryMonitoring::AlwaysMonitor;
