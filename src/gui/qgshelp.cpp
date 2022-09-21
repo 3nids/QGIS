@@ -116,7 +116,7 @@ bool QgsHelp::urlExists( const QString &url )
   QTcpSocket socket;
 
   const QgsSettings settings;
-  const bool proxyEnabled = settings.value( QStringLiteral( "proxy/proxyEnabled" ), false ).toBool();
+  const bool proxyEnabled = QgsNetworkAccessManager::settingsProxyProxyEnabled.value();
   if ( proxyEnabled )
   {
     QNetworkProxy proxy;
