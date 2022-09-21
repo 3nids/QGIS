@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
+  addSettingsEntry( &QgsVectorLayer::settingsSimplifyLocal );
   addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultEarlyResampling );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyEnabled );
   addSettingsEntry( &QgsAuthManager::settingsPasswordHelperLogging );
