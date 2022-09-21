@@ -222,7 +222,7 @@ QgsVectorLayer::QgsVectorLayer( const QString &vectorLayerPath,
 
   // Default simplify drawing settings
   QgsSettings settings;
-  mSimplifyMethod.setSimplifyHints( settings.flagValue( QStringLiteral( "qgis/simplifyDrawingHints" ), mSimplifyMethod.simplifyHints(), QgsSettings::NoSection ) );
+  mSimplifyMethod.setSimplifyHints( QgsVectorLayer::settingsSimplifyDrawingHints.valueWithDefaultOverride(mSimplifyMethod.simplifyHints()) );
   mSimplifyMethod.setSimplifyAlgorithm( settings.enumValue( QStringLiteral( "qgis/simplifyAlgorithm" ), mSimplifyMethod.simplifyAlgorithm() ) );
   mSimplifyMethod.setThreshold( settings.value( QStringLiteral( "qgis/simplifyDrawingTol" ), mSimplifyMethod.threshold() ).toFloat() );
   mSimplifyMethod.setForceLocalOptimization( settings.value( QStringLiteral( "qgis/simplifyLocal" ), mSimplifyMethod.forceLocalOptimization() ).toBool() );

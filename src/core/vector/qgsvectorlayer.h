@@ -17,6 +17,7 @@
 
 #ifndef QGSVECTORLAYER_H
 #define QGSVECTORLAYER_H
+#include "qgssettingsentryimpl.h"
 
 
 #include "qgis_core.h"
@@ -401,6 +402,7 @@ class CORE_EXPORT QgsVectorLayer : public QgsMapLayer, public QgsExpressionConte
 
   public:
 
+    static const inline QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyHint> settingsSimplifyDrawingHints = QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyHint>( QStringLiteral( "simplifyDrawingHints" ), QgsSettings::Prefix::QGIS, QgsVectorSimplifyMethod::SimplifyHint::NoSimplification ) SIP_SKIP;
     /**
      * Setting options for loading vector layers.
      * \since QGIS 3.0
