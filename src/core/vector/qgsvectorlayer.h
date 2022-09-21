@@ -402,6 +402,7 @@ class CORE_EXPORT QgsVectorLayer : public QgsMapLayer, public QgsExpressionConte
 
   public:
 
+    static const inline QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyAlgorithm> settingsSimplifyAlgorithm = QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyAlgorithm>( QStringLiteral( "simplifyAlgorithm" ), QgsSettings::Prefix::QGIS, QgsVectorSimplifyMethod::SimplifyAlgorithm::Distance ) SIP_SKIP;
     static const inline QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyHint> settingsSimplifyDrawingHints = QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyHint>( QStringLiteral( "simplifyDrawingHints" ), QgsSettings::Prefix::QGIS, QgsVectorSimplifyMethod::SimplifyHint::NoSimplification ) SIP_SKIP;
     /**
      * Setting options for loading vector layers.
