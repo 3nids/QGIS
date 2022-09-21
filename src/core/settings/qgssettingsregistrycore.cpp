@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsgpsdetector.h"
 #include "qgsvectorlayer.h"
 #include "qgsogrdbconnection.h"
 #include "qgsfontmanager.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &settingsDigitizingOffsetMiterLimit );
   addSettingsEntry( &settingsDigitizingConvertToCurve );
+  addSettingsEntry( &QgsGpsDetector::settingsGpsFlowControl );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingHints );
   addSettingsEntry( &settingsDigitizingConvertToCurveAngleTolerance );
   addSettingsEntry( &settingsDigitizingConvertToCurveDistanceTolerance );
