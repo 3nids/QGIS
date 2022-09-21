@@ -192,7 +192,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
 
   QgsSettings settings;
   QStringList noMonitorDirs = QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue();
-  QStringList alwaysMonitorDirs = settings.value( QStringLiteral( "qgis/alwaysMonitorItemUris" ), QStringList() ).toStringList();
+  QStringList alwaysMonitorDirs = QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue();
 
   switch ( mMonitoring )
   {
@@ -203,7 +203,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
       QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue( noMonitorDirs );
 
       alwaysMonitorDirs.removeAll( mDirPath );
-      settings.setValue( QStringLiteral( "qgis/alwaysMonitorItemUris" ), alwaysMonitorDirs );
+      QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue( alwaysMonitorDirs );
 
       mMonitored = pathShouldByMonitoredByDefault( mDirPath );
       break;
@@ -218,7 +218,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
       }
 
       alwaysMonitorDirs.removeAll( mDirPath );
-      settings.setValue( QStringLiteral( "qgis/alwaysMonitorItemUris" ), alwaysMonitorDirs );
+      QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue( alwaysMonitorDirs );
 
       mMonitored = false;
       break;
@@ -232,7 +232,7 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
       if ( !alwaysMonitorDirs.contains( mDirPath ) )
       {
         alwaysMonitorDirs.append( mDirPath );
-        settings.setValue( QStringLiteral( "qgis/alwaysMonitorItemUris" ), alwaysMonitorDirs );
+        QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue( alwaysMonitorDirs );
       }
 
       mMonitored = true;
@@ -424,7 +424,7 @@ Qgis::BrowserDirectoryMonitoring QgsDirectoryItem::monitoringForPath( const QStr
   const QgsSettings settings;
   if ( QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue().contains( path ) )
     return Qgis::BrowserDirectoryMonitoring::NeverMonitor;
-  else if ( settings.value( QStringLiteral( "qgis/alwaysMonitorItemUris" ), QStringList() ).toStringList().contains( path ) )
+  else if ( QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue().contains( path ) )
     return Qgis::BrowserDirectoryMonitoring::AlwaysMonitor;
   return Qgis::BrowserDirectoryMonitoring::Default;
 }

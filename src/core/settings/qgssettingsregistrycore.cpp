@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnapType );
   addSettingsEntry( &settingsDigitizingDefaultSnappingTolerance );
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
+  addSettingsEntry( &settingsAlwaysMonitorItemUris );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDisableMonitorItemUris );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
