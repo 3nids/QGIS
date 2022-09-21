@@ -17,6 +17,7 @@
 #include "qgswfscapabilities.h"
 #include "qgswfsconstants.h"
 #include "qgswfsutils.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslogger.h"
 #include "qgsmessagelog.h"
 #include "qgsogcutils.h"

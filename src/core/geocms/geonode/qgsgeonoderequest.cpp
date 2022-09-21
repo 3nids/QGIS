@@ -17,6 +17,7 @@
 #include "qgssettings.h"
 #include "qgsmessagelog.h"
 #include "qgslogger.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsgeonoderequest.h"
 #include "qgsvariantutils.h"
 
@@ -227,7 +228,7 @@ void QgsGeoNodeRequest::replyFinished()
           if ( cmd.expirationDate().isNull() )
           {
             QgsSettings settings;
-            cmd.setExpirationDate( QDateTime::currentDateTime().addSecs( settings.value( QStringLiteral( "qgis/defaultCapabilitiesExpiry" ), "24", QgsSettings::Providers ).toInt() * 60 * 60 ) );
+            cmd.setExpirationDate( QDateTime::currentDateTime().addSecs( QgsSettingsRegistryCore::settingsDefaultCapabilitiesExpiry.setValue() * 60 * 60 ) );
           }
 
           nam->cache()->updateMetaData( cmd );

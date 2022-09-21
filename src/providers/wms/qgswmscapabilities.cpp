@@ -17,6 +17,7 @@
 #include "qgswmsprovider.h"
 
 #include <QFile>
+#include "qgssettingsregistrycore.h"
 #include <QDir>
 #include <QNetworkCacheMetaData>
 #include <QRegularExpression>
