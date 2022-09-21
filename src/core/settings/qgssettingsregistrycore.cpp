@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsmaplayerlegend.h"
 #include "qgsauthmanager.h"
 #include "qgsvectorfilewriter.h"
 #include "qgscptcityarchive.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
+  addSettingsEntry( &QgsMapLayerLegend::settingsShowLegendClassifiers );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyLocal );
   addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultEarlyResampling );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyEnabled );

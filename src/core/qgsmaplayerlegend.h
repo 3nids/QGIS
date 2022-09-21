@@ -17,6 +17,7 @@
 #define QGSMAPLAYERLEGEND_H
 
 #include <QObject>
+#include "qgssettingsentryimpl.h"
 #include "qgis_sip.h"
 
 class QDomDocument;
@@ -49,6 +50,7 @@ class CORE_EXPORT QgsMapLayerLegend : public QObject
     Q_OBJECT
   public:
 
+    static const inline QgsSettingsEntryBool settingsShowLegendClassifiers = QgsSettingsEntryBool( QStringLiteral( "showLegendClassifiers" ), QgsSettings::Prefix::QGIS, false ) SIP_SKIP;
     //! Constructor for QgsMapLayerLegend
     explicit QgsMapLayerLegend( QObject *parent SIP_TRANSFERTHIS = nullptr );
 
