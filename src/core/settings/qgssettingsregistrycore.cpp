@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPassword );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyUser );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPort );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyHost );
