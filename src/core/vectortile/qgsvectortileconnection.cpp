@@ -158,7 +158,7 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
   QgsVectorTileProviderConnection::Data conn;
   conn.url = settings.value( QStringLiteral( "url" ) ).toString();
   conn.zMin = QgsSettingsRegistryCore::settingsZmin.setValue();
-  conn.zMax = settings.value( QStringLiteral( "zmax" ), -1 ).toInt();
+  conn.zMax = QgsSettingsRegistryCore::settingsZmax.setValue();
   conn.authCfg = settings.value( QStringLiteral( "authcfg" ) ).toString();
   conn.username = settings.value( QStringLiteral( "username" ) ).toString();
   conn.password = settings.value( QStringLiteral( "password" ) ).toString();
@@ -188,7 +188,7 @@ void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVec
   settings.beginGroup( "qgis/connections-vector-tile/" + name );
   settings.setValue( QStringLiteral( "url" ), conn.url );
   QgsSettingsRegistryCore::settingsZmin.setValue( conn.zMin );
-  settings.setValue( QStringLiteral( "zmax" ), conn.zMax );
+  QgsSettingsRegistryCore::settingsZmax.setValue( conn.zMax );
   settings.setValue( QStringLiteral( "authcfg" ), conn.authCfg );
   settings.setValue( QStringLiteral( "username" ), conn.username );
   settings.setValue( QStringLiteral( "password" ), conn.password );
