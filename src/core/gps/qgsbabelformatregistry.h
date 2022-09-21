@@ -17,6 +17,7 @@
 #define QGSBABELFORMATREGISTRY_H
 
 #include "qgis_core.h"
+#include "qgssettingsentryimpl.h"
 #include "qgis.h"
 
 class QgsBabelSimpleImportFormat;
@@ -36,6 +37,7 @@ class CORE_EXPORT QgsBabelFormatRegistry
 {
   public:
 
+    static const inline QgsSettingsEntryStringList settingsBabelDeviceList = QgsSettingsEntryStringList( QStringLiteral( "babelDeviceList" ), QgsSettings::Prefix::GPS_, QStringList() ) SIP_SKIP;
     /**
      * Constructor for QgsBabelFormatRegistry.
      *

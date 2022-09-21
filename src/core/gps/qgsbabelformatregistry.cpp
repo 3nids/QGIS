@@ -268,7 +268,7 @@ void QgsBabelFormatRegistry::reloadFromSettings()
   QgsSettings settings;
 
   bool useOldPath = false;
-  QStringList deviceNames = settings.value( QStringLiteral( "babelDeviceList" ), QVariant(), QgsSettings::Gps ).toStringList();
+  QStringList deviceNames = QgsBabelFormatRegistry::settingsBabelDeviceList.setValue();
   if ( deviceNames.empty() ) // migrate old settings
   {
     useOldPath = true;
