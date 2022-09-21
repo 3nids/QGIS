@@ -51,7 +51,7 @@ QgsRasterRenderingOptionsWidget::QgsRasterRenderingOptionsWidget( QWidget *paren
   QString zoomedOutResampling = settings.value( QStringLiteral( "/Raster/defaultZoomedOutResampling" ), QStringLiteral( "nearest neighbour" ) ).toString();
   mZoomedOutResamplingComboBox->setCurrentIndex( mZoomedOutResamplingComboBox->findData( zoomedOutResampling ) );
 
-  spnOversampling->setValue( settings.value( QStringLiteral( "/Raster/defaultOversampling" ), 2.0 ).toDouble() );
+  spnOversampling->setValue( QgsRasterLayer::settingsRasterDefaultOversampling.setValue() );
   spnOversampling->setClearValue( 2.0 );
   mCbEarlyResampling->setChecked( settings.value( QStringLiteral( "/Raster/defaultEarlyResampling" ), false ).toBool() );
 
@@ -89,7 +89,7 @@ void QgsRasterRenderingOptionsWidget::apply()
   settings.setValue( QStringLiteral( "/Raster/defaultZoomedInResampling" ), mZoomedInResamplingComboBox->currentData().toString() );
   settings.setValue( QStringLiteral( "/Raster/defaultZoomedOutResampling" ), mZoomedOutResamplingComboBox->currentData().toString() );
 
-  settings.setValue( QStringLiteral( "/Raster/defaultOversampling" ), spnOversampling->value() );
+  QgsRasterLayer::settingsRasterDefaultOversampling.setValue( spnOversampling->value() );
   settings.setValue( QStringLiteral( "/Raster/defaultEarlyResampling" ), mCbEarlyResampling->isChecked() );
 
   saveContrastEnhancement( cboxContrastEnhancementAlgorithmSingleBand, QStringLiteral( "singleBand" ) );
