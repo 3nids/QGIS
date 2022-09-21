@@ -411,7 +411,6 @@ void QgsVectorFileWriter::init( QString vectorFileName,
   {
     QgsDebugMsg( "error finding QTextCodec for " + fileEncoding );
 
-    QgsSettings settings;
     QString enc = QgsSettingsRegistryCore::settingsEncoding.value();
     mCodec = QTextCodec::codecForName( enc.toLocal8Bit().constData() );
     if ( !mCodec )

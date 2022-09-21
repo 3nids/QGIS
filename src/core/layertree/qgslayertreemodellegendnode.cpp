@@ -304,7 +304,6 @@ QgsSymbolLegendNode::QgsSymbolLegendNode( QgsLayerTreeLayer *nodeLayer, const Qg
   {
     // it's FAR too expensive to construct a QgsSettings object for every symbol node, especially for complex
     // projects. So only read the valid size ranges once, and store them for subsequent use
-    const QgsSettings settings;
     MINIMUM_SIZE = settings.value( "/qgis/legendsymbolMinimumSize", 0.5 ).toDouble();
     MAXIMUM_SIZE = settings.value( "/qgis/legendsymbolMaximumSize", 20.0 ).toDouble();
   }

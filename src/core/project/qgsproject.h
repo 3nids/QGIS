@@ -2301,7 +2301,6 @@ class CORE_EXPORT QgsProject : public QObject, public QgsExpressionContextGenera
 
     bool mIsBeingDeleted = false;
 
-    QgsSettings mSettings;
 
     mutable std::unique_ptr< QgsExpressionContextScope > mProjectScope;
 

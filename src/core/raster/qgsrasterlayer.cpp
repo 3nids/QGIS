@@ -797,7 +797,6 @@ void QgsRasterLayer::setDataProvider( QString const &provider, const QgsDataProv
 
   if ( mDataProvider->providerCapabilities() & QgsRasterDataProvider::ProviderHintBenefitsFromResampling )
   {
-    const QgsSettings settings;
     QString resampling = settings.value( QStringLiteral( "/Raster/defaultZoomedInResampling" ), QStringLiteral( "nearest neighbour" ) ).toString();
     if ( resampling == QLatin1String( "bilinear" ) )
     {

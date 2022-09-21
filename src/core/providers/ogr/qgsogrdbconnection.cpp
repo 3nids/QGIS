@@ -56,7 +56,6 @@ bool QgsOgrDbConnection::allowProjectsInDatabase()
 
 const QStringList QgsOgrDbConnection::connectionList( const QString &driverName )
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "providers/ogr/%1/connections" ).arg( driverName ) );
   return settings.childGroups();
 }

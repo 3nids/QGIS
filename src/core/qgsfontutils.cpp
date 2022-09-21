@@ -585,7 +585,6 @@ void QgsFontUtils::addRecentFontFamily( const QString &family )
     return;
   }
 
-  QgsSettings settings;
   QStringList recentFamilies = settings.value( QStringLiteral( "fonts/recent" ) ).toStringList();
 
   //remove matching families
@@ -602,6 +601,5 @@ void QgsFontUtils::addRecentFontFamily( const QString &family )
 
 QStringList QgsFontUtils::recentFontFamilies()
 {
-  const QgsSettings settings;
   return settings.value( QStringLiteral( "fonts/recent" ) ).toStringList();
 }

@@ -108,7 +108,6 @@ QgsDataSourceUri &QgsOwsConnection::addWmsWcsConnectionSettings( QgsDataSourceUr
   addCommonConnectionSettings( uri, settingsKey );
   Q_NOWARN_DEPRECATED_POP
 
-  const QgsSettings settings;
   uri.httpHeaders().setFromSettings( settings, settingsKey );
 
   if ( settings.value( settingsKey + QStringLiteral( "/ignoreGetMapURI" ), false ).toBool() )
@@ -141,7 +140,6 @@ QgsDataSourceUri &QgsOwsConnection::addWmsWcsConnectionSettings( QgsDataSourceUr
   addCommonConnectionSettings( uri, service, connName );
 
   QString settingsKey = QString( "%3/connections-%1/%2/" ).arg( service.toLower(), connName, QgsSettings::Prefix::QGIS );
-  const QgsSettings settings;
   uri.httpHeaders().setFromSettings( settings, settingsKey );
 
   if ( settingsConnectionIgnoreGetMapURI.value( {service.toLower(), connName} ) )
@@ -174,7 +172,6 @@ QgsDataSourceUri &QgsOwsConnection::addWfsConnectionSettings( QgsDataSourceUri &
   addCommonConnectionSettings( uri, settingsKey );
   Q_NOWARN_DEPRECATED_POP
 
-  const QgsSettings settings;
   const QString version = settings.value( settingsKey + "/version" ).toString();
   if ( !version.isEmpty() )
   {
@@ -211,26 +208,22 @@ QgsDataSourceUri &QgsOwsConnection::addWfsConnectionSettings( QgsDataSourceUri &
 
 QStringList QgsOwsConnection::connectionList( const QString &service )
 {
-  QgsSettings settings;
   settings.beginGroup( QString( "%1/connections-%2" ).arg( QgsSettings::Prefix::QGIS, service.toLower() ) );
   return settings.childGroups();
 }
 
 QString QgsOwsConnection::selectedConnection( const QString &service )
 {
-  const QgsSettings settings;
   return settings.value( QString( "%1/connections-%2/selected" ).arg( QgsSettings::Prefix::QGIS, service.toLower() ) ).toString();
 }
 
 void QgsOwsConnection::setSelectedConnection( const QString &service, const QString &name )
 {
-  QgsSettings settings;
   settings.setValue( QString( "%1/connections-%2/selected" ).arg( QgsSettings::Prefix::QGIS, service.toLower() ), name );
 }
 
 void QgsOwsConnection::addCommonConnectionSettings( QgsDataSourceUri &uri, const QString &key )
 {
-  const QgsSettings settings;
 
   if ( settings.value( key + QStringLiteral( "/ignoreAxisOrientation" ), false ).toBool() )
   {

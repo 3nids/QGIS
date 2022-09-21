@@ -221,7 +221,6 @@ QgsVectorLayer::QgsVectorLayer( const QString &vectorLayerPath,
   connect( this, &QgsVectorLayer::readOnlyChanged, this, &QgsVectorLayer::supportsEditingChanged );
 
   // Default simplify drawing settings
-  QgsSettings settings;
   mSimplifyMethod.setSimplifyHints( QgsVectorLayer::settingsSimplifyDrawingHints.valueWithDefaultOverride(mSimplifyMethod.simplifyHints()) );
   mSimplifyMethod.setSimplifyAlgorithm( QgsVectorLayer::settingsSimplifyAlgorithm.valueWithDefaultOverride(mSimplifyMethod.simplifyAlgorithm()) );
   mSimplifyMethod.setThreshold( QgsVectorLayer::settingsSimplifyDrawingTol.valueWithDefaultOverride(mSimplifyMethod.threshold()) );

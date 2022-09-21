@@ -188,7 +188,6 @@ QgsTileDownloadManager::QgsTileDownloadManager()
 {
   mRangesCache.reset( new QgsRangeRequestCache );
 
-  const QgsSettings settings;
   QString cacheDirectory = settings.value( QStringLiteral( "cache/directory" ) ).toString();
   if ( cacheDirectory.isEmpty() )
     cacheDirectory = QStandardPaths::writableLocation( QStandardPaths::CacheLocation );
