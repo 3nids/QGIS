@@ -53,7 +53,7 @@ QgsRasterRenderingOptionsWidget::QgsRasterRenderingOptionsWidget( QWidget *paren
 
   spnOversampling->setValue( QgsRasterLayer::settingsRasterDefaultOversampling.setValue() );
   spnOversampling->setClearValue( 2.0 );
-  mCbEarlyResampling->setChecked( settings.value( QStringLiteral( "/Raster/defaultEarlyResampling" ), false ).toBool() );
+  mCbEarlyResampling->setChecked( QgsRasterLayer::settingsRasterDefaultEarlyResampling.setValue() );
 
   initContrastEnhancement( cboxContrastEnhancementAlgorithmSingleBand, QStringLiteral( "singleBand" ),
                            QgsContrastEnhancement::contrastEnhancementAlgorithmString( QgsRasterLayer::SINGLE_BAND_ENHANCEMENT_ALGORITHM ) );
@@ -90,7 +90,7 @@ void QgsRasterRenderingOptionsWidget::apply()
   settings.setValue( QStringLiteral( "/Raster/defaultZoomedOutResampling" ), mZoomedOutResamplingComboBox->currentData().toString() );
 
   QgsRasterLayer::settingsRasterDefaultOversampling.setValue( spnOversampling->value() );
-  settings.setValue( QStringLiteral( "/Raster/defaultEarlyResampling" ), mCbEarlyResampling->isChecked() );
+  QgsRasterLayer::settingsRasterDefaultEarlyResampling.setValue( mCbEarlyResampling->isChecked() );
 
   saveContrastEnhancement( cboxContrastEnhancementAlgorithmSingleBand, QStringLiteral( "singleBand" ) );
   saveContrastEnhancement( cboxContrastEnhancementAlgorithmMultiBandSingleByte, QStringLiteral( "multiBandSingleByte" ) );

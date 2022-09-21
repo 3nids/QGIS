@@ -821,7 +821,7 @@ void QgsRasterLayer::setDataProvider( QString const &provider, const QgsDataProv
     mDataProvider->setMaxOversampling( maxOversampling );
 
     if ( ( mDataProvider->providerCapabilities() & QgsRasterDataProvider::ProviderHintCanPerformProviderResampling ) &&
-         settings.value( QStringLiteral( "/Raster/defaultEarlyResampling" ), false ).toBool() )
+         QgsRasterLayer::settingsRasterDefaultEarlyResampling.setValue() )
     {
       setResamplingStage( Qgis::RasterResamplingStage::Provider );
     }
