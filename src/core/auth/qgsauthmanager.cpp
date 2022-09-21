@@ -3202,7 +3202,7 @@ bool QgsAuthManager::passwordHelperDelete()
   bool result;
   QKeychain::DeletePasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
   QgsSettings settings;
-  job.setInsecureFallback( settings.value( QStringLiteral( "password_helper_insecure_fallback" ), false, QgsSettings::Section::Auth ).toBool() );
+  job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
   QEventLoop loop;
@@ -3234,7 +3234,7 @@ QString QgsAuthManager::passwordHelperRead()
   passwordHelperLog( tr( "Opening %1 for READ…" ).arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) );
   QKeychain::ReadPasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
   QgsSettings settings;
-  job.setInsecureFallback( settings.value( QStringLiteral( "password_helper_insecure_fallback" ), false, QgsSettings::Section::Auth ).toBool() );
+  job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
   QEventLoop loop;
@@ -3276,7 +3276,7 @@ bool QgsAuthManager::passwordHelperWrite( const QString &password )
   passwordHelperLog( tr( "Opening %1 for WRITE…" ).arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) );
   QKeychain::WritePasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
   QgsSettings settings;
-  job.setInsecureFallback( settings.value( QStringLiteral( "password_helper_insecure_fallback" ), false, QgsSettings::Section::Auth ).toBool() );
+  job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
   job.setTextData( password );
