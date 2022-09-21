@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingValidateGeometries );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
+  addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingTol );
   addSettingsEntry( &settingsDigitizingOffsetMiterLimit );
   addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultOversampling );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyAlgorithm );
