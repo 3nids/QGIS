@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
+  addSettingsEntry( &settingsGdalSkipDrivers );
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsEncoding );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyAuthcfg );

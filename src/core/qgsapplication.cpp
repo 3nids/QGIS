@@ -1879,7 +1879,7 @@ void QgsApplication::registerGdalDriversFromSettings()
   QString joinedList, delimiter;
   if ( settings.contains( QStringLiteral( "gdal/skipDrivers" ) ) )
   {
-    joinedList = settings.value( QStringLiteral( "gdal/skipDrivers" ), QString() ).toString();
+    joinedList = QgsSettingsRegistryCore::settingsGdalSkipDrivers.setValue();
     delimiter = QStringLiteral( "," );
   }
   else
