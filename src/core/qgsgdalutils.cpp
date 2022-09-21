@@ -373,7 +373,7 @@ void QgsGdalUtils::setupProxy()
   // is created.
   const QgsSettings settings;
   // Check that proxy is enabled
-  if ( settings.value( QStringLiteral( "proxy/proxyEnabled" ), false ).toBool() )
+  if ( QgsNetworkAccessManager::settingsProxyProxyEnabled.setValue() )
   {
     // Get the first configured proxy
     QList<QNetworkProxy> proxies( QgsNetworkAccessManager::instance()->proxyFactory()->queryProxy( ) );
