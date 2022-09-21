@@ -1884,7 +1884,7 @@ void QgsApplication::registerGdalDriversFromSettings()
   }
   else
   {
-    joinedList = settings.value( QStringLiteral( "gdal/skipList" ), QString() ).toString();
+    joinedList = QgsSettingsRegistryCore::settingsGdalSkipList.value();
     delimiter = QStringLiteral( " " );
   }
   QStringList myList;
