@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
+  addSettingsEntry( &QgsAuthManager::settingsPasswordHelperLogging );
   addSettingsEntry( &QgsAuthManager::settingsUsePasswordHelper );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &QgsAuthManager::settingsPasswordHelperInsecureFallback );
