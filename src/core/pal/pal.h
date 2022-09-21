@@ -35,6 +35,7 @@
 
 #include "qgis_core.h"
 #include "qgsgeometry.h"
+#include "qgssettingsentryimpl.h"
 #include "qgsgeos.h"
 #include "qgslabelingenginesettings.h"
 #include <QList>
@@ -84,6 +85,7 @@ namespace pal
 
     public:
 
+    static const inline QgsSettingsEntryInteger settingsRenderingLabelCandidatesLimitPoints = QgsSettingsEntryInteger( QStringLiteral( "label_candidates_limit_points" ), QgsSettings::Prefix::CORE_RENDERING, 0 ) SIP_SKIP;
       /**
        * \brief Create an new pal instance
        */
