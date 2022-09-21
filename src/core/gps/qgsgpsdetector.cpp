@@ -125,7 +125,7 @@ void QgsGpsDetector::advance()
 
       serial->setFlowControl( QgsGpsDetector::settingsGpsFlowControl.setValue() );
       serial->setParity( QgsGpsDetector::settingsGpsParity.setValue() );
-      serial->setDataBits( settings.enumValue( QStringLiteral( "gps/data_bits" ), QSerialPort::Data8, QgsSettings::Core ) );
+      serial->setDataBits( QgsGpsDetector::settingsGpsDataBits.setValue() );
       serial->setStopBits( settings.enumValue( QStringLiteral( "gps/stop_bits" ), QSerialPort::OneStop, QgsSettings::Core ) );
 
       if ( serial->open( QIODevice::ReadOnly ) )
