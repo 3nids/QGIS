@@ -123,7 +123,7 @@ bool QgsHelp::urlExists( const QString &url )
     const QString proxyHost = QgsNetworkAccessManager::settingsProxyProxyHost.setValue();
     const int proxyPort = QgsNetworkAccessManager::settingsProxyProxyPort.setValue().toInt();
     const QString proxyUser = QgsNetworkAccessManager::settingsProxyProxyUser.setValue();
-    const QString proxyPassword = settings.value( QStringLiteral( "proxy/proxyPassword" ), QString() ).toString();
+    const QString proxyPassword = QgsNetworkAccessManager::settingsProxyProxyPassword.setValue();
 
     const QString proxyTypeString = settings.value( QStringLiteral( "proxy/proxyType" ), QString() ).toString();
 
