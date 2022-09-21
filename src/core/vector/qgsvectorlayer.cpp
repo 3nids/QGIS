@@ -226,7 +226,7 @@ QgsVectorLayer::QgsVectorLayer( const QString &vectorLayerPath,
   mSimplifyMethod.setSimplifyAlgorithm( QgsVectorLayer::settingsSimplifyAlgorithm.valueWithDefaultOverride(mSimplifyMethod.simplifyAlgorithm()) );
   mSimplifyMethod.setThreshold( QgsVectorLayer::settingsSimplifyDrawingTol.valueWithDefaultOverride(mSimplifyMethod.threshold()) );
   mSimplifyMethod.setForceLocalOptimization( settings.value( QStringLiteral( "qgis/simplifyLocal" ), mSimplifyMethod.forceLocalOptimization() ).toBool() );
-  mSimplifyMethod.setMaximumScale( settings.value( QStringLiteral( "qgis/simplifyMaxScale" ), mSimplifyMethod.maximumScale() ).toFloat() );
+  mSimplifyMethod.setMaximumScale( QgsVectorLayer::settingsSimplifyMaxScale.valueWithDefaultOverride(mSimplifyMethod.maximumScale()) );
 
   connect( mRefreshRendererTimer, &QTimer::timeout, this, [ = ] { triggerRepaint( true ); } );
 }
