@@ -102,6 +102,7 @@ class CORE_EXPORT QgsSettings : public QObject
         static const inline char *QGIS_DIGITIZING = "qgis/digitizing";
         static const inline char *QGIS_DIGITIZING_SHAPEMAPTOOLS = "qgis/digitizing/shape-map-tools";
         static const inline char *QGIS_NETWORKANDPROXY = "qgis/networkAndProxy";
+        static const inline char *CORE_GPS = "core_gps";
         static const inline char *SVG = "svg";
         static const inline char *ELEVATION_PROFILE = "elevation-profile";
         static const inline char *CORE_LAYERTREE = "core/layer-tree";
