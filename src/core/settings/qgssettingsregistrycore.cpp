@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgslayoutitemlabel.h"
 #include "qgslayoututils.h"
 #include "qgsgeonoderequest.h"
 #include "qgsvectortileconnection.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
+  addSettingsEntry( &settingsLayoutDesignerDefaultFont );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsMapScales );
   addSettingsEntry( &settingsDigitizingValidateGeometries );

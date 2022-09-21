@@ -17,6 +17,7 @@
 
 #include "qgslayoutitemlabel.h"
 #include "qgslayoutitemregistry.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslayoututils.h"
 #include "qgslayoutmodel.h"
 #include "qgsexpression.h"
@@ -50,7 +51,7 @@ QgsLayoutItemLabel::QgsLayoutItemLabel( QgsLayout *layout )
 
   //get default layout font from settings
   const QgsSettings settings;
-  const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+  const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.setValue();
   if ( !defaultFontString.isEmpty() )
   {
     QFont f = mFormat.font();

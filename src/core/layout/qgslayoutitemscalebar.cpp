@@ -17,6 +17,7 @@
 #include "qgslayoutitemscalebar.h"
 #include "qgslayoutitemregistry.h"
 #include "qgsscalebarrendererregistry.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslayoutitemmap.h"
 #include "qgslayout.h"
 #include "qgslayoututils.h"
@@ -668,7 +669,7 @@ void QgsLayoutItemScaleBar::applyDefaultSettings()
 
   //get default composer font from settings
   const QgsSettings settings;
-  const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+  const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.setValue();
   QgsTextFormat format;
   QFont f;
   if ( !defaultFontString.isEmpty() )

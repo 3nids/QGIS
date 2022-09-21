@@ -17,6 +17,7 @@
 
 #include "qgsmessagelog.h"
 #include "qgslayoutitemmapgrid.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslayoututils.h"
 #include "qgsgeometry.h"
 #include "qgslayoutitemmap.h"
@@ -189,7 +190,7 @@ QgsLayoutItemMapGrid::QgsLayoutItemMapGrid( const QString &name, QgsLayoutItemMa
 {
   //get default layout font from settings
   const QgsSettings settings;
-  const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+  const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.setValue();
   if ( !defaultFontString.isEmpty() )
   {
     QFont font;
