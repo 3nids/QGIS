@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &settingsDigitizingOffsetMiterLimit );
+  addSettingsEntry( &QgsGpsDetector::settingsGpsParity );
   addSettingsEntry( &settingsDigitizingConvertToCurve );
   addSettingsEntry( &QgsGpsDetector::settingsGpsFlowControl );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingHints );

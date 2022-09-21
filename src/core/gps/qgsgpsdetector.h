@@ -38,6 +38,7 @@ class CORE_EXPORT QgsGpsDetector : public QObject
     Q_OBJECT
   public:
     QgsGpsDetector( const QString &portName );
+    static const inline QgsSettingsEntryEnumFlag settingsGpsParity = QgsSettingsEntryEnumFlag( QStringLiteral( "parity" ), QgsSettings::Prefix::CORE_GPS, QSerialPort::NoParity ) SIP_SKIP;
     static const inline QgsSettingsEntryEnumFlag settingsGpsFlowControl = QgsSettingsEntryEnumFlag( QStringLiteral( "flow_control" ), QgsSettings::Prefix::CORE_GPS, QSerialPort::NoFlowControl ) SIP_SKIP;
     ~QgsGpsDetector() override;
 
