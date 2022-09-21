@@ -124,7 +124,7 @@ void QgsGpsDetector::advance()
       serial->setBaudRate( mBaudList[ mBaudIndex ] );
 
       serial->setFlowControl( QgsGpsDetector::settingsGpsFlowControl.value() );
-      serial->setParity( settings.enumValue( QStringLiteral( "gps/parity" ), QSerialPort::NoParity, QgsSettings::Core ) );
+      serial->setParity( QgsGpsDetector::settingsGpsParity.value() );
       serial->setDataBits( settings.enumValue( QStringLiteral( "gps/data_bits" ), QSerialPort::Data8, QgsSettings::Core ) );
       serial->setStopBits( settings.enumValue( QStringLiteral( "gps/stop_bits" ), QSerialPort::OneStop, QgsSettings::Core ) );
 
