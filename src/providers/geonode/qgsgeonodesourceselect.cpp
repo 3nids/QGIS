@@ -17,6 +17,7 @@
 
 #include "qgslogger.h"
 #include "qgsmessagelog.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsproviderregistry.h"
 
 #include "qgsgeonodesourceselect.h"

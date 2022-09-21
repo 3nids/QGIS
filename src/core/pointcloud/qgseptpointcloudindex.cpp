@@ -17,6 +17,7 @@
 
 #include "qgseptpointcloudindex.h"
 #include <QFile>
+#include "qgssettingsregistrycore.h"
 #include <QFileInfo>
 #include <QDir>
 #include <QJsonArray>

@@ -17,6 +17,7 @@
 
 #include "qgslogger.h"
 #include "qgsrasterlayer.h"
+#include "qgssettingsregistrycore.h"
 #include "qgscoordinatetransform.h"
 #include "qgsgdalutils.h"
 

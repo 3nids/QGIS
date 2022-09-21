@@ -17,6 +17,7 @@
 
 #ifndef QGSBOX3D_H
 #define QGSBOX3D_H
+#include "qgssettingsregistrycore.h"
 
 #include "qgis_core.h"
 #include "qgsrectangle.h"

@@ -17,6 +17,7 @@
 using namespace nlohmann;
 
 #include "qgslogger.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsoapifcollection.h"
 #include "qgsoapifutils.h"
 
