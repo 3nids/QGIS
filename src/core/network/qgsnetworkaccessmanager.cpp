@@ -728,7 +728,7 @@ void QgsNetworkAccessManager::setupDefaultProxyAndCache( Qt::ConnectionType conn
       proxy = QNetworkProxy( proxyType, proxyHost, proxyPort, proxyUser, proxyPassword );
     }
     // Setup network proxy authentication configuration
-    const QString authcfg = settings.value( QStringLiteral( "proxy/authcfg" ), "" ).toString();
+    const QString authcfg = QgsNetworkAccessManager::settingsProxyAuthcfg.setValue();
     if ( !authcfg.isEmpty( ) )
     {
       QgsDebugMsg( QStringLiteral( "setting proxy from stored authentication configuration %1" ).arg( authcfg ) );
