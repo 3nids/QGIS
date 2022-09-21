@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgscptcityarchive.h"
 #include "qgslayoututils.h"
 #include "qgsogrproviderutils.h"
 #include "qgslayoutitemmapgrid.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
+  addSettingsEntry( &QgsCptCityArchive::settingsCptCityArchiveName );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
   addSettingsEntry( &settingsMapScales );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyAuthcfg );
