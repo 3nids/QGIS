@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "qgsapplication.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsfields.h"
 #include "qgsfeature.h"
 #include "qgsfeatureiterator.h"
@@ -411,7 +412,7 @@ void QgsVectorFileWriter::init( QString vectorFileName,
     QgsDebugMsg( "error finding QTextCodec for " + fileEncoding );
 
     QgsSettings settings;
-    QString enc = settings.value( QStringLiteral( "UI/encoding" ), "System" ).toString();
+    QString enc = QgsSettingsRegistryCore::settingsEncoding.setValue();
     mCodec = QTextCodec::codecForName( enc.toLocal8Bit().constData() );
     if ( !mCodec )
     {

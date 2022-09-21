@@ -17,6 +17,7 @@
  ***************************************************************************/
 #include "qgslogger.h"
 #include "qgsvectorlayersaveasdialog.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsprojectionselectiondialog.h"
 #include "qgsvectordataprovider.h"
 #include "qgscoordinatereferencesystem.h"
@@ -159,7 +160,7 @@ void QgsVectorLayerSaveAsDialog::setup()
 
   mEncodingComboBox->addItems( QgsVectorDataProvider::availableEncodings() );
 
-  QString enc = settings.value( QStringLiteral( "UI/encoding" ), "System" ).toString();
+  QString enc = QgsSettingsRegistryCore::settingsEncoding.setValue();
   int idx = mEncodingComboBox->findText( enc );
   if ( idx < 0 )
   {
@@ -421,7 +422,7 @@ void QgsVectorLayerSaveAsDialog::accept()
   QgsSettings settings;
   settings.setValue( QStringLiteral( "UI/lastVectorFileFilterDir" ), QFileInfo( filename() ).absolutePath() );
   settings.setValue( QStringLiteral( "UI/lastVectorFormat" ), format() );
-  settings.setValue( QStringLiteral( "UI/encoding" ), encoding() );
+  QgsSettingsRegistryCore::settingsEncoding.setValue( encoding() );
   QDialog::accept();
 }
 

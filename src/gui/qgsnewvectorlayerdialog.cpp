@@ -17,6 +17,7 @@
 
 #include "qgsnewvectorlayerdialog.h"
 #include "qgsapplication.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsfilewidget.h"
 #include "qgis.h"
 #include "qgslogger.h"
@@ -340,7 +341,7 @@ QString QgsNewVectorLayerDialog::execAndCreateLayer( QString &errorMessage, QWid
 
   QgsSettings settings;
   settings.setValue( QStringLiteral( "UI/lastVectorFileFilterDir" ), QFileInfo( fileName ).absolutePath() );
-  settings.setValue( QStringLiteral( "UI/encoding" ), enc );
+  QgsSettingsRegistryCore::settingsEncoding.setValue( enc );
 
   //try to create the new layer with OGRProvider instead of QgsVectorFileWriter
   if ( geometrytype != QgsWkbTypes::Unknown )
