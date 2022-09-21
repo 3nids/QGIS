@@ -17,6 +17,7 @@ email                : nyall dot dawson at gmail dot com
 #include "qgsogrproviderutils.h"
 #include "qgsogrprovidermetadata.h"
 #include "qgslogger.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsapplication.h"
 #include "qgsmessagelog.h"
 #include "qgsvectorfilewriter.h"
@@ -632,7 +633,7 @@ QString createFilters( const QString &type )
     // Requires GDAL>=1.6.0 with libz support, let's assume we have it.
     // This does not work for some file types, see VSIFileHandler doc.
     QgsSettings settings;
-    if ( settings.value( QStringLiteral( "qgis/scanZipInBrowser2" ), "basic" ).toString() != QLatin1String( "no" ) )
+    if ( QgsSettingsRegistryCore::settingsScanZipInBrowser2.setValue() != QLatin1String( "no" ) )
     {
       sFileFilters.prepend( createFileFilter_( QObject::tr( "GDAL/OGR VSIFileHandler" ), QStringLiteral( "*.zip *.gz *.tar *.tar.gz *.tgz" ) ) );
       sExtensions << QStringLiteral( "zip" ) << QStringLiteral( "gz" ) << QStringLiteral( "tar" ) << QStringLiteral( "tar.gz" ) << QStringLiteral( "tgz" );

@@ -17,6 +17,7 @@
 
 #include "qgszipitem.h"
 #include "qgsapplication.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsdataitemprovider.h"
 #include "qgsdataitemproviderregistry.h"
 #include <QFileInfo>
@@ -85,7 +86,7 @@ QVector<QgsDataItem *> QgsZipItem::createChildren()
   QVector<QgsDataItem *> children;
   QString tmpPath;
   const QgsSettings settings;
-  const QString scanZipSetting = settings.value( QStringLiteral( "qgis/scanZipInBrowser2" ), "basic" ).toString();
+  const QString scanZipSetting = QgsSettingsRegistryCore::settingsScanZipInBrowser2.setValue();
 
   mZipFileList.clear();
 
@@ -155,7 +156,7 @@ QgsDataItem *QgsZipItem::itemFromPath( QgsDataItem *parent, const QString &path,
 QgsDataItem *QgsZipItem::itemFromPath( QgsDataItem *parent, const QString &filePath, const QString &name, const QString &path )
 {
   const QgsSettings settings;
-  const QString scanZipSetting = settings.value( QStringLiteral( "qgis/scanZipInBrowser2" ), "basic" ).toString();
+  const QString scanZipSetting = QgsSettingsRegistryCore::settingsScanZipInBrowser2.setValue();
   QStringList zipFileList;
   const QString vsiPrefix = QgsZipItem::vsiPrefix( filePath );
   QgsZipItem *zipItem = nullptr;
@@ -216,7 +217,7 @@ QStringList QgsZipItem::getZipFileList()
 
   QString tmpPath;
   const QgsSettings settings;
-  const QString scanZipSetting = settings.value( QStringLiteral( "qgis/scanZipInBrowser2" ), "basic" ).toString();
+  const QString scanZipSetting = QgsSettingsRegistryCore::settingsScanZipInBrowser2.setValue();
 
   QgsDebugMsgLevel( QStringLiteral( "mFilePath = %1 name= %2 scanZipSetting= %3 vsiPrefix= %4" ).arg( mFilePath, name(), scanZipSetting, mVsiPrefix ), 3 );
 

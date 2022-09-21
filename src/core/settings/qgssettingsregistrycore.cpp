@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsogrproviderutils.h"
 #include "qgslayoutitemlabel.h"
 #include "qgslayoututils.h"
 #include "qgsgeonoderequest.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &settingsScanZipInBrowser2 );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsLayoutDesignerDefaultFont );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
