@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
+  addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPolygons );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitLines );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPoints );
