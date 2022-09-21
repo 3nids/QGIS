@@ -402,6 +402,7 @@ class CORE_EXPORT QgsVectorLayer : public QgsMapLayer, public QgsExpressionConte
 
   public:
 
+    static const inline QgsSettingsEntryBool settingsSimplifyLocal = QgsSettingsEntryBool( QStringLiteral( "simplifyLocal" ), QgsSettings::Prefix::QGIS, false ) SIP_SKIP;
     static const inline QgsSettingsEntryDouble settingsSimplifyMaxScale = QgsSettingsEntryDouble( QStringLiteral( "simplifyMaxScale" ), QgsSettings::Prefix::QGIS, 0.0 ) SIP_SKIP;
     static const inline QgsSettingsEntryDouble settingsSimplifyDrawingTol = QgsSettingsEntryDouble( QStringLiteral( "simplifyDrawingTol" ), QgsSettings::Prefix::QGIS, 0.0 ) SIP_SKIP;
     static const inline QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyAlgorithm> settingsSimplifyAlgorithm = QgsSettingsEntryEnumFlag<QgsVectorSimplifyMethod::SimplifyAlgorithm>( QStringLiteral( "simplifyAlgorithm" ), QgsSettings::Prefix::QGIS, QgsVectorSimplifyMethod::SimplifyAlgorithm::Distance ) SIP_SKIP;
