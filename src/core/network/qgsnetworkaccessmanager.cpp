@@ -688,7 +688,7 @@ void QgsNetworkAccessManager::setupDefaultProxyAndCache( Qt::ConnectionType conn
     const QString proxyUser = QgsNetworkAccessManager::settingsProxyProxyUser.setValue();
     const QString proxyPassword = QgsNetworkAccessManager::settingsProxyProxyPassword.setValue();
 
-    const QString proxyTypeString = settings.value( QStringLiteral( "proxy/proxyType" ), "" ).toString();
+    const QString proxyTypeString = QgsNetworkAccessManager::settingsProxyProxyType.setValue();
 
     if ( proxyTypeString == QLatin1String( "DefaultProxy" ) )
     {

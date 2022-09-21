@@ -125,7 +125,7 @@ bool QgsHelp::urlExists( const QString &url )
     const QString proxyUser = QgsNetworkAccessManager::settingsProxyProxyUser.setValue();
     const QString proxyPassword = QgsNetworkAccessManager::settingsProxyProxyPassword.setValue();
 
-    const QString proxyTypeString = settings.value( QStringLiteral( "proxy/proxyType" ), QString() ).toString();
+    const QString proxyTypeString = QgsNetworkAccessManager::settingsProxyProxyType.setValue();
 
     if ( proxyTypeString == QLatin1String( "DefaultProxy" ) )
     {

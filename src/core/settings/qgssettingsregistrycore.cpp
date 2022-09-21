@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyType );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPassword );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyUser );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPort );
