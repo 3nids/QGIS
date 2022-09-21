@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgslayoututils.h"
 #include "qgsogrproviderutils.h"
 #include "qgslayoutitemmapgrid.h"
 #include "qgsgeonoderequest.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &settingsMapScales );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyAuthcfg );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyType );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPassword );
