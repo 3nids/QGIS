@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
+  addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitLines );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPoints );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyMaxScale );

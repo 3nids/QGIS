@@ -53,7 +53,7 @@ Pal::Pal()
 {
   QgsSettings settings;
   mGlobalCandidatesLimitPoint = Pal::settingsRenderingLabelCandidatesLimitPoints.setValue();
-  mGlobalCandidatesLimitLine = settings.value( QStringLiteral( "rendering/label_candidates_limit_lines" ), 0, QgsSettings::Core ).toInt();
+  mGlobalCandidatesLimitLine = Pal::settingsRenderingLabelCandidatesLimitLines.setValue();
   mGlobalCandidatesLimitPolygon = settings.value( QStringLiteral( "rendering/label_candidates_limit_polygons" ), 0, QgsSettings::Core ).toInt();
 }
 
