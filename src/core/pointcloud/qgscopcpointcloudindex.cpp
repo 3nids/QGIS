@@ -17,6 +17,7 @@
 
 #include "qgscopcpointcloudindex.h"
 
+#include "qgssettingsregistrycore.h"
 #include <fstream>
 #include <QFile>
 #include <QtDebug>

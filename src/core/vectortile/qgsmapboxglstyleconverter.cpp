@@ -17,6 +17,7 @@
 /*
  * Ported from original work by Martin Dobias, and extended by the MapTiler team!
  */
+#include "qgssettingsregistrycore.h"
 
 #include "qgsmapboxglstyleconverter.h"
 #include "qgsvectortilebasicrenderer.h"

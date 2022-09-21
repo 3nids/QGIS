@@ -17,6 +17,7 @@
  * MODULE:       qgis.g.info
  * AUTHOR(S):    Radim Blazek <radim.blazek gmail.com>
  *               using various GRASS modules
+#include "qgssettingsregistrycore.h"
  * PURPOSE:      get information about locations, mapsets, maps
  * COPYRIGHT:    (C) 2010 by Radim Blazek
  *

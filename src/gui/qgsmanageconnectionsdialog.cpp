@@ -17,6 +17,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "qgssettingsregistrycore.h"
 #include <QPushButton>
 #include <QTextStream>
 

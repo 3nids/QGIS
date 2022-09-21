@@ -17,6 +17,7 @@
 
 #include "qgslogger.h"
 #include "qgsvectortilelayerrenderer.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsmbtiles.h"
 #include "qgsvtpktiles.h"
 #include "qgsvectortilebasiclabeling.h"

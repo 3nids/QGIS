@@ -17,6 +17,7 @@
 
 #include "qgsbox3d.h"
 #include "qgspoint.h"
+#include "qgssettingsregistrycore.h"
 
 QgsBox3d::QgsBox3d( double xmin, double ymin, double zmin, double xmax, double ymax, double zmax )
   : mBounds2d( xmin, ymin, xmax, ymax )

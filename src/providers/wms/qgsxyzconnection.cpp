@@ -17,6 +17,7 @@
 #include "qgsxyzconnection.h"
 
 #include "qgsdatasourceuri.h"
+#include "qgssettingsregistrycore.h"
 #include "qgssettings.h"
 
 QString QgsXyzConnection::encodedUri() const
@@ -89,7 +90,7 @@ QgsXyzConnection QgsXyzConnectionUtils::connection( const QString &name )
   QgsXyzConnection conn;
   conn.name = name;
   conn.url = settings.value( QStringLiteral( "url" ) ).toString();
-  conn.zMin = settings.value( QStringLiteral( "zmin" ), -1 ).toInt();
+  conn.zMin = QgsSettingsRegistryCore::settingsZmin.setValue();
   conn.zMax = settings.value( QStringLiteral( "zmax" ), -1 ).toInt();
   conn.authCfg = settings.value( QStringLiteral( "authcfg" ) ).toString();
   conn.username = settings.value( QStringLiteral( "username" ) ).toString();
@@ -135,7 +136,7 @@ void QgsXyzConnectionUtils::addConnection( const QgsXyzConnection &conn )
 
   settings.beginGroup( "qgis/connections-xyz/" + conn.name );
   settings.setValue( QStringLiteral( "url" ), conn.url );
-  settings.setValue( QStringLiteral( "zmin" ), conn.zMin );
+  QgsSettingsRegistryCore::settingsZmin.setValue( conn.zMin );
   settings.setValue( QStringLiteral( "zmax" ), conn.zMax );
   settings.setValue( QStringLiteral( "authcfg" ), conn.authCfg );
   settings.setValue( QStringLiteral( "username" ), conn.username );

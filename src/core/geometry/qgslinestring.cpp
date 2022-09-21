@@ -17,6 +17,7 @@
 
 #include "qgslinestring.h"
 #include "qgsapplication.h"
+#include "qgssettingsregistrycore.h"
 #include "qgscompoundcurve.h"
 #include "qgscoordinatetransform.h"
 #include "qgsgeometryutils.h"

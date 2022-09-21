@@ -17,6 +17,7 @@
 
 #include "qgslogger.h"
 #include "qgsdatasourceuri.h"
+#include "qgssettingsregistrycore.h"
 #include "qgssettings.h"
 #include "qgshttpheaders.h"
 
@@ -156,7 +157,7 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
 
   QgsVectorTileProviderConnection::Data conn;
   conn.url = settings.value( QStringLiteral( "url" ) ).toString();
-  conn.zMin = settings.value( QStringLiteral( "zmin" ), -1 ).toInt();
+  conn.zMin = QgsSettingsRegistryCore::settingsZmin.setValue();
   conn.zMax = settings.value( QStringLiteral( "zmax" ), -1 ).toInt();
   conn.authCfg = settings.value( QStringLiteral( "authcfg" ) ).toString();
   conn.username = settings.value( QStringLiteral( "username" ) ).toString();
@@ -186,7 +187,7 @@ void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVec
 
   settings.beginGroup( "qgis/connections-vector-tile/" + name );
   settings.setValue( QStringLiteral( "url" ), conn.url );
-  settings.setValue( QStringLiteral( "zmin" ), conn.zMin );
+  QgsSettingsRegistryCore::settingsZmin.setValue( conn.zMin );
   settings.setValue( QStringLiteral( "zmax" ), conn.zMax );
   settings.setValue( QStringLiteral( "authcfg" ), conn.authCfg );
   settings.setValue( QStringLiteral( "username" ), conn.username );
