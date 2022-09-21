@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyHost );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &QgsCptCityArchive::settingsCptCityArchiveName );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
