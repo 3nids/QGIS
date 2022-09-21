@@ -227,7 +227,6 @@ void QgsGeoNodeRequest::replyFinished()
           QgsDebugMsgLevel( QStringLiteral( "expirationDate:%1" ).arg( cmd.expirationDate().toString() ), 2 );
           if ( cmd.expirationDate().isNull() )
           {
-            QgsSettings settings;
             cmd.setExpirationDate( QDateTime::currentDateTime().addSecs( QgsSettingsRegistryCore::settingsDefaultCapabilitiesExpiry.setValue() * 60 * 60 ) );
           }
 

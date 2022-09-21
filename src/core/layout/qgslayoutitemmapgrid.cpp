@@ -189,7 +189,6 @@ QgsLayoutItemMapGrid::QgsLayoutItemMapGrid( const QString &name, QgsLayoutItemMa
                      QgsLayoutItemMapGrid::FrameTop | QgsLayoutItemMapGrid::FrameBottom )
 {
   //get default layout font from settings
-  const QgsSettings settings;
   const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.setValue();
   if ( !defaultFontString.isEmpty() )
   {

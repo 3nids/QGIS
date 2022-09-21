@@ -668,7 +668,6 @@ void QgsLayoutItemScaleBar::applyDefaultSettings()
   setBackgroundEnabled( false );
 
   //get default composer font from settings
-  const QgsSettings settings;
   const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.setValue();
   QgsTextFormat format;
   QFont f;

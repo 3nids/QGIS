@@ -80,7 +80,6 @@ void QgsGpsDetector::advance()
 {
   mConn.reset();
 
-  QgsSettings settings;
 
   while ( !mConn )
   {

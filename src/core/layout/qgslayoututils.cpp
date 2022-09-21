@@ -523,7 +523,6 @@ QVector< double > QgsLayoutUtils::predefinedScales( const QgsLayout *layout )
   if ( !hasProjectScales || mapScales.isEmpty() )
   {
     // default to global map tool scales
-    QgsSettings settings;
     QString scalesStr( QgsSettingsRegistryCore::settingsMapScales.setValue() );
     const QStringList scales = scalesStr.split( ',' );
     for ( const QString &scale : scales )

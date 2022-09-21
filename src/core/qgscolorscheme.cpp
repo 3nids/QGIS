@@ -47,7 +47,6 @@ QgsNamedColorList QgsRecentColorScheme::fetchColors( const QString &context, con
   Q_UNUSED( baseColor )
 
   //fetch recent colors
-  const QgsSettings settings;
   const QList< QVariant > recentColorVariants = settings.value( QStringLiteral( "colors/recent" ) ).toList();
 
   //generate list from recent colors
@@ -76,7 +75,6 @@ void QgsRecentColorScheme::addRecentColor( const QColor &color )
   QColor opaqueColor = color;
   opaqueColor.setAlpha( 255 );
 
-  QgsSettings settings;
   QList< QVariant > recentColorVariants = settings.value( QStringLiteral( "colors/recent" ) ).toList();
 
   //remove colors by name
@@ -104,7 +102,6 @@ void QgsRecentColorScheme::addRecentColor( const QColor &color )
 QColor QgsRecentColorScheme::lastUsedColor()
 {
   //fetch recent colors
-  const QgsSettings settings;
   const QList< QVariant > recentColorVariants = settings.value( QStringLiteral( "colors/recent" ) ).toList();
 
   if ( recentColorVariants.isEmpty() )
@@ -120,7 +117,6 @@ QgsNamedColorList QgsCustomColorScheme::fetchColors( const QString &context, con
 
   //fetch predefined custom colors
   QgsNamedColorList colorList;
-  const QgsSettings settings;
 
   //check if settings contains custom palette
   if ( !settings.contains( QStringLiteral( "/colors/palettecolors" ) ) )
@@ -168,7 +164,6 @@ bool QgsCustomColorScheme::setColors( const QgsNamedColorList &colors, const QSt
   Q_UNUSED( baseColor )
 
   // save colors to settings
-  QgsSettings settings;
   QList< QVariant > customColors;
   QList< QVariant > customColorLabels;
 

@@ -1867,7 +1867,6 @@ void QgsApplication::setSkippedGdalDrivers( const QStringList &skippedGdalDriver
   *sGdalSkipList() = skippedGdalDrivers;
   *sDeferredSkippedGdalDrivers() = deferredSkippedGdalDrivers;
 
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "gdal/skipDrivers" ), skippedGdalDrivers.join( QLatin1Char( ',' ) ) );
 
   applyGdalSkippedDrivers();
@@ -1875,7 +1874,6 @@ void QgsApplication::setSkippedGdalDrivers( const QStringList &skippedGdalDriver
 
 void QgsApplication::registerGdalDriversFromSettings()
 {
-  QgsSettings settings;
   QString joinedList, delimiter;
   if ( settings.contains( QStringLiteral( "gdal/skipDrivers" ) ) )
   {
@@ -1953,7 +1951,6 @@ void QgsApplication::copyPath( const QString &src, const QString &dst )
 QVariantMap QgsApplication::customVariables()
 {
   //read values from QgsSettings
-  QgsSettings settings;
 
   QVariantMap variables;
 
@@ -1971,7 +1968,6 @@ QVariantMap QgsApplication::customVariables()
 
 void QgsApplication::setCustomVariables( const QVariantMap &variables )
 {
-  QgsSettings settings;
 
   QVariantMap::const_iterator it = variables.constBegin();
   settings.beginGroup( "variables" );
@@ -1987,7 +1983,6 @@ void QgsApplication::setCustomVariables( const QVariantMap &variables )
 void QgsApplication::setCustomVariable( const QString &name, const QVariant &value )
 {
   // save variable to settings
-  QgsSettings settings;
 
   settings.setValue( QStringLiteral( "variables/" ) + name, value );
 

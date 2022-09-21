@@ -131,7 +131,6 @@ QString QgsCptCityArchive::baseDir( QString archiveName )
 QString QgsCptCityArchive::defaultBaseDir()
 {
   QString baseDir, archiveName;
-  const QgsSettings settings;
 
   // use CptCity/baseDir setting if set, default is user dir
   baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),
@@ -431,7 +430,6 @@ bool QgsCptCityArchive::isEmpty()
 
 QgsCptCityArchive *QgsCptCityArchive::defaultArchive()
 {
-  const QgsSettings settings;
   *sDefaultArchiveName() = QgsCptCityArchive::settingsCptCityArchiveName.setValue();
   if ( sArchiveRegistry()->contains( *sDefaultArchiveName() ) )
     return sArchiveRegistry()->value( *sDefaultArchiveName() );
@@ -450,7 +448,6 @@ void QgsCptCityArchive::initArchive( const QString &archiveName, const QString &
 
 void QgsCptCityArchive::initDefaultArchive()
 {
-  const QgsSettings settings;
   // use CptCity/baseDir setting if set, default is user dir
   const QString baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),
                                           QString( QgsApplication::pkgDataPath() + "/resources" ) ).toString();
@@ -465,7 +462,6 @@ void QgsCptCityArchive::initArchives( bool loadAll )
 {
   QgsStringMap archivesMap;
   QString baseDir, defArchiveName;
-  const QgsSettings settings;
 
   // use CptCity/baseDir setting if set, default is user dir
   baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),

@@ -300,7 +300,6 @@ void QgsCoordinateTransformContext::readSettings()
 
   d->mSourceDestDatumTransforms.clear();
 
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "/Projections" ) );
   const QStringList projectionKeys = settings.allKeys();
 
@@ -347,7 +346,6 @@ void QgsCoordinateTransformContext::readSettings()
 
 void QgsCoordinateTransformContext::writeSettings()
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "/Projections" ) );
   const QStringList groupKeys = settings.allKeys();
   QStringList::const_iterator groupKeyIt = groupKeys.constBegin();

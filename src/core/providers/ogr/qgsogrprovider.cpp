@@ -375,7 +375,6 @@ QgsOgrProvider::QgsOgrProvider( QString const &uri, const ProviderOptions &optio
 {
   QgsApplication::registerOgrDrivers();
 
-  QgsSettings settings;
   // we always disable GDAL side shapefile encoding handling, and do it on the QGIS side.
   // why? it's not the ideal choice, but...
   // - if we DON'T disable GDAL side encoding support, then there's NO way to change the encoding used when reading
@@ -604,7 +603,6 @@ void QgsOgrProvider::setEncoding( const QString &e )
   QgsCPLHTTPFetchOverrider oCPLHTTPFetcher( mAuthCfg );
   QgsSetCPLHTTPFetchOverriderInitiatorClass( oCPLHTTPFetcher, QStringLiteral( "QgsOgrProvider" ) );
 
-  QgsSettings settings;
 
   // if the layer has the OLCStringsAsUTF8 capability, we CANNOT override the
   // encoding on the QGIS side!

@@ -265,7 +265,6 @@ void QgsBabelFormatRegistry::reloadFromSettings()
                                  QStringLiteral( "%babel -t -i garmin -o gpx %in %out" ),
                                  QStringLiteral( "%babel -t -i gpx -o garmin %in %out" ) );
 
-  QgsSettings settings;
 
   bool useOldPath = false;
   QStringList deviceNames = QgsBabelFormatRegistry::settingsBabelDeviceList.setValue();

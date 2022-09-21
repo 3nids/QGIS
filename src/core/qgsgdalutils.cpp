@@ -371,7 +371,6 @@ void QgsGdalUtils::setupProxy()
   // given the limited cost of checking them on every provider instantiation
   // we can do it here so that new settings are applied whenever a new layer
   // is created.
-  const QgsSettings settings;
   // Check that proxy is enabled
   if ( QgsNetworkAccessManager::settingsProxyProxyEnabled.setValue() )
   {

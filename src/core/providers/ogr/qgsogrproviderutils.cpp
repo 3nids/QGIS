@@ -632,7 +632,6 @@ QString createFilters( const QString &type )
     //   see http://trac.osgeo.org/gdal/wiki/UserDocs/ReadInZip
     // Requires GDAL>=1.6.0 with libz support, let's assume we have it.
     // This does not work for some file types, see VSIFileHandler doc.
-    QgsSettings settings;
     if ( QgsSettingsRegistryCore::settingsScanZipInBrowser2.setValue() != QLatin1String( "no" ) )
     {
       sFileFilters.prepend( createFileFilter_( QObject::tr( "GDAL/OGR VSIFileHandler" ), QStringLiteral( "*.zip *.gz *.tar *.tar.gz *.tgz" ) ) );

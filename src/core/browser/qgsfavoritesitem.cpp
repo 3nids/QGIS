@@ -42,7 +42,6 @@ QVector<QgsDataItem *> QgsFavoritesItem::createChildren()
 {
   QVector<QgsDataItem *> children;
 
-  const QgsSettings settings;
 
   const QStringList favDirs = QgsSettingsRegistryCore::settingsBrowserFavourites.setValue();
 
@@ -68,7 +67,6 @@ void QgsFavoritesItem::addDirectory( const QString &favDir, const QString &n )
 {
   const QString name = n.isEmpty() ? favDir : n;
 
-  QgsSettings settings;
   QStringList favDirs = QgsSettingsRegistryCore::settingsBrowserFavourites.setValue();
   favDirs.append( QStringLiteral( "%1|||%2" ).arg( favDir, name ) );
   QgsSettingsRegistryCore::settingsBrowserFavourites.setValue( favDirs );
@@ -88,7 +86,6 @@ void QgsFavoritesItem::removeDirectory( QgsDirectoryItem *item )
   if ( !item )
     return;
 
-  QgsSettings settings;
   QStringList favDirs = QgsSettingsRegistryCore::settingsBrowserFavourites.setValue();
   for ( int i = favDirs.count() - 1; i >= 0; --i )
   {
@@ -116,7 +113,6 @@ void QgsFavoritesItem::removeDirectory( QgsDirectoryItem *item )
 void QgsFavoritesItem::renameFavorite( const QString &path, const QString &name )
 {
   // update stored name
-  QgsSettings settings;
   QStringList favDirs = QgsSettingsRegistryCore::settingsBrowserFavourites.setValue();
   for ( int i = 0; i < favDirs.count(); ++i )
   {

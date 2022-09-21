@@ -140,7 +140,6 @@ QString QgsVectorTileProviderConnection::encodedLayerUri( const QgsVectorTilePro
 
 QStringList QgsVectorTileProviderConnection::connectionList()
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "qgis/connections-vector-tile" ) );
   QStringList connList = settings.childGroups();
 
@@ -149,7 +148,6 @@ QStringList QgsVectorTileProviderConnection::connectionList()
 
 QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connection( const QString &name )
 {
-  QgsSettings settings;
   settings.beginGroup( "qgis/connections-vector-tile/" + name );
 
   if ( settings.value( "url" ).toString().isEmpty() )
@@ -177,13 +175,11 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
 
 void QgsVectorTileProviderConnection::deleteConnection( const QString &name )
 {
-  QgsSettings settings;
   settings.remove( "qgis/connections-vector-tile/" + name );
 }
 
 void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVectorTileProviderConnection::Data conn )
 {
-  QgsSettings settings;
 
   settings.beginGroup( "qgis/connections-vector-tile/" + name );
   settings.setValue( QStringLiteral( "url" ), conn.url );
@@ -209,13 +205,11 @@ void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVec
 
 QString QgsVectorTileProviderConnection::selectedConnection()
 {
-  const QgsSettings settings;
   return settings.value( QStringLiteral( "qgis/connections-vector-tile/selected" ) ).toString();
 }
 
 void QgsVectorTileProviderConnection::setSelectedConnection( const QString &name )
 {
-  QgsSettings settings;
   return settings.setValue( QStringLiteral( "qgis/connections-vector-tile/selected" ), name );
 }
 

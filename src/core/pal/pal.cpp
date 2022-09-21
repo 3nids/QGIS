@@ -51,7 +51,6 @@ using namespace pal;
 
 Pal::Pal()
 {
-  QgsSettings settings;
   mGlobalCandidatesLimitPoint = Pal::settingsRenderingLabelCandidatesLimitPoints.setValue();
   mGlobalCandidatesLimitLine = Pal::settingsRenderingLabelCandidatesLimitLines.setValue();
   mGlobalCandidatesLimitPolygon = Pal::settingsRenderingLabelCandidatesLimitPolygons.setValue();

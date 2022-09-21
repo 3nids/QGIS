@@ -57,7 +57,6 @@ void QgsDirectoryItem::init( const QString &dirName )
   mType = Qgis::BrowserItemType::Directory;
   setToolTip( QDir::toNativeSeparators( mDirPath ) );
 
-  QgsSettings settings;
 
   mMonitoring = monitoringForPath( mDirPath );
   switch ( mMonitoring )
@@ -144,7 +143,6 @@ void QgsDirectoryItem::setIconColor( const QColor &color )
 
 void QgsDirectoryItem::setCustomColor( const QString &directory, const QColor &color )
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "qgis/browserPathColors" ) );
   QString settingKey = directory;
   settingKey.replace( '/', QLatin1String( "|||" ) );
@@ -190,7 +188,6 @@ void QgsDirectoryItem::setMonitoring( Qgis::BrowserDirectoryMonitoring monitorin
 {
   mMonitoring = monitoring;
 
-  QgsSettings settings;
   QStringList noMonitorDirs = QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue();
   QStringList alwaysMonitorDirs = QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue();
 
@@ -412,7 +409,6 @@ void QgsDirectoryItem::directoryChanged()
 
 bool QgsDirectoryItem::hiddenPath( const QString &path )
 {
-  const QgsSettings settings;
   const QStringList hiddenItems = settings.value( QStringLiteral( "browser/hiddenPaths" ),
                                   QStringList() ).toStringList();
   const int idx = hiddenItems.indexOf( path );
@@ -421,7 +417,6 @@ bool QgsDirectoryItem::hiddenPath( const QString &path )
 
 Qgis::BrowserDirectoryMonitoring QgsDirectoryItem::monitoringForPath( const QString &path )
 {
-  const QgsSettings settings;
   if ( QgsSettingsRegistryCore::settingsDisableMonitorItemUris.setValue().contains( path ) )
     return Qgis::BrowserDirectoryMonitoring::NeverMonitor;
   else if ( QgsSettingsRegistryCore::settingsAlwaysMonitorItemUris.setValue().contains( path ) )
@@ -603,7 +598,6 @@ QgsDirectoryParamWidget::QgsDirectoryParamWidget( const QString &path, QWidget *
   addTopLevelItems( items );
 
   // hide columns that are not requested
-  const QgsSettings settings;
   const QList<QVariant> lst = settings.value( QStringLiteral( "dataitem/directoryHiddenColumns" ) ).toList();
   for ( const QVariant &colVariant : lst )
   {
@@ -642,7 +636,6 @@ void QgsDirectoryParamWidget::showHideColumn()
   setColumnHidden( columnIndex, !isColumnHidden( columnIndex ) );
 
   // save in settings
-  QgsSettings settings;
   QList<QVariant> lst;
   for ( int i = 0; i < columnCount(); i++ )
   {

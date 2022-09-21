@@ -3201,7 +3201,6 @@ bool QgsAuthManager::passwordHelperDelete()
   passwordHelperLog( tr( "Opening %1 for DELETE…" ).arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) );
   bool result;
   QKeychain::DeletePasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
-  QgsSettings settings;
   job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
@@ -3233,7 +3232,6 @@ QString QgsAuthManager::passwordHelperRead()
   QString password;
   passwordHelperLog( tr( "Opening %1 for READ…" ).arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) );
   QKeychain::ReadPasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
-  QgsSettings settings;
   job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
@@ -3275,7 +3273,6 @@ bool QgsAuthManager::passwordHelperWrite( const QString &password )
   bool result;
   passwordHelperLog( tr( "Opening %1 for WRITE…" ).arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) );
   QKeychain::WritePasswordJob job( AUTH_PASSWORD_HELPER_FOLDER_NAME );
-  QgsSettings settings;
   job.setInsecureFallback( QgsAuthManager::settingsPasswordHelperInsecureFallback.setValue() );
   job.setAutoDelete( false );
   job.setKey( AUTH_PASSWORD_HELPER_KEY_NAME );
@@ -3306,13 +3303,11 @@ bool QgsAuthManager::passwordHelperWrite( const QString &password )
 bool QgsAuthManager::passwordHelperEnabled() const
 {
   // Does the user want to store the password in the wallet?
-  QgsSettings settings;
   return QgsAuthManager::settingsUsePasswordHelper.setValue();
 }
 
 void QgsAuthManager::setPasswordHelperEnabled( const bool enabled )
 {
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "use_password_helper" ),  enabled, QgsSettings::Section::Auth );
   emit messageOut( enabled ? tr( "Your %1 will be <b>used from now</b> on to store and retrieve the master password." )
                    .arg( AUTH_PASSWORD_HELPER_DISPLAY_NAME ) :
@@ -3323,13 +3318,11 @@ void QgsAuthManager::setPasswordHelperEnabled( const bool enabled )
 bool QgsAuthManager::passwordHelperLoggingEnabled() const
 {
   // Does the user want to store the password in the wallet?
-  QgsSettings settings;
   return QgsAuthManager::settingsPasswordHelperLogging.setValue();
 }
 
 void QgsAuthManager::setPasswordHelperLoggingEnabled( const bool enabled )
 {
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "password_helper_logging" ),  enabled, QgsSettings::Section::Auth );
 }
 

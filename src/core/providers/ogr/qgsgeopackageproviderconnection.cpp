@@ -40,7 +40,6 @@
 QgsGeoPackageProviderConnection::QgsGeoPackageProviderConnection( const QString &name )
   : QgsOgrProviderConnection( name )
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "ogr" ), QgsSettings::Section::Providers );
   settings.beginGroup( QStringLiteral( "GPKG" ) );
   settings.beginGroup( QStringLiteral( "connections" ) );
@@ -57,7 +56,6 @@ QgsGeoPackageProviderConnection::QgsGeoPackageProviderConnection( const QString 
 
 void QgsGeoPackageProviderConnection::store( const QString &name ) const
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "ogr" ), QgsSettings::Section::Providers );
   settings.beginGroup( QStringLiteral( "GPKG" ) );
   settings.beginGroup( QStringLiteral( "connections" ) );
@@ -67,7 +65,6 @@ void QgsGeoPackageProviderConnection::store( const QString &name ) const
 
 void QgsGeoPackageProviderConnection::remove( const QString &name ) const
 {
-  QgsSettings settings;
   settings.beginGroup( QStringLiteral( "ogr" ), QgsSettings::Section::Providers );
   settings.beginGroup( QStringLiteral( "GPKG" ) );
   settings.beginGroup( QStringLiteral( "connections" ) );

@@ -89,7 +89,6 @@ QgsDataSourceUri &QgsGeoNodeConnection::addWcsConnectionSettings( QgsDataSourceU
 
 QStringList QgsGeoNodeConnectionUtils::connectionList()
 {
-  QgsSettings settings;
   // Add Section manually
   settings.beginGroup( QStringLiteral( "qgis/connections-geonode" ) );
   return settings.childGroups();
