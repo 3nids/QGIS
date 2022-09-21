@@ -85,6 +85,7 @@ namespace pal
 
     public:
 
+    static const inline QgsSettingsEntryInteger settingsRenderingLabelCandidatesLimitPolygons = QgsSettingsEntryInteger( QStringLiteral( "label_candidates_limit_polygons" ), QgsSettings::Prefix::CORE_RENDERING, 0 ) SIP_SKIP;
     static const inline QgsSettingsEntryInteger settingsRenderingLabelCandidatesLimitLines = QgsSettingsEntryInteger( QStringLiteral( "label_candidates_limit_lines" ), QgsSettings::Prefix::CORE_RENDERING, 0 ) SIP_SKIP;
     static const inline QgsSettingsEntryInteger settingsRenderingLabelCandidatesLimitPoints = QgsSettingsEntryInteger( QStringLiteral( "label_candidates_limit_points" ), QgsSettings::Prefix::CORE_RENDERING, 0 ) SIP_SKIP;
       /**
