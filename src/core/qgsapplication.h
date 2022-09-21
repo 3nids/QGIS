@@ -17,6 +17,7 @@
 
 #include "qgis_core.h"
 #include <QApplication>
+#include "qgssettingsregistrycore.h"
 #include <QEvent>
 #include <QStringList>
 #include <QColor>
