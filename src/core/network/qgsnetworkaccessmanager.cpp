@@ -679,7 +679,7 @@ void QgsNetworkAccessManager::setupDefaultProxyAndCache( Qt::ConnectionType conn
     // meaning the system one
     excludes = QgsNetworkAccessManager::settingsProxyProxyExcludedUrls.setValue();
 
-    noProxyURLs = settings.value( QStringLiteral( "proxy/noProxyUrls" ), QStringList() ).toStringList();
+    noProxyURLs = QgsNetworkAccessManager::settingsProxyNoProxyUrls.setValue();
 
     //read type, host, port, user, passw from settings
     const QString proxyHost = QgsNetworkAccessManager::settingsProxyProxyHost.setValue();
