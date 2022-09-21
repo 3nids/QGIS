@@ -17,6 +17,7 @@
 
 #include "qgslayoututils.h"
 #include "qgslayout.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslayoutitemmap.h"
 #include "qgsprojectviewsettings.h"
 #include "qgsrendercontext.h"
@@ -523,7 +524,7 @@ QVector< double > QgsLayoutUtils::predefinedScales( const QgsLayout *layout )
   {
     // default to global map tool scales
     QgsSettings settings;
-    QString scalesStr( settings.value( QStringLiteral( "Map/scales" ), Qgis::defaultProjectScales() ).toString() );
+    QString scalesStr( QgsSettingsRegistryCore::settingsMapScales.setValue() );
     const QStringList scales = scalesStr.split( ',' );
     for ( const QString &scale : scales )
     {

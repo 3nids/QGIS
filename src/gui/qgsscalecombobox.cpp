@@ -17,6 +17,7 @@
 
 #include "qgis.h"
 #include "qgslogger.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsscalecombobox.h"
 #include "qgssettings.h"
 
@@ -45,7 +46,7 @@ void QgsScaleComboBox::updateScales( const QStringList &scales )
   if ( scales.isEmpty() )
   {
     const QgsSettings settings;
-    const QString myScales = settings.value( QStringLiteral( "Map/scales" ), Qgis::defaultProjectScales() ).toString();
+    const QString myScales = QgsSettingsRegistryCore::settingsMapScales.setValue();
     if ( !myScales.isEmpty() )
     {
       myScalesList = myScales.split( ',' );
