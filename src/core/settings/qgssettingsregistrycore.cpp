@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyHost );
   addSettingsEntry( &settingsGdalSkipList );
   addSettingsEntry( &settingsGdalSkipDrivers );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
