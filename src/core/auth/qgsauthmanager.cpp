@@ -3307,7 +3307,7 @@ bool QgsAuthManager::passwordHelperEnabled() const
 {
   // Does the user want to store the password in the wallet?
   QgsSettings settings;
-  return settings.value( QStringLiteral( "use_password_helper" ), true, QgsSettings::Section::Auth ).toBool();
+  return QgsAuthManager::settingsUsePasswordHelper.setValue();
 }
 
 void QgsAuthManager::setPasswordHelperEnabled( const bool enabled )
