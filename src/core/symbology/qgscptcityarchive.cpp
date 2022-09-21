@@ -137,7 +137,7 @@ QString QgsCptCityArchive::defaultBaseDir()
   baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),
                             QString( QgsApplication::pkgDataPath() + "/resources" ) ).toString();
   // sub-dir defaults to cpt-city
-  archiveName = settings.value( QStringLiteral( "CptCity/archiveName" ), DEFAULT_CPTCITY_ARCHIVE ).toString();
+  archiveName = QgsCptCityArchive::settingsCptCityArchiveName.setValue();
 
   return baseDir + '/' + archiveName;
 }
@@ -432,7 +432,7 @@ bool QgsCptCityArchive::isEmpty()
 QgsCptCityArchive *QgsCptCityArchive::defaultArchive()
 {
   const QgsSettings settings;
-  *sDefaultArchiveName() = settings.value( QStringLiteral( "CptCity/archiveName" ), DEFAULT_CPTCITY_ARCHIVE ).toString();
+  *sDefaultArchiveName() = QgsCptCityArchive::settingsCptCityArchiveName.setValue();
   if ( sArchiveRegistry()->contains( *sDefaultArchiveName() ) )
     return sArchiveRegistry()->value( *sDefaultArchiveName() );
   else
@@ -455,7 +455,7 @@ void QgsCptCityArchive::initDefaultArchive()
   const QString baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),
                                           QString( QgsApplication::pkgDataPath() + "/resources" ) ).toString();
   // sub-dir defaults to
-  const QString defArchiveName = settings.value( QStringLiteral( "CptCity/archiveName" ), DEFAULT_CPTCITY_ARCHIVE ).toString();
+  const QString defArchiveName = QgsCptCityArchive::settingsCptCityArchiveName.setValue();
 
   if ( ! sArchiveRegistry()->contains( defArchiveName ) )
     initArchive( defArchiveName, baseDir + '/' + defArchiveName );
@@ -471,7 +471,7 @@ void QgsCptCityArchive::initArchives( bool loadAll )
   baseDir = settings.value( QStringLiteral( "CptCity/baseDir" ),
                             QString( QgsApplication::pkgDataPath() + "/resources" ) ).toString();
   // sub-dir defaults to
-  defArchiveName = settings.value( QStringLiteral( "CptCity/archiveName" ), DEFAULT_CPTCITY_ARCHIVE ).toString();
+  defArchiveName = QgsCptCityArchive::settingsCptCityArchiveName.setValue();
 
   QgsDebugMsgLevel( "baseDir= " + baseDir + " defArchiveName= " + defArchiveName, 2 );
   if ( loadAll )
