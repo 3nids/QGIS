@@ -272,6 +272,7 @@ class CORE_EXPORT QgsNetworkAccessManager : public QNetworkAccessManager
 
   public:
 
+    static const inline QgsSettingsEntryString settingsProxyProxyHost = QgsSettingsEntryString( QStringLiteral( "proxyHost" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
     /**
      * Returns a pointer to the active QgsNetworkAccessManager
      * for the current thread.
