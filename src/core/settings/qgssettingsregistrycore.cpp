@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
+  addSettingsEntry( &settingsZmax );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsZmin );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPolygons );
