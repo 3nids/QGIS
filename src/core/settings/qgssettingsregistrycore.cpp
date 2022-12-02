@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &settingsDigitizingOffsetMiterLimit );
+  addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingHints );
   addSettingsEntry( &settingsDigitizingConvertToCurve );
   addSettingsEntry( &settingsDigitizingConvertToCurveAngleTolerance );
   addSettingsEntry( &settingsDigitizingConvertToCurveDistanceTolerance );
