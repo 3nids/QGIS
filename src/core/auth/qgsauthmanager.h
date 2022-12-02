@@ -69,6 +69,7 @@ class CORE_EXPORT QgsAuthManager : public QObject
 
   public:
 
+    static const inline QgsSettingsEntryBool settingsUsePasswordHelper = QgsSettingsEntryBool( QStringLiteral( "use_password_helper" ), QgsSettings::Prefix::AUTH_, true ) SIP_SKIP;
     static const inline QgsSettingsEntryBool settingsPasswordHelperInsecureFallback = QgsSettingsEntryBool( QStringLiteral( "password_helper_insecure_fallback" ), QgsSettings::Prefix::AUTH_, false ) SIP_SKIP;
     //! Message log level (mirrors that of QgsMessageLog, so it can also output there)
     enum MessageLevel

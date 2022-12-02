@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
+  addSettingsEntry( &QgsAuthManager::settingsUsePasswordHelper );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &QgsAuthManager::settingsPasswordHelperInsecureFallback );
   addSettingsEntry( &QgsGpsLogger::settingsApplyLeapSeconds );
