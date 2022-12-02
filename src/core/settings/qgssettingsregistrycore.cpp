@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
+  addSettingsEntry( &QgsGpsLogger::settingsAcquisitionInterval );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyMaxScale );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingTol );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );

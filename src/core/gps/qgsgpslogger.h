@@ -51,6 +51,7 @@ class CORE_EXPORT QgsGpsLogger : public QObject
 
   public:
 
+    static const inline QgsSettingsEntryInteger settingsAcquisitionInterval = QgsSettingsEntryInteger( QStringLiteral( "acquisitionInterval" ), QgsSettings::Prefix::GPS_, 0 ) SIP_SKIP;
     static const inline QgsSettingsEntryDouble settingsDistanceThreshold = QgsSettingsEntryDouble( QStringLiteral( "distanceThreshold" ), QgsSettings::Prefix::GPS_, 0 ) SIP_SKIP;
     /**
      * Constructor for QgsGpsLogger with the specified \a parent object.
