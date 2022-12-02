@@ -500,7 +500,6 @@ QgsDataItem *QgsFileBasedDataItemProvider::createDataItem( const QString &path, 
   if ( QgsProviderRegistry::instance()->uriIsBlocklisted( path ) )
     return nullptr;
 
-  QgsSettings settings;
 
   Qgis::SublayerQueryFlags queryFlags = Qgis::SublayerQueryFlags();
 

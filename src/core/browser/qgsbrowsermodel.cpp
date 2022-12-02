@@ -774,7 +774,6 @@ void QgsBrowserModel::removeFavorite( QgsFavoriteItem *favorite )
 
 void QgsBrowserModel::hidePath( QgsDataItem *item )
 {
-  QgsSettings settings;
   QStringList hiddenItems = settings.value( QStringLiteral( "browser/hiddenPaths" ),
                             QStringList() ).toStringList();
   int idx = hiddenItems.indexOf( item->path() );

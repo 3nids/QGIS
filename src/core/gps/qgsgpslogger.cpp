@@ -205,7 +205,6 @@ void QgsGpsLogger::updateGpsSettings()
   else
   {
     // legacy settings
-    QgsSettings settings;
 
     acquisitionInterval = QgsGpsLogger::settingsAcquisitionInterval.value();
     mDistanceThreshold = QgsGpsLogger::settingsDistanceThreshold.value();

@@ -1390,7 +1390,6 @@ int QgsStyle::addTag( const QString &tagname )
   if ( nErr == SQLITE_OK )
     ( void )sqlite3_step( statement.get() );
 
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "qgis/symbolsListGroupsIndex" ), 0 );
 
   emit groupsModified();
@@ -1489,7 +1488,6 @@ bool QgsStyle::remove( StyleEntity type, int id )
 
     if ( groupRemoved )
     {
-      QgsSettings settings;
       settings.setValue( QStringLiteral( "qgis/symbolsListGroupsIndex" ), 0 );
 
       emit groupsModified();
@@ -2307,7 +2305,6 @@ int QgsStyle::addSmartgroup( const QString &name, const QString &op, const QStri
 
   if ( runEmptyQuery( query ) )
   {
-    QgsSettings settings;
     settings.setValue( QStringLiteral( "qgis/symbolsListGroupsIndex" ), 0 );
 
     emit groupsModified();

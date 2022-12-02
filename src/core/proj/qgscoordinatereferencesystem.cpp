@@ -2885,7 +2885,6 @@ QList<QgsCoordinateReferenceSystem> QgsCoordinateReferenceSystem::recentCoordina
   QList<QgsCoordinateReferenceSystem> res;
 
   // Read settings from persistent storage
-  QgsSettings settings;
   QStringList projectionsProj4  = settings.value( QStringLiteral( "UI/recentProjectionsProj4" ) ).toStringList();
   QStringList projectionsWkt = settings.value( QStringLiteral( "UI/recentProjectionsWkt" ) ).toStringList();
   QStringList projectionsAuthId = settings.value( QStringLiteral( "UI/recentProjectionsAuthId" ) ).toStringList();
@@ -2936,7 +2935,6 @@ void QgsCoordinateReferenceSystem::pushRecentCoordinateReferenceSystem( const Qg
     wkt << c.toWkt( WKT_PREFERRED );
   }
 
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "UI/recentProjectionsAuthId" ), authids );
   settings.setValue( QStringLiteral( "UI/recentProjectionsWkt" ), wkt );
   settings.setValue( QStringLiteral( "UI/recentProjectionsProj4" ), proj );

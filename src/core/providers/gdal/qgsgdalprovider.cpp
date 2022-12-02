@@ -2644,7 +2644,6 @@ void buildSupportedRasterFileFilterAndExtensions( QString &fileFiltersString, QS
   fileFiltersString = filters.join( QLatin1String( ";;" ) ) + ";;";
 
   // VSIFileHandler (see qgsogrprovider.cpp) - second
-  QgsSettings settings;
   if ( QgsSettingsRegistryCore::settingsScanZipInBrowser2.value() != QLatin1String( "no" ) )
   {
     fileFiltersString.prepend( createFileFilter_( QObject::tr( "GDAL/OGR VSIFileHandler" ), QStringLiteral( "*.zip *.gz *.tar *.tar.gz *.tgz" ) ) );

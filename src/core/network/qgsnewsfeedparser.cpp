@@ -205,7 +205,6 @@ void QgsNewsFeedParser::onFetch( const QString &content )
 
 void QgsNewsFeedParser::readStoredEntries()
 {
-  QgsSettings settings;
 
   settings.beginGroup( mSettingsKey, QgsSettings::Core );
   QStringList existing = settings.childGroups();
@@ -232,7 +231,6 @@ void QgsNewsFeedParser::readStoredEntries()
 QgsNewsFeedParser::Entry QgsNewsFeedParser::readEntryFromSettings( const int key )
 {
   const QString baseSettingsKey = QStringLiteral( "%1/%2" ).arg( mSettingsKey ).arg( key );
-  QgsSettings settings;
   settings.beginGroup( baseSettingsKey, QgsSettings::Core );
   Entry entry;
   entry.key = key;
@@ -262,7 +260,6 @@ QgsNewsFeedParser::Entry QgsNewsFeedParser::readEntryFromSettings( const int key
 void QgsNewsFeedParser::storeEntryInSettings( const QgsNewsFeedParser::Entry &entry )
 {
   const QString baseSettingsKey = QStringLiteral( "%1/%2" ).arg( mSettingsKey ).arg( entry.key );
-  QgsSettings settings;
   settings.setValue( QStringLiteral( "%1/title" ).arg( baseSettingsKey ), entry.title, QgsSettings::Core );
   settings.setValue( QStringLiteral( "%1/imageUrl" ).arg( baseSettingsKey ), entry.imageUrl, QgsSettings::Core );
   settings.setValue( QStringLiteral( "%1/content" ).arg( baseSettingsKey ), entry.content, QgsSettings::Core );
