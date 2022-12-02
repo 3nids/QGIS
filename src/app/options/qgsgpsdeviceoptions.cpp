@@ -109,7 +109,7 @@ void QgsGpsDeviceOptionsWidget::apply()
     settings.setValue( devPath.arg( name ) + "/trkdownload", commands.value( 4 ), QgsSettings::Gps );
     settings.setValue( devPath.arg( name ) + "/trkupload", commands.value( 5 ), QgsSettings::Gps );
   }
-  settings.setValue( QStringLiteral( "babelDeviceList" ), deviceNames, QgsSettings::Gps );
+  QgsBabelFormatRegistry::settingsBabelDeviceList.setValue( deviceNames );
 
   QgsSettingsRegistryCore::settingsGpsBabelPath.setValue( mGpsBabelFileWidget->filePath() );
 
