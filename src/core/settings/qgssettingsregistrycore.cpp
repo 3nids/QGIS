@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
+  addSettingsEntry( &QgsVectorLayer::settingsSimplifyLocal );
   addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultEarlyResampling );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyEnabled );
   addSettingsEntry( &QgsAuthManager::settingsPasswordHelperLogging );
