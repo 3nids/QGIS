@@ -17,6 +17,7 @@
 #define QGSGPSLOGGER_H
 
 #include "qgis_core.h"
+#include "qgssettingsentryimpl.h"
 #include "qgis.h"
 #include "qgis_sip.h"
 #include "qgscoordinatereferencesystem.h"
@@ -50,6 +51,7 @@ class CORE_EXPORT QgsGpsLogger : public QObject
 
   public:
 
+    static const inline QgsSettingsEntryDouble settingsDistanceThreshold = QgsSettingsEntryDouble( QStringLiteral( "distanceThreshold" ), QgsSettings::Prefix::GPS_, 0 ) SIP_SKIP;
     /**
      * Constructor for QgsGpsLogger with the specified \a parent object.
      *
