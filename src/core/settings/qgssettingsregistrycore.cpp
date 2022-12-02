@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnapEnabled );
   addSettingsEntry( &settingsDigitizingDefaultSnapMode );
   addSettingsEntry( &settingsDigitizingDefaultSnapType );
+  addSettingsEntry( &settingsAlwaysMonitorItemUris );
   addSettingsEntry( &settingsDigitizingDefaultSnappingTolerance );
   addSettingsEntry( &settingsDisableMonitorItemUris );
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
