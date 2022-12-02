@@ -17,6 +17,7 @@
 #ifndef QGSCPTCITYARCHIVE_H
 #define QGSCPTCITYARCHIVE_H
 
+#include "qgssettingsentryimpl.h"
 #include "qgis_core.h"
 #include "qgis_sip.h"
 #include "qgis.h"
@@ -40,6 +41,7 @@ class CORE_EXPORT QgsCptCityArchive
 {
   public:
     QgsCptCityArchive( const QString &archiveName = DEFAULT_CPTCITY_ARCHIVE,
+    static const inline QgsSettingsEntryString settingsCptCityArchiveName = QgsSettingsEntryString( QStringLiteral( "archiveName" ), QgsSettings::Prefix::CPTCITY, DEFAULT_CPTCITY_ARCHIVE ) SIP_SKIP;
                        const QString &baseDir = QString() );
     ~QgsCptCityArchive();
 

@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgscptcityarchive.h"
 #include "qgsogrproviderutils.h"
 #include "qgslayoutitemlabel.h"
 #include "qgslayoututils.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
+  addSettingsEntry( &QgsCptCityArchive::settingsCptCityArchiveName );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyAuthcfg );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyType );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyPassword );
