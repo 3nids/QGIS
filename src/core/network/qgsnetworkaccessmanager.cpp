@@ -670,7 +670,7 @@ void QgsNetworkAccessManager::setupDefaultProxyAndCache( Qt::ConnectionType conn
   {
     // This settings is keep for retrocompatibility, the returned proxy for these URL is the default one,
     // meaning the system one
-    excludes = settings.value( QStringLiteral( "proxy/proxyExcludedUrls" ), QStringList() ).toStringList();
+    excludes = QgsGdalUtils::settingsProxyProxyExcludedUrls.value();
 
     noProxyURLs = settings.value( QStringLiteral( "proxy/noProxyUrls" ), QStringList() ).toStringList();
 

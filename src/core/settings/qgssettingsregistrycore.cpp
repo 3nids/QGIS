@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsgdalutils.h"
 #include "qgsdirectoryitem.h"
 #include "qgsfavoritesitem.h"
 #include "qgsbabelformatregistry.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnapEnabled );
   addSettingsEntry( &settingsDigitizingDefaultSnapMode );
   addSettingsEntry( &settingsDigitizingDefaultSnapType );
+  addSettingsEntry( &QgsGdalUtils::settingsProxyProxyExcludedUrls );
   addSettingsEntry( &settingsAlwaysMonitorItemUris );
   addSettingsEntry( &settingsDigitizingDefaultSnappingTolerance );
   addSettingsEntry( &settingsDisableMonitorItemUris );

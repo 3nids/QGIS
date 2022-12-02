@@ -17,6 +17,7 @@
 #define QGSGDALUTILS_H
 
 #define SIP_NO_FILE
+#include "qgssettingsentryimpl.h"
 
 #include "qgis_core.h"
 #include <gdal.h>
@@ -35,6 +36,7 @@ class CORE_EXPORT QgsGdalUtils
 {
   public:
 
+    static const inline QgsSettingsEntryStringList settingsProxyProxyExcludedUrls = QgsSettingsEntryStringList( QStringLiteral( "proxyExcludedUrls" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
     /**
      * Reads whether a driver supports GDALCreate() for raster purposes.
      * \param driver GDAL driver
