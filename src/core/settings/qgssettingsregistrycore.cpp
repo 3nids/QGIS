@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "pal.h"
 #include "qgsrasterlayer.h"
 #include "qgsgpslogger.h"
 #include "qgsgpsdetector.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
+  addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPoints );
   addSettingsEntry( &QgsGpsLogger::settingsTimeStampFormat );
   addSettingsEntry( &QgsGpsLogger::settingsLeapSecondsCorrection );
   addSettingsEntry( &QgsGpsLogger::settingsAcquisitionInterval );
