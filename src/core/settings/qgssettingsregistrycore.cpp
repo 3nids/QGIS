@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsogrproviderutils.h"
 #include "qgslayoutitemlabel.h"
 #include "qgslayoututils.h"
 #include "qgsgeonoderequest.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
+  addSettingsEntry( &settingsScanZipInBrowser2 );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsLayoutDesignerDefaultFont );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );

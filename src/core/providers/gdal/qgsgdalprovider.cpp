@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "qgsgdalprovider.h"
+#include "qgssettingsregistrycore.h"
 ///@cond PRIVATE
 
 #include "qgis.h"
@@ -2644,7 +2645,7 @@ void buildSupportedRasterFileFilterAndExtensions( QString &fileFiltersString, QS
 
   // VSIFileHandler (see qgsogrprovider.cpp) - second
   QgsSettings settings;
-  if ( settings.value( QStringLiteral( "qgis/scanZipInBrowser2" ), "basic" ).toString() != QLatin1String( "no" ) )
+  if ( QgsSettingsRegistryCore::settingsScanZipInBrowser2.value() != QLatin1String( "no" ) )
   {
     fileFiltersString.prepend( createFileFilter_( QObject::tr( "GDAL/OGR VSIFileHandler" ), QStringLiteral( "*.zip *.gz *.tar *.tar.gz *.tgz" ) ) );
     extensions << QStringLiteral( "zip" ) << QStringLiteral( "gz" ) << QStringLiteral( "tar" ) << QStringLiteral( "tar.gz" ) << QStringLiteral( "tgz" );
