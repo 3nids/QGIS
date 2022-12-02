@@ -272,6 +272,7 @@ class CORE_EXPORT QgsNetworkAccessManager : public QNetworkAccessManager
 
   public:
 
+    static const inline QgsSettingsEntryString settingsProxyProxyPassword = QgsSettingsEntryString( QStringLiteral( "proxyPassword" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingsProxyProxyUser = QgsSettingsEntryString( QStringLiteral( "proxyUser" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingsProxyProxyPort = QgsSettingsEntryString( QStringLiteral( "proxyPort" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingsProxyProxyHost = QgsSettingsEntryString( QStringLiteral( "proxyHost" ), QgsSettings::Prefix::PROXY, "" ) SIP_SKIP;
