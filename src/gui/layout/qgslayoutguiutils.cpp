@@ -17,6 +17,7 @@
 #include "qgsgui.h"
 #include "qgslayout.h"
 #include "qgslayoutitemguiregistry.h"
+#include "qgssettingsregistrycore.h"
 #include "qgslayoutitemregistry.h"
 #include "qgslayoutviewrubberband.h"
 #include "qgslayoutitemshape.h"
@@ -226,7 +227,7 @@ void QgsLayoutGuiUtils::registerGuiForKnownItemTypes( QgsMapCanvas *mapCanvas )
 
     //set default legend font from settings
     QgsSettings settings;
-    const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+    const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.value();
     if ( !defaultFontString.isEmpty() )
     {
       QFont font;
@@ -456,7 +457,7 @@ void QgsLayoutGuiUtils::registerGuiForKnownItemTypes( QgsMapCanvas *mapCanvas )
 
     //set default table fonts from settings
     QgsSettings settings;
-    const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+    const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.value();
     if ( !defaultFontString.isEmpty() )
     {
       QgsTextFormat format;
@@ -497,7 +498,7 @@ void QgsLayoutGuiUtils::registerGuiForKnownItemTypes( QgsMapCanvas *mapCanvas )
 
     //set default table fonts from settings
     QgsSettings settings;
-    const QString defaultFontString = settings.value( QStringLiteral( "LayoutDesigner/defaultFont" ), QVariant(), QgsSettings::Gui ).toString();
+    const QString defaultFontString = QgsSettingsRegistryCore::settingsLayoutDesignerDefaultFont.value();
     if ( !defaultFontString.isEmpty() )
     {
       QgsTextFormat format;
