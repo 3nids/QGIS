@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
+  addSettingsEntry( &QgsGpsLogger::settingsApplyLeapSeconds );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsEncoding );
   addSettingsEntry( &settingsGdalSkipList );

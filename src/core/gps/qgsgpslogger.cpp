@@ -209,7 +209,7 @@ void QgsGpsLogger::updateGpsSettings()
 
     acquisitionInterval = QgsGpsLogger::settingsAcquisitionInterval.value();
     mDistanceThreshold = QgsGpsLogger::settingsDistanceThreshold.value();
-    mApplyLeapSettings = settings.value( QStringLiteral( "applyLeapSeconds" ), true, QgsSettings::Gps ).toBool();
+    mApplyLeapSettings = QgsGpsLogger::settingsApplyLeapSeconds.value();
     mLeapSeconds = QgsGpsLogger::settingsLeapSecondsCorrection.value();
 
     switch ( QgsGpsLogger::settingsTimeStampFormat.value() )

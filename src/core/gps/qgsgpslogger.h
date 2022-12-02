@@ -51,6 +51,7 @@ class CORE_EXPORT QgsGpsLogger : public QObject
 
   public:
 
+    static const inline QgsSettingsEntryBool settingsApplyLeapSeconds = QgsSettingsEntryBool( QStringLiteral( "applyLeapSeconds" ), QgsSettings::Prefix::GPS_, true ) SIP_SKIP;
     static const inline QgsSettingsEntryString settingsTimestampTimeZone = QgsSettingsEntryString( QStringLiteral( "timestampTimeZone" ), QgsSettings::Prefix::GPS_, QString() ) SIP_SKIP;
     static const inline QgsSettingsEntryInteger settingsTimeStampFormat = QgsSettingsEntryInteger( QStringLiteral( "timeStampFormat" ), QgsSettings::Prefix::GPS_, Qt::LocalTime ) SIP_SKIP;
     static const inline QgsSettingsEntryInteger settingsLeapSecondsCorrection = QgsSettingsEntryInteger( QStringLiteral( "leapSecondsCorrection" ), QgsSettings::Prefix::GPS_, 18 ) SIP_SKIP;
