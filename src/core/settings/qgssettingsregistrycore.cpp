@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
+  addSettingsEntry( &QgsGpsLogger::settingsTimeStampFormat );
   addSettingsEntry( &QgsGpsLogger::settingsLeapSecondsCorrection );
   addSettingsEntry( &QgsGpsLogger::settingsAcquisitionInterval );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyMaxScale );

@@ -212,7 +212,7 @@ void QgsGpsLogger::updateGpsSettings()
     mApplyLeapSettings = settings.value( QStringLiteral( "applyLeapSeconds" ), true, QgsSettings::Gps ).toBool();
     mLeapSeconds = QgsGpsLogger::settingsLeapSecondsCorrection.value();
 
-    switch ( settings.value( QStringLiteral( "timeStampFormat" ), Qt::LocalTime, QgsSettings::Gps ).toInt() )
+    switch ( QgsGpsLogger::settingsTimeStampFormat.value() )
     {
       case 0:
         mTimeStampSpec = Qt::TimeSpec::LocalTime;
