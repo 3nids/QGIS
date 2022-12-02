@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
+  addSettingsEntry( &QgsVectorLayer::settingsSimplifyDrawingTol );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
   addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultOversampling );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
