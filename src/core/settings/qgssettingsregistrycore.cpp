@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultMValue );
   addSettingsEntry( &settingsDigitizingDefaultSnapEnabled );
   addSettingsEntry( &settingsDigitizingDefaultSnapMode );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyNoProxyUrls );
   addSettingsEntry( &settingsDigitizingDefaultSnapType );
   addSettingsEntry( &QgsGdalUtils::settingsProxyProxyExcludedUrls );
   addSettingsEntry( &settingsAlwaysMonitorItemUris );
