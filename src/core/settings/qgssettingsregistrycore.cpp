@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
+  addSettingsEntry( &QgsNetworkAccessManager::settingsProxyProxyEnabled );
   addSettingsEntry( &QgsAuthManager::settingsPasswordHelperLogging );
   addSettingsEntry( &QgsAuthManager::settingsUsePasswordHelper );
   addSettingsEntry( &settingsDigitizingSnapColor );

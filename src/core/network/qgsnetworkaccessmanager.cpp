@@ -665,7 +665,7 @@ void QgsNetworkAccessManager::setupDefaultProxyAndCache( Qt::ConnectionType conn
   QStringList excludes;
   QStringList noProxyURLs;
 
-  const bool proxyEnabled = settings.value( QStringLiteral( "proxy/proxyEnabled" ), false ).toBool();
+  const bool proxyEnabled = QgsNetworkAccessManager::settingsProxyProxyEnabled.value();
   if ( proxyEnabled )
   {
     // This settings is keep for retrocompatibility, the returned proxy for these URL is the default one,
