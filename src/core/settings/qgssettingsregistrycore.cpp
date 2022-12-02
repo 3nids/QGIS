@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgslayoututils.h"
 #include "qgsgeonoderequest.h"
 #include "qgsvectortileconnection.h"
 #include "pal.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &settingsMapScales );
   addSettingsEntry( &QgsGpsLogger::settingsTimestampTimeZone );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDefaultCapabilitiesExpiry );
