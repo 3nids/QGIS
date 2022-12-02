@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
+  addSettingsEntry( &settingsGdalSkipDrivers );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
   addSettingsEntry( &QgsCptCityArchive::settingsCptCityArchiveName );
   addSettingsEntry( &QgsNetworkAccessManager::settingsProxyAuthcfg );
