@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsvectorfilewriter.h"
 #include "qgscptcityarchive.h"
 #include "qgsogrproviderutils.h"
 #include "qgslayoutitemlabel.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
+  addSettingsEntry( &settingsEncoding );
   addSettingsEntry( &settingsGdalSkipList );
   addSettingsEntry( &settingsGdalSkipDrivers );
   addSettingsEntry( &settingsDigitizingSnapInvisibleFeature );
