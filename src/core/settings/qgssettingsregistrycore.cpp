@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsvectortileconnection.h"
 #include "pal.h"
 #include "qgsrasterlayer.h"
 #include "qgsgpslogger.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
+  addSettingsEntry( &settingsZmin );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitPolygons );
   addSettingsEntry( &Pal::settingsRenderingLabelCandidatesLimitLines );
   addSettingsEntry( &settingsDigitizingValidateGeometries );

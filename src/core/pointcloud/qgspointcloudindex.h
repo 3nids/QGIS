@@ -17,6 +17,7 @@
 
 #ifndef QGSPOINTCLOUDINDEX_H
 #define QGSPOINTCLOUDINDEX_H
+#include "qgssettingsregistrycore.h"
 
 #include <QObject>
 #include <QString>

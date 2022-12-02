@@ -17,6 +17,7 @@
 
 #include "qgsvectortileconnection.h"
 #include "qgsvectortiledataitems.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsapplication.h"
 
 ///@cond PRIVATE

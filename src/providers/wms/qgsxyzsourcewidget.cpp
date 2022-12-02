@@ -17,6 +17,7 @@
 
 #include "qgsxyzsourcewidget.h"
 #include "qgswmssourceselect.h"
+#include "qgssettingsregistrycore.h"
 #include "qgsproviderregistry.h"
 
 #include "qgswmsprovider.h"
