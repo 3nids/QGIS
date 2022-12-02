@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsauthmanager.h"
 #include "qgsvectorfilewriter.h"
 #include "qgscptcityarchive.h"
 #include "qgsogrproviderutils.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
   addSettingsEntry( &settingsDigitizingSnapColor );
+  addSettingsEntry( &QgsAuthManager::settingsPasswordHelperInsecureFallback );
   addSettingsEntry( &QgsGpsLogger::settingsApplyLeapSeconds );
   addSettingsEntry( &settingsDigitizingSnapTooltip );
   addSettingsEntry( &settingsEncoding );

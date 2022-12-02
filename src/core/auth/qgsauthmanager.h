@@ -17,6 +17,7 @@
 #ifndef QGSAUTHMANAGER_H
 #define QGSAUTHMANAGER_H
 
+#include "qgssettingsentryimpl.h"
 #include "qgis_core.h"
 #include "qgis_sip.h"
 #include <QObject>
@@ -68,6 +69,7 @@ class CORE_EXPORT QgsAuthManager : public QObject
 
   public:
 
+    static const inline QgsSettingsEntryBool settingsPasswordHelperInsecureFallback = QgsSettingsEntryBool( QStringLiteral( "password_helper_insecure_fallback" ), QgsSettings::Prefix::AUTH_, false ) SIP_SKIP;
     //! Message log level (mirrors that of QgsMessageLog, so it can also output there)
     enum MessageLevel
     {
