@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsrasterlayer.h"
 #include "qgsgpslogger.h"
 #include "qgsgpsdetector.h"
 #include "qgsvectorlayer.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDisableEnterAttributeValuesDialog );
   addSettingsEntry( &settingsDigitizingValidateGeometries );
   addSettingsEntry( &settingsDigitizingOffsetJoinStyle );
+  addSettingsEntry( &QgsRasterLayer::settingsRasterDefaultOversampling );
   addSettingsEntry( &settingsDigitizingOffsetQuadSeg );
   addSettingsEntry( &QgsGpsLogger::settingsDistanceThreshold );
   addSettingsEntry( &QgsVectorLayer::settingsSimplifyAlgorithm );

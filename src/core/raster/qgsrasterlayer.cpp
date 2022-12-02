@@ -878,7 +878,7 @@ void QgsRasterLayer::setDataProvider( QString const &provider, const QgsDataProv
       mDataProvider->setZoomedOutResamplingMethod( QgsRasterDataProvider::ResamplingMethod::Bilinear );
     }
 
-    const double maxOversampling = settings.value( QStringLiteral( "/Raster/defaultOversampling" ), 2.0 ).toDouble();
+    const double maxOversampling = QgsRasterLayer::settingsRasterDefaultOversampling.value();
     resampleFilter->setMaxOversampling( maxOversampling );
     mDataProvider->setMaxOversampling( maxOversampling );
 
