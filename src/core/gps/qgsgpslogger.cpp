@@ -226,7 +226,7 @@ void QgsGpsLogger::updateGpsSettings()
         mTimeStampSpec = Qt::TimeSpec::TimeZone;
         break;
     }
-    mTimeZone = settings.value( QStringLiteral( "timestampTimeZone" ), QVariant(), QgsSettings::Gps ).toString();
+    mTimeZone = QgsGpsLogger::settingsTimestampTimeZone.value();
   }
 
   mAcquisitionInterval = acquisitionInterval * 1000;

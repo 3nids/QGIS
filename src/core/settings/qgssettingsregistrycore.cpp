@@ -99,6 +99,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingMarkerOnlyForSelected );
   addSettingsEntry( &settingsDigitizingMarkerStyle );
   addSettingsEntry( &settingsDigitizingMarkerSizeMm );
+  addSettingsEntry( &QgsGpsLogger::settingsTimestampTimeZone );
   addSettingsEntry( &settingsDigitizingReuseLastValues );
   addSettingsEntry( &settingsDefaultCapabilitiesExpiry );
   addSettingsEntry( &settingsZmax );
