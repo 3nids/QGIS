@@ -25,6 +25,7 @@
 #include "qgsnewsfeedparser.h"
 #include "qgsowsconnection.h"
 #include "qgsprocessing.h"
+#include "qgsfavoritesitem.h"
 #include "qgsbabelformatregistry.h"
 #include "qgsmaplayerlegend.h"
 #include "qgsauthmanager.h"
@@ -99,6 +100,7 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &settingsDigitizingDefaultSnapType );
   addSettingsEntry( &settingsDigitizingDefaultSnappingTolerance );
   addSettingsEntry( &settingsDigitizingDefaultSnappingToleranceUnit );
+  addSettingsEntry( &settingsBrowserFavourites );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEdit );
   addSettingsEntry( &QgsBabelFormatRegistry::settingsBabelDeviceList );
   addSettingsEntry( &settingsDigitizingSearchRadiusVertexEditUnit );
