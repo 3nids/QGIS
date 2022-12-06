@@ -29,6 +29,7 @@
 #include "qgsfontmanager.h"
 #include "qgsgpsconnection.h"
 #include "qgsbabelformatregistry.h"
+#include "qgsvectortileconnection.h"
 
 
 QgsSettingsRegistryCore::QgsSettingsRegistryCore()
@@ -113,6 +114,9 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &QgsOwsConnection::settingsConnectionSelected );
   addSettingsEntryGroup( &QgsOwsConnection::settingsServiceConnectionDetailsGroup );
   addSettingsEntryGroup( &QgsOwsConnection::settingsServiceConnectionCredentialsGroup );
+
+  addSettingsEntry( &QgsVectorTileProviderConnection::settingsConnectionSelected );
+  addSettingsEntryGroup( &QgsVectorTileProviderConnection::settingsConnections );
 
   addSettingsEntry( &QgsFontManager::settingsFontFamilyReplacements );
   addSettingsEntry( &QgsFontManager::settingsDownloadMissingFonts );
