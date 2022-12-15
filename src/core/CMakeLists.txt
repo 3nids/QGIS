@@ -856,6 +856,7 @@ set(QGIS_CORE_SRCS
   settings/qgssettingsentryimpl.cpp
   settings/qgssettingsregistry.cpp
   settings/qgssettingsregistrycore.cpp
+  settings/qgssettingstreeelement.cpp
 
   validity/qgsabstractvaliditycheck.cpp
   validity/qgsvaliditycheckcontext.cpp
@@ -1855,6 +1856,7 @@ set(QGIS_CORE_HDRS
   settings/qgssettingsentryimpl.h
   settings/qgssettingsregistry.h
   settings/qgssettingsregistrycore.h
+  settings/qgssettingstreeelement.h
 
   validity/qgsabstractvaliditycheck.h
   validity/qgsvaliditycheckcontext.h

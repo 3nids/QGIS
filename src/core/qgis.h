@@ -242,6 +242,19 @@ class CORE_EXPORT Qgis
     Q_ENUM( SettingsType )
 
     /**
+     * SettingsAccessMode
+     * \since QGIS 3.30
+     */
+    enum class SettingsAccessMode : int
+    {
+      PreferLocal, //!< Look in local settings first, then in global if the setting is not found
+      PreferGlobal, //!< Look in global settings first, then in local if the setting is not found
+      LocalOnly, //!< Lool only in local settings
+      GlobalOnly, //!< Look only in global settings
+    };
+    Q_ENUM( SettingsAccessMode )
+
+    /**
      * Settings options
      * \since QGIS 3.26
      */

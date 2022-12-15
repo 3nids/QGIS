@@ -1,0 +1,144 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/settings/qgssettingstreeelement.h                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+class QgsSettingsTreeElement
+{
+%Docstring(signature="appended")
+:py:class:`QgsSettingsTreeElement` is a tree element for the settings registry
+to help organizing and introspecting the registry.
+It is either a root element, a normal element or
+a named list (to store a group of settings under a dynamic named key).
+The root element holds a pointer to a registry (might be null)
+to automatically register a settings entry on its creation when a parent is provided.
+
+.. seealso:: :py:class:`QgsSettingsEntryBase`
+
+.. seealso:: :py:class:`QgsSettingsRegistry`
+
+.. versionadded:: 3.30
+%End
+
+%TypeHeaderCode
+#include "qgssettingstreeelement.h"
+%End
+  public:
+    static const QMetaObject staticMetaObject;
+
+  public:
+    enum class Type
+    {
+      Root,
+      Normal,
+      NamedList,
+    };
+
+    enum class NamedListOption
+    {
+      CreateCurrentItemSetting,
+    };
+
+    typedef QFlags<QgsSettingsTreeElement::NamedListOption> NamedListOptions;
+
+
+    QgsSettingsTreeElement();
+%Docstring
+Default constructor with no reference of a registry
+%End
+
+    ~QgsSettingsTreeElement();
+
+
+    static QgsSettingsTreeElement *createRootElement( QgsSettingsRegistry *registry = 0 );
+%Docstring
+Creates the root element, with an optional pointer to a settings registry, on which any settings having this root as top parent will be automatically registered into.
+%End
+
+    static QgsSettingsTreeElement *createElement( QgsSettingsTreeElement *parent, const QString &key, const NamedListOptions &options = NamedListOptions() );
+%Docstring
+Creates a normal tree element
+%End
+
+    static QgsSettingsTreeElement *createNamedListElement( QgsSettingsTreeElement *parent, const QString &key );
+%Docstring
+Creates a named list tree element.
+This is useful to register group of settings for several named entries (for instance credentials for several named services)
+%End
+
+    Type type() const;
+%Docstring
+Returns the type of element
+%End
+
+    void addChildElement( const QgsSettingsTreeElement *element );
+%Docstring
+Adds a child elements
+%End
+
+    void addChildSetting( const QgsSettingsEntryBase *setting );
+%Docstring
+Adds a child setting
+%End
+
+    const QgsSettingsTreeElement *parent() const;
+%Docstring
+Returns the parent of the element or None if it does not exists
+%End
+
+    QgsSettingsRegistry *registry() const;
+%Docstring
+Returns the registry which must be set for the top element
+%End
+
+    QString key() const;
+%Docstring
+Returns the key of the element (without its parents)
+%End
+
+    QString completeKey() const;
+%Docstring
+Returns the complete key of the element (including its parents)
+%End
+
+    int namedElementsCount() const;
+%Docstring
+Returns the number of named elements in the complete key
+%End
+
+    void deleteNamedEntry( const QString &entry );
+%Docstring
+Delete a named entry from the named list element
+
+.. note::
+
+   This must not be called on a element which is not a named list
+%End
+
+    void deleteNamedEntry( const QString &entry, const QString &parentEntry );
+%Docstring
+Delete a named entry from the named list element
+\The ``parentEntry`` is used if the named list is nested in anoter named list
+
+.. note::
+
+   This must not be called on a element which is not a named list
+%End
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/settings/qgssettingstreeelement.h                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

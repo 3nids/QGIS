@@ -18,7 +18,6 @@
 #define QGSSETTINGSREGISTRY_H
 
 #include "qgis_core.h"
-#include "qgis_sip.h"
 #include "qgssettingsentry.h"
 
 #include <QMap>
@@ -92,6 +91,8 @@ class CORE_EXPORT QgsSettingsRegistry
     QMap<const QgsSettingsEntryBase *, const QgsSettingsEntryGroup *> mSettingsEntriesGroupMap;
 
     QList<const QgsSettingsRegistry *> mSettingsRegistryChildList;
+
+    friend class QgsSettingsEntryBase;
 
 };
 

@@ -15,6 +15,9 @@
 
 #include "qgssettingsentry.h"
 #include "qgslogger.h"
+#include "qgsapplication.h"
+#include "qgssettingsregistry.h"
+#include "qgssettingsregistrycore.h"
 
 #include <QRegularExpression>
 
@@ -107,6 +110,21 @@ bool QgsSettingsEntryGroup::hasDynamicKey() const
 
 
 /*--------------*/
+
+QgsSettingsEntryBase::QgsSettingsEntryBase( const QString &key, QgsSettingsTreeElement *parentTreeElement, const QVariant &defaultValue, const QString &description, Qgis::SettingsOptions options )
+  : mParent( parentTreeElement )
+  , mDefaultValue( defaultValue )
+  , mDescription( description )
+  , mPluginName()
+  , mOptions( options )
+{
+  mKey = parentTreeElement->completeKey();
+  if ( !mKey.isEmpty() )
+    mKey.append( QStringLiteral( "/" ) );
+  mKey.append( key );
+
+  parentTreeElement->addChildSetting( this );
+}
 
 
 QString QgsSettingsEntryBase::key( const QString &dynamicKeyPart ) const
@@ -233,6 +251,8 @@ QStringList QgsSettingsEntryBase::dynamicKeyPartToList( const QString &dynamicKe
   return dynamicKeyPartList;
 }
 
+
+
 QVariant QgsSettingsEntryBase::valueAsVariant( const QString &dynamicKeyPart ) const
 {
   return valueAsVariant( dynamicKeyPartToList( dynamicKeyPart ) );
@@ -291,17 +311,17 @@ QVariant QgsSettingsEntryBase::formerValueAsVariant( const QStringList &dynamicK
   return QgsSettings().value( formerValuekey( dynamicKeyPartList ), defaultValueOverride );
 }
 
-bool QgsSettingsEntryBase::migrateFromKey( const QString &oldKey, const QString &oldSection, const QString &dynamicKeyPart ) const
+bool QgsSettingsEntryBase::migrateFromKey( const QString &oldKey, const QString &dynamicKeyPart ) const
 {
-  return migrateFromKey( oldKey, oldSection, dynamicKeyPartToList( dynamicKeyPart ) );
+  return copyValueFromKey( oldKey, dynamicKeyPartToList( dynamicKeyPart ) );
 }
 
-bool QgsSettingsEntryBase::migrateFromKey( const QString &oldKey, const QString &oldSection, const QStringList &dynamicKeyPartList ) const
+bool QgsSettingsEntryBase::copyValueFromKey( const QString &oldKey, const QStringList &dynamicKeyPartList ) const
 {
   if ( exists( dynamicKeyPartList ) )
     return false;
 
-  const QString oldCompleteKey = completeKeyPrivate( QStringLiteral( "%1/%2" ).arg( oldSection, oldKey ), dynamicKeyPartList );
+  const QString oldCompleteKey = completeKeyPrivate( oldKey, dynamicKeyPartList );
 
   if ( QgsSettings().contains( oldCompleteKey ) )
   {
@@ -316,6 +336,8 @@ QString QgsSettingsEntryBase::formerValuekey( const QStringList &dynamicKeyPartL
 {
   return key( dynamicKeyPartList ) + QStringLiteral( "_formervalue" );
 }
+
+
 
 
 

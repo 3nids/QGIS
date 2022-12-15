@@ -180,6 +180,14 @@ Qgis.SettingsType.__doc__ = 'Types of settings entries\n\n.. versionadded:: 3.26
 # --
 Qgis.SettingsType.baseClass = Qgis
 # monkey patching scoped based enum
+Qgis.SettingsAccessMode.PreferLocal.__doc__ = "Look in local settings first, then in global if the setting is not found"
+Qgis.SettingsAccessMode.PreferGlobal.__doc__ = "Look in global settings first, then in local if the setting is not found"
+Qgis.SettingsAccessMode.LocalOnly.__doc__ = "Lool only in local settings"
+Qgis.SettingsAccessMode.GlobalOnly.__doc__ = "Look only in global settings"
+Qgis.SettingsAccessMode.__doc__ = 'SettingsAccessMode\n\n.. versionadded:: 3.30\n\n' + '* ``PreferLocal``: ' + Qgis.SettingsAccessMode.PreferLocal.__doc__ + '\n' + '* ``PreferGlobal``: ' + Qgis.SettingsAccessMode.PreferGlobal.__doc__ + '\n' + '* ``LocalOnly``: ' + Qgis.SettingsAccessMode.LocalOnly.__doc__ + '\n' + '* ``GlobalOnly``: ' + Qgis.SettingsAccessMode.GlobalOnly.__doc__
+# --
+Qgis.SettingsAccessMode.baseClass = Qgis
+# monkey patching scoped based enum
 Qgis.SettingsOption.SaveFormerValue.__doc__ = ""
 Qgis.SettingsOption.SaveEnumFlagAsInt.__doc__ = ""
 Qgis.SettingsOption.__doc__ = 'Settings options\n\n.. versionadded:: 3.26\n\n' + '* ``SaveFormerValue``: ' + Qgis.SettingsOption.SaveFormerValue.__doc__ + '\n' + '* ``SaveEnumFlagAsInt``: ' + Qgis.SettingsOption.SaveEnumFlagAsInt.__doc__

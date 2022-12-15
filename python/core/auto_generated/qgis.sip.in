@@ -161,6 +161,14 @@ The development version
       Color
     };
 
+    enum class SettingsAccessMode
+    {
+      PreferLocal,
+      PreferGlobal,
+      LocalOnly,
+      GlobalOnly,
+    };
+
     enum class SettingsOption
     {
       SaveFormerValue,
