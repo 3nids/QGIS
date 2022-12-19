@@ -15,9 +15,6 @@
 
 #include "qgssettingsentry.h"
 #include "qgslogger.h"
-#include "qgsapplication.h"
-#include "qgssettingsregistry.h"
-#include "qgssettingsregistrycore.h"
 
 #include <QRegularExpression>
 
@@ -311,25 +308,32 @@ QVariant QgsSettingsEntryBase::formerValueAsVariant( const QStringList &dynamicK
   return QgsSettings().value( formerValuekey( dynamicKeyPartList ), defaultValueOverride );
 }
 
-bool QgsSettingsEntryBase::migrateFromKey( const QString &oldKey, const QString &dynamicKeyPart ) const
-{
-  return copyValueFromKey( oldKey, dynamicKeyPartToList( dynamicKeyPart ) );
-}
 
-bool QgsSettingsEntryBase::copyValueFromKey( const QString &oldKey, const QStringList &dynamicKeyPartList ) const
+bool QgsSettingsEntryBase::copyValueFromKey( const QString &key, const QStringList &dynamicKeyPartList, bool deleteOldKey ) const
 {
   if ( exists( dynamicKeyPartList ) )
     return false;
 
-  const QString oldCompleteKey = completeKeyPrivate( oldKey, dynamicKeyPartList );
+  QgsSettings settings;
 
-  if ( QgsSettings().contains( oldCompleteKey ) )
+  const QString oldCompleteKey = completeKeyPrivate( key, dynamicKeyPartList );
+
+  if ( settings.contains( oldCompleteKey ) )
   {
-    QVariant oldValue = QgsSettings().value( oldCompleteKey, mDefaultValue );
-    setVariantValuePrivate( oldValue );
+    QVariant oldValue = settings.value( oldCompleteKey, mDefaultValue );
+    setVariantValuePrivate( oldValue, dynamicKeyPartList );
+    if ( deleteOldKey )
+      settings.remove( oldCompleteKey );
     return true;
   }
   return false;
+}
+
+void QgsSettingsEntryBase::copyValueToKey( const QString &key, const QStringList &dynamicKeyPartList ) const
+{
+  QgsSettings settings;
+  const QString completeKey = completeKeyPrivate( key, dynamicKeyPartList );
+  QgsSettings().setValue( completeKey, valueAsVariant( dynamicKeyPartList ) );
 }
 
 QString QgsSettingsEntryBase::formerValuekey( const QStringList &dynamicKeyPartList ) const

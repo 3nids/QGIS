@@ -18,9 +18,11 @@
 #define QGSSETTINGSREGISTRY_H
 
 #include "qgis_core.h"
-#include "qgssettingsentry.h"
 
 #include <QMap>
+
+class QgsSettingsEntryBase;
+class QgsSettingsEntryGroup;
 
 /**
  * \ingroup core

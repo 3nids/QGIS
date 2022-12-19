@@ -22,8 +22,6 @@
 #include "qgis.h" // GEO_EPSG_CRS_ID
 #include "qgsdatasourceuri.h"
 #include "qgslogger.h"
-#include "qgsproject.h"
-#include "qgsproviderregistry.h"
 #include "qgsowsconnection.h"
 #include "qgssettings.h"
 #include "qgshttpheaders.h"
@@ -61,7 +59,7 @@ QgsOwsConnection::QgsOwsConnection( const QString &service, const QString &connN
   }
   mConnectionInfo.append( ",authcfg=" + authcfg );
 
-  QgsHttpHeaders httpHeaders( QString( "%3/connections-%1/%2/" ).arg( mService.toLower(), mConnName, QgsSettings::Prefix::QGIS ) );
+  QgsHttpHeaders httpHeaders( settingsConnectionHeaders.value( {mService.toLower(), mConnName} ) );
   mUri.setHttpHeaders( httpHeaders );
   const QString referer = httpHeaders[QgsHttpHeaders::KEY_REFERER].toString();
   if ( !referer.isEmpty() )
@@ -145,9 +143,7 @@ QgsDataSourceUri &QgsOwsConnection::addWmsWcsConnectionSettings( QgsDataSourceUr
 {
   addCommonConnectionSettings( uri, service, connName );
 
-  QString settingsKey = QString( "%3/connections-%1/%2/" ).arg( service.toLower(), connName, QgsSettings::Prefix::QGIS );
-  const QgsSettings settings;
-  uri.httpHeaders().setFromSettings( settings, settingsKey );
+  settingsConnectionHeaders.setValue( uri.httpHeaders().headers(), {service.toLower(), connName} );
 
   if ( settingsConnectionIgnoreGetMapURI.value( {service.toLower(), connName} ) )
   {
@@ -266,5 +262,5 @@ void QgsOwsConnection::addCommonConnectionSettings( QgsDataSourceUri &uri, const
 
 void QgsOwsConnection::deleteConnection( const QString &service, const QString &name )
 {
-  sTreeConnectionServices.deleteNamedEntry( {service.toLower(), name} );
+  sTreeConnectionServices.deleteNamedEntry( service.toLower(), name );
 }

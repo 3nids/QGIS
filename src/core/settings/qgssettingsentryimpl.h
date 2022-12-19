@@ -45,8 +45,8 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<Q
                              QgsSettingsTreeElement *parent,
                              const QVariant &defaultValue = QVariant(),
                              const QString &description = QString(),
-                             Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
+                             Qgis::SettingsOptions options = Qgis::SettingsOptions() )
+      : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
     {}
 
     /**
@@ -85,7 +85,7 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<Q
                              const QString &description = QString(),
                              Qgis::SettingsOptions options = Qgis::SettingsOptions() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryVariant( QgsSettingsEntryVariant( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), *a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryVariant( QgsSettingsEntryVariant( *a0, QgsSettings.createPluginTreeElement( *a1 ), *a2, *a3, *a4 ) );
     % End
 #endif
 
@@ -124,10 +124,10 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
                             const QString &description = QString(),
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             int minLength = 0,
-                            int maxLength = -1 ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference<QString>( key, parent, defaultValue, description, options )
-    , mMinLength( minLength )
-    , mMaxLength( maxLength )
+                            int maxLength = -1 )
+      : QgsSettingsEntryByReference<QString>( key, parent, defaultValue, description, options )
+      , mMinLength( minLength )
+      , mMaxLength( maxLength )
     {}
 
     /**
@@ -173,7 +173,7 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
                             int minLength = 0,
                             int maxLength = -1 );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryString( QgsSettingsEntryString( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), *a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryString( QgsSettingsEntryString( *a0, QgsSettings.createPluginTreeElement( *a1 ), *a2, *a3, *a4 ) );
     % End
 #endif
 
@@ -237,8 +237,8 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReferenc
                                 QgsSettingsTreeElement *parent,
                                 const QStringList &defaultValue = QStringList(),
                                 const QString &description = QString(),
-                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
+                                Qgis::SettingsOptions options = Qgis::SettingsOptions() )
+      : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
     { }
 
     /**
@@ -277,7 +277,7 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReferenc
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryStringList( QgsSettingsEntryStringList( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), *a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryStringList( QgsSettingsEntryStringList( *a0, QgsSettings.createPluginTreeElement( *a1 ), *a2, *a3, *a4 ) );
     % End
 #endif
 
@@ -313,8 +313,8 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
                           QgsSettingsTreeElement *parent,
                           bool defaultValue = false,
                           const QString &description = QString(),
-                          Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
+                          Qgis::SettingsOptions options = Qgis::SettingsOptions() )
+      : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
     {}
 
     /**
@@ -352,7 +352,7 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
                           const QString &description = QString(),
                           Qgis::SettingsOptions options = Qgis::SettingsOptions() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryBool( QgsSettingsEntryBool( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryBool( QgsSettingsEntryBool( *a0, QgsSettings.createPluginTreeElement( *a1 ), a2, *a3, *a4 ) );
     % End
 #endif
 
@@ -392,10 +392,10 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<qlong
                              const QString &description = QString(),
                              Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                              qlonglong minValue = std::numeric_limits<qlonglong>::min(),
-                             qlonglong maxValue = std::numeric_limits<qlonglong>::max() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
-    , mMinValue( minValue )
-    , mMaxValue( maxValue )
+                             qlonglong maxValue = std::numeric_limits<qlonglong>::max() )
+      : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
+      , mMinValue( minValue )
+      , mMaxValue( maxValue )
     { }
 
     /**
@@ -444,7 +444,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<qlong
                              qlonglong minValue = std::numeric_limits<qlonglong>::min(),
                              qlonglong maxValue = std::numeric_limits<qlonglong>::max() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryInteger( QgsSettingsEntryInteger( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), a2, *a3, *a4, a5, a6 ) );
+    sipCpp = new sipQgsSettingsEntryInteger( QgsSettingsEntryInteger( *a0, QgsSettings.createPluginTreeElement( *a1 ), a2, *a3, *a4, a5, a6 ) );
     % End
 #endif
 
@@ -515,11 +515,11 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             double minValue = std::numeric_limits<double>::lowest(),
                             double maxValue = std::numeric_limits<double>::max(),
-                            int displayDecimals = 1 ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
-    , mMinValue( minValue )
-    , mMaxValue( maxValue )
-    , mDisplayHintDecimals( displayDecimals )
+                            int displayDecimals = 1 )
+      : QgsSettingsEntryByValue( key, parent, defaultValue, description, options )
+      , mMinValue( minValue )
+      , mMaxValue( maxValue )
+      , mDisplayHintDecimals( displayDecimals )
     {}
 
     /**
@@ -574,7 +574,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
                             double maxValue = std::numeric_limits<double>::max(),
                             int displayDecimals = 1 );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryDouble( QgsSettingsEntryDouble( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), a2, *a3, *a4, a5, a6, a7 ) );
+    sipCpp = new sipQgsSettingsEntryDouble( QgsSettingsEntryDouble( *a0, QgsSettings.createPluginTreeElement( *a1 ), a2, *a3, *a4, a5, a6, a7 ) );
     % End
 #endif
 
@@ -653,8 +653,8 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
                            QgsSettingsTreeElement *parent,
                            const QColor &defaultValue = QColor(),
                            const QString &description = QString(),
-                           Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
+                           Qgis::SettingsOptions options = Qgis::SettingsOptions() )
+      : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
     {}
 
     /**
@@ -692,7 +692,7 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
                            const QString &description = QString(),
                            Qgis::SettingsOptions options = Qgis::SettingsOptions() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryColor( QgsSettingsEntryColor( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), *a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryColor( QgsSettingsEntryColor( *a0, QgsSettings.createPluginTreeElement( *a1 ), *a2, *a3, *a4 ) );
     % End
 #endif
 
@@ -714,6 +714,7 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
 {
   public:
 
+
     /**
      * Constructor for QgsSettingsEntryVariantMap.
      *
@@ -727,8 +728,8 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
                                 QgsSettingsTreeElement *parent,
                                 const QVariantMap &defaultValue = QVariantMap(),
                                 const QString &description = QString(),
-                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
+                                Qgis::SettingsOptions options = Qgis::SettingsOptions() )
+      : QgsSettingsEntryByReference( key, parent, defaultValue, description, options )
     {
     }
 
@@ -769,7 +770,7 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() );
     % MethodCode
-    sipCpp = new sipQgsSettingsEntryVariantMap( QgsSettingsEntryVariantMap( *a0, QStringLiteral( "plugins/%1" ).arg( *a1 ), *a2, *a3, *a4 ) );
+    sipCpp = new sipQgsSettingsEntryVariantMap( QgsSettingsEntryVariantMap( *a0, QgsSettings.createPluginTreeElement( *a1 ), *a2, *a3, *a4 ) );
     % End
 #endif
 

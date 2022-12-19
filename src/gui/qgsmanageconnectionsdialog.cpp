@@ -877,7 +877,7 @@ void QgsManageConnectionsDialog::loadOWSConnections( const QDomDocument &doc, co
     QgsOwsConnection::settingsConnectionDpiMode.setValue( static_cast<Qgis::DpiMode>( child.attribute( QStringLiteral( "dpiMode" ), QStringLiteral( "7" ) ).toInt() ), {service.toLower(), connectionName} );
 
     QgsHttpHeaders httpHeader( child );
-    QgsOwsConnection::settingsConnectionHeader.setValue( httpHeader.headers(), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionHeaders.setValue( httpHeader.headers(), {service.toLower(), connectionName} );
 
     if ( !child.attribute( QStringLiteral( "username" ) ).isEmpty() )
     {

@@ -334,17 +334,26 @@ class CORE_EXPORT QgsSettingsEntryBase
     QVariant formerValueAsVariant( const QStringList &dynamicKeyPartList ) const;
 
     /**
-     * Check if the settings does not exist and try to set it from a given \a oldKey and \a oldSection
+     * Checks if the settings does not exist and try to set it from a given \a oldKey.
+     * \arg dynamicKeyPartList is the optional dynamic key part to determine the key. It must be the same for origin and destination keys.
+     * If \a deleteOldKey, the setting with the old key will be removed
+     * \returns TRUE if the key exists and the setting value could be copied
      * \since QGIS 3.30
      */
-    bool migrateFromKey( const QString &oldKey, const QString &dynamicKeyPart = QString() ) const;
+    bool copyValueFromKey( const QString &key, const QStringList &dynamicKeyPartList = QStringList(), bool deleteOldKey = false ) const;
 
     /**
-     * Check if the settings does not exist and try to set it from a given \a oldKey
-     * \note The old key must contain its section (the section from the current setting will not be prepended)
+     * Copies the settings to the given \a key
+     * \arg dynamicKeyPartList is the optional dynamic key part to determine the key. It must be the same for origin and destination keys.
      * \since QGIS 3.30
      */
-    bool copyValueFromKey( const QString &oldKey, const QStringList &dynamicKeyPartList ) const;
+    void copyValueToKey( const QString &key, const QStringList &dynamicKeyPartList ) const;
+
+    /**
+    * Returns the parent tree element
+    * \since QGIS 3.30
+    */
+    QgsSettingsTreeElement *parent() const {return mParent;}
 
   protected:
 
@@ -360,7 +369,7 @@ class CORE_EXPORT QgsSettingsEntryBase
 
     QString completeKeyPrivate( const QString &key, const QStringList &dynamicKeyPartList ) const;
 
-    const QgsSettingsTreeElement *mParent = nullptr;
+    QgsSettingsTreeElement *mParent = nullptr;
     QString mKey;
     QVariant mDefaultValue;
     QString mDescription;

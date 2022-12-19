@@ -66,6 +66,14 @@ static bool setGlobalSettingsPath( QString path );
     };
 
 
+    static QgsSettingsTreeElement *createPluginTreeElement( const QString &pluginName );
+%Docstring
+Creates a settings tree element for the given ``pluginName``
+
+.. versionadded:: 3.30
+%End
+
+
     explicit QgsSettings( const QString &organization,
                           const QString &application = QString(), QObject *parent = 0 );
 %Docstring

@@ -38,16 +38,15 @@ class CORE_EXPORT QgsBabelFormatRegistry
   public:
 
 #ifndef SIP_RUN
-    static const inline QgsSettingsEntryStringList settingsBabelDeviceList = QgsSettingsEntryStringList( QStringLiteral( "babelDeviceList" ), QgsSettings::Prefix::GPS, QStringList() );
 
-    static const inline QgsSettingsEntryString settingsBabelWptDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/wptdownload" ), QgsSettings::Prefix::GPS );
-    static const inline QgsSettingsEntryString settingsBabelWptUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/wptupload" ), QgsSettings::Prefix::GPS );
-    static const inline QgsSettingsEntryString settingsBabelRteDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/rtedownload" ), QgsSettings::Prefix::GPS );
-    static const inline QgsSettingsEntryString settingsBabelRteUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/rteupload" ), QgsSettings::Prefix::GPS );
-    static const inline QgsSettingsEntryString settingsBabelTrkDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/trkdownload" ), QgsSettings::Prefix::GPS );
-    static const inline QgsSettingsEntryString settingsBabelTrkUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/trkupload" ), QgsSettings::Prefix::GPS );
+    static inline QgsSettingsTreeNamedListElement sTreeBabelDevices = *QgsSettings::sTreeGps.createNamedListElement( QStringLiteral( "babelDevices" ) );
 
-    static const inline QgsSettingsEntryGroup settingsBabelDeviceGroup = QgsSettingsEntryGroup( {&settingsBabelWptDownload, &settingsBabelWptUpload, &settingsBabelRteDownload, &settingsBabelRteUpload, &settingsBabelTrkDownload, &settingsBabelTrkUpload } );
+    static const inline QgsSettingsEntryString settingsBabelWptDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/wptdownload" ), &sTreeBabelDevices );
+    static const inline QgsSettingsEntryString settingsBabelWptUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/wptupload" ), &sTreeBabelDevices );
+    static const inline QgsSettingsEntryString settingsBabelRteDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/rtedownload" ), &sTreeBabelDevices );
+    static const inline QgsSettingsEntryString settingsBabelRteUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/rteupload" ), &sTreeBabelDevices );
+    static const inline QgsSettingsEntryString settingsBabelTrkDownload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/trkdownload" ), &sTreeBabelDevices );
+    static const inline QgsSettingsEntryString settingsBabelTrkUpload = QgsSettingsEntryString( QStringLiteral( "babelDevices/%1/trkupload" ), &sTreeBabelDevices );
 #endif
 
     /**

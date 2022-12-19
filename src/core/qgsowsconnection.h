@@ -26,7 +26,6 @@
 #include "qgsdatasourceuri.h"
 #include "qgssettingsentryimpl.h"
 #include "qgssettingsentryenumflag.h"
-#include "qgssettingsregistrycore.h"
 
 #include <QStringList>
 #include <QPushButton>
@@ -45,11 +44,11 @@ class CORE_EXPORT QgsOwsConnection : public QObject
 #ifndef SIP_RUN
     static const inline QgsSettingsEntryString settingsConnectionSelected = QgsSettingsEntryString( QStringLiteral( "connections-%1/selected" ), QgsSettings::Prefix::QGIS ) ;
 
-    static inline QgsSettingsTreeElement sTtreeConnections = *QgsSettingsTreeElement::createNamedListElement( &QgsSettingsRegistryCore::sTreeQgis, QStringLiteral( "connections" ) );
-    static inline QgsSettingsTreeElement sTreeConnectionServices = *QgsSettingsTreeElement::createNamedListElement( &sTtreeConnections, QStringLiteral( "services" ) );
+    static inline QgsSettingsTreeNamedListElement sTtreeConnections = *QgsSettings::sTreeQgis.createNamedListElement( QStringLiteral( "connections" ) );
+    static inline QgsSettingsTreeNamedListElement sTreeConnectionServices = *sTtreeConnections.createNamedListElement( QStringLiteral( "services" ) );
 
     static const inline QgsSettingsEntryString settingsConnectionUrl = QgsSettingsEntryString( QStringLiteral( "url" ), &sTreeConnectionServices, QString() ) ;
-    static const inline QgsSettingsEntryVariantMap settingsConnectionHeader = QgsSettingsEntryVariantMap( QStringLiteral( "http-header" ), &sTreeConnectionServices ) ;
+    static const inline QgsSettingsEntryVariantMap settingsConnectionHeaders = QgsSettingsEntryVariantMap( QStringLiteral( "http-header" ), &sTreeConnectionServices ) ;
     static const inline QgsSettingsEntryString settingsConnectionVersion = QgsSettingsEntryString( QStringLiteral( "version" ), &sTreeConnectionServices, QString() ) ;
     static const inline QgsSettingsEntryBool settingsConnectionIgnoreGetMapURI = QgsSettingsEntryBool( QStringLiteral( "ignoreGetMapURI" ), &sTreeConnectionServices, false ) ;
     static const inline QgsSettingsEntryBool settingsConnectionIgnoreGetFeatureInfoURI = QgsSettingsEntryBool( QStringLiteral( "ignoreGetFeatureInfoURI" ), &sTreeConnectionServices, false ) ;

@@ -10,6 +10,7 @@
 
 
 
+
 class QgsSettingsTreeElement
 {
 %Docstring(signature="appended")
@@ -51,23 +52,22 @@ to automatically register a settings entry on its creation when a parent is prov
 
     QgsSettingsTreeElement();
 %Docstring
-Default constructor with no reference of a registry
+Creates a root tree element
+%End
+%MethodCode
+    sipCpp = nullptr;
+    PyErr_SetString( PyExc_ValueError, QStringLiteral( "From Python, the tree element must be created from QgsSettings.createPluginTreeElement" ).toUtf8().constData() );
+    sipIsErr = 1;
 %End
 
-    ~QgsSettingsTreeElement();
+    virtual ~QgsSettingsTreeElement();
 
-
-    static QgsSettingsTreeElement *createRootElement( QgsSettingsRegistry *registry = 0 );
-%Docstring
-Creates the root element, with an optional pointer to a settings registry, on which any settings having this root as top parent will be automatically registered into.
-%End
-
-    static QgsSettingsTreeElement *createElement( QgsSettingsTreeElement *parent, const QString &key, const NamedListOptions &options = NamedListOptions() );
+    QgsSettingsTreeElement *createChildElement( const QString &key );
 %Docstring
 Creates a normal tree element
 %End
 
-    static QgsSettingsTreeElement *createNamedListElement( QgsSettingsTreeElement *parent, const QString &key );
+    QgsSettingsTreeNamedListElement *createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() );
 %Docstring
 Creates a named list tree element.
 This is useful to register group of settings for several named entries (for instance credentials for several named services)
@@ -78,24 +78,29 @@ This is useful to register group of settings for several named entries (for inst
 Returns the type of element
 %End
 
-    void addChildElement( const QgsSettingsTreeElement *element );
+    void addChildElement( QgsSettingsTreeElement *element );
 %Docstring
 Adds a child elements
 %End
 
-    void addChildSetting( const QgsSettingsEntryBase *setting );
+    void addChildSetting( QgsSettingsEntryBase *setting );
 %Docstring
 Adds a child setting
+%End
+
+    QList<QgsSettingsTreeElement *> childrenElements() const;
+%Docstring
+Returns the children elements
+%End
+
+    QList<QgsSettingsEntryBase *> childrenSettings() const;
+%Docstring
+Returns the children settings
 %End
 
     const QgsSettingsTreeElement *parent() const;
 %Docstring
 Returns the parent of the element or None if it does not exists
-%End
-
-    QgsSettingsRegistry *registry() const;
-%Docstring
-Returns the registry which must be set for the top element
 %End
 
     QString key() const;
@@ -113,18 +118,91 @@ Returns the complete key of the element (including its parents)
 Returns the number of named elements in the complete key
 %End
 
-    void deleteNamedEntry( const QString &entry );
+
+  protected:
+    void init( QgsSettingsTreeElement *parent, const QString &key );
+
+
+};
+
+
+
+class QgsSettingsTreeNamedListElement : QgsSettingsTreeElement
+{
+%Docstring(signature="appended")
+:py:class:`QgsSettingsTreeNamedListElement` is a named list tree element for the settings registry
+to help organizing and introspecting the registry.
+the named list element is used to store a group of settings under a dynamic named key.
+
+.. seealso:: :py:class:`QgsSettingsTreeElement`
+
+.. seealso:: :py:class:`QgsSettingsEntryBase`
+
+.. seealso:: :py:class:`QgsSettingsRegistry`
+
+.. versionadded:: 3.30
+%End
+
+%TypeHeaderCode
+#include "qgssettingstreeelement.h"
+%End
+  public:
+
+    QgsSettingsTreeNamedListElement( const QString &key, QgsSettingsTreeElement *parent, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() );
 %Docstring
-Delete a named entry from the named list element
+Default constructor with no reference of a registry
+%End
+
+    ~QgsSettingsTreeNamedListElement();
+
+    const QStringList entries( const QString &parentEntry = QString() ) const;
+%Docstring
+Returns the list of entries
+\The ``parentEntry`` is used if the named list is nested in anoter named list
+%End
+
+
+    void setSelectedNamedEntryElement( const QString &entry );
+%Docstring
+Sets the selected named entry from the named list element
 
 .. note::
 
    This must not be called on a element which is not a named list
 %End
 
-    void deleteNamedEntry( const QString &entry, const QString &parentEntry );
+    void setSelectedNamedEntryElement( const QString &parentEntry, const QString &entry );
 %Docstring
-Delete a named entry from the named list element
+Sets the selected named entry from the named list element
+\The ``parentEntry`` is used if the named list is nested in anoter named list
+
+.. note::
+
+   This must not be called on a element which is not a named list
+%End
+
+    QString selectedNamedEntryElement( const QString &parentEntry = QString() );
+%Docstring
+Returns the selected named entry from the named list element
+\The ``parentEntry`` is used if the named list is nested in anoter named list
+
+.. note::
+
+   This must not be called on a element which is not a named list
+%End
+
+    void deleteNamedEntry( const QString &entry );
+%Docstring
+Deletes a named entry from the named list element
+
+.. note::
+
+   This must not be called on a element which is not a named list
+%End
+
+    void deleteNamedEntry( const QString &parentEntry, const QString &entry );
+%Docstring
+Deletes a named entry from the named list element
 \The ``parentEntry`` is used if the named list is nested in anoter named list
 
 .. note::
@@ -134,6 +212,10 @@ Delete a named entry from the named list element
 
 
 };
+
+QFlags<QgsSettingsTreeElement::NamedListOption> operator|(QgsSettingsTreeElement::NamedListOption f1, QFlags<QgsSettingsTreeElement::NamedListOption> f2);
+
+
 
 /************************************************************************
  * This file has been generated automatically from                      *

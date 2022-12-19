@@ -16,10 +16,13 @@
 #ifndef QGSSETTINGSTREEELEMENT_H
 #define QGSSETTINGSTREEELEMENT_H
 
+#include <QObject>
 
 #include "qgis_core.h"
 #include "qgssettingsregistry.h"
-#include "qgssettingsentryimpl.h"
+
+class QgsSettingsTreeNamedListElement;
+class QgsSettingsEntryString;
 
 
 /**
@@ -40,6 +43,7 @@
 class CORE_EXPORT QgsSettingsTreeElement
 {
     Q_GADGET
+
   public:
     enum class Type
     {
@@ -59,73 +63,44 @@ class CORE_EXPORT QgsSettingsTreeElement
     Q_DECLARE_FLAGS( NamedListOptions, NamedListOption )
     Q_FLAG( NamedListOptions )
 
-    //! Default constructor with no reference of a registry
-    QgsSettingsTreeElement() = default;
+    //! Creates a root tree element
+    QgsSettingsTreeElement();
+#ifdef SIP_RUN
+    % MethodCode
+    sipCpp = nullptr;
+    PyErr_SetString( PyExc_ValueError, QStringLiteral( "From Python, the tree element must be created from QgsSettings.createPluginTreeElement" ).toUtf8().constData() );
+    sipIsErr = 1;
+    % End
+#endif
 
-    ~QgsSettingsTreeElement()
-    {
-      if ( mCurrentItemSetting )
-        delete mCurrentItemSetting;
-    }
-
-
-    //! Creates the root element, with an optional pointer to a settings registry, on which any settings having this root as top parent will be automatically registered into.
-    static QgsSettingsTreeElement *createRootElement( QgsSettingsRegistry *registry = nullptr )
-    {
-      QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
-      te->mType = Type::Root;
-      te->mRegistryInstance = registry;
-      te->init();
-      return te;
-    };
+    virtual ~QgsSettingsTreeElement();
 
     //! Creates a normal tree element
-    static QgsSettingsTreeElement *createElement( QgsSettingsTreeElement *parent, const QString &key, const NamedListOptions &options = NamedListOptions() )
-    {
-      Q_ASSERT( parent );
-      // TODO handle python
-      QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
-      te->mType = Type::Normal;
-      te->mParent = parent;
-      te->mKey = key;
-      te->init();
-      parent->addChildElement( te );
-      if ( options.testFlag( NamedListOption::CreateCurrentItemSetting ) )
-        te->mCurrentItemSetting = new QgsSettingsEntryBool( QStringLiteral( "selected" ), te );
-      return te;
-    }
+    QgsSettingsTreeElement *createChildElement( const QString &key );
 
     /**
      * Creates a named list tree element.
      * This is useful to register group of settings for several named entries (for instance credentials for several named services)
      */
-    static QgsSettingsTreeElement *createNamedListElement( QgsSettingsTreeElement *parent, const QString &key )
-    {
-      Q_ASSERT( parent );
-      // TODO handle python
-      QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
-      te->mType = Type::NamedList;
-      te->mParent = parent;
-      te->mKey = key;
-      te->init();
-      parent->addChildElement( te );
-      return te;
-    };
+    QgsSettingsTreeNamedListElement *createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() );
 
     //! Returns the type of element
     Type type() const {return mType;}
 
     //! Adds a child elements
-    void addChildElement( const QgsSettingsTreeElement *element ) {mChildrenElements.append( element );}
+    void addChildElement( QgsSettingsTreeElement *element ) {mChildrenElements.append( element );}
 
     //! Adds a child setting
-    void addChildSetting( const QgsSettingsEntryBase *setting ) {mChildrenSettings.append( setting );}
+    void addChildSetting( QgsSettingsEntryBase *setting ) {mChildrenSettings.append( setting );}
+
+    //! Returns the children elements
+    QList<QgsSettingsTreeElement *> childrenElements() const {return mChildrenElements;}
+
+    //! Returns the children settings
+    QList<QgsSettingsEntryBase *> childrenSettings() const {return mChildrenSettings;}
 
     //! Returns the parent of the element or nullptr if it does not exists
     const QgsSettingsTreeElement *parent() const {return mParent;}
-
-    //! Returns the registry which must be set for the top element
-    QgsSettingsRegistry *registry() const {return mRegistryInstance;}
 
     //! Returns the key of the element (without its parents)
     QString key() const {return mKey;}
@@ -136,33 +111,93 @@ class CORE_EXPORT QgsSettingsTreeElement
     //! Returns the number of named elements in the complete key
     int namedElementsCount() const {return mNamedElementsCount;}
 
-    /**
-     * Delete a named entry from the named list element
-     * \note This must not be called on a element which is not a named list
-     */
-    void deleteNamedEntry( const QString &entry );
 
-    /**
-     * Delete a named entry from the named list element
-     * \The \a parentEntry is used if the named list is nested in anoter named list
-     * \note This must not be called on a element which is not a named list
-     */
-    void deleteNamedEntry( const QString &entry, const QString &parentEntry );
+  protected:
+    void init( QgsSettingsTreeElement *parent, const QString &key );
+    Type mType = Type::Root;
 
 
   private:
-    void init();
-
-    QList<const QgsSettingsTreeElement *> mChildrenElements;
-    QList<const QgsSettingsEntryBase *> mChildrenSettings;
-    Type mType = Type::Root;
-    QgsSettingsRegistry *mRegistryInstance = nullptr;
-    const QgsSettingsTreeElement *mParent = nullptr;
-    const QgsSettingsEntryBool *mCurrentItemSetting = nullptr;
+    QList<QgsSettingsTreeElement *> mChildrenElements;
+    QList<QgsSettingsEntryBase *> mChildrenSettings;
+    QgsSettingsTreeElement *mParent = nullptr;
 
     QString mKey;
     QString mCompleteKey;
     int mNamedElementsCount = 0;
 };
+
+
+
+/**
+ * \ingroup core
+ * \class QgsSettingsTreeNamedListElement
+ * \brief QgsSettingsTreeNamedListElement is a named list tree element for the settings registry
+ * to help organizing and introspecting the registry.
+ * the named list element is used to store a group of settings under a dynamic named key.
+ *
+ * \see QgsSettingsTreeElement
+ * \see QgsSettingsEntryBase
+ * \see QgsSettingsRegistry
+ *
+ * \since QGIS 3.30
+ */
+class CORE_EXPORT QgsSettingsTreeNamedListElement : public QgsSettingsTreeElement
+{
+  public:
+
+    //! Default constructor with no reference of a registry
+    QgsSettingsTreeNamedListElement( const QString &key, QgsSettingsTreeElement *parent, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() );
+
+    ~QgsSettingsTreeNamedListElement();
+
+    /**
+     *  Returns the list of entries
+     * \The \a parentEntry is used if the named list is nested in anoter named list
+    */
+    const QStringList entries( const QString &parentEntry = QString() ) const;
+
+
+    /**
+     * Sets the selected named entry from the named list element
+     * \note This must not be called on a element which is not a named list
+     */
+    void setSelectedNamedEntryElement( const QString &entry );
+
+    /**
+     * Sets the selected named entry from the named list element
+     * \The \a parentEntry is used if the named list is nested in anoter named list
+     * \note This must not be called on a element which is not a named list
+     */
+    void setSelectedNamedEntryElement( const QString &parentEntry, const QString &entry );
+
+    /**
+     * Returns the selected named entry from the named list element
+     * \The \a parentEntry is used if the named list is nested in anoter named list
+     * \note This must not be called on a element which is not a named list
+     */
+    QString selectedNamedEntryElement( const QString &parentEntry = QString() );
+
+    /**
+     * Deletes a named entry from the named list element
+     * \note This must not be called on a element which is not a named list
+     */
+    void deleteNamedEntry( const QString &entry );
+
+    /**
+     * Deletes a named entry from the named list element
+     * \The \a parentEntry is used if the named list is nested in anoter named list
+     * \note This must not be called on a element which is not a named list
+     */
+    void deleteNamedEntry( const QString &parentEntry, const QString &entry );
+
+
+  private:
+    QgsSettingsEntryString *mSelectedElementSetting = nullptr;
+
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS( QgsSettingsTreeElement::NamedListOptions )
+
 
 #endif  // QGSSETTINGSTREEELEMENT_H

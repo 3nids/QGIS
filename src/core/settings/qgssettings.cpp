@@ -48,6 +48,13 @@ void QgsSettings::init()
 }
 
 
+QgsSettingsTreeElement *QgsSettings::treeRoot()
+{
+  // this must be defined in cpp code so we are sure only one instance is around
+  static QgsSettingsTreeElement sTreeRoot = QgsSettingsTreeElement();
+  return &sTreeRoot;
+}
+
 QgsSettings::QgsSettings( const QString &organization, const QString &application, QObject *parent )
 {
   mUserSettings = new QSettings( organization, application, parent );

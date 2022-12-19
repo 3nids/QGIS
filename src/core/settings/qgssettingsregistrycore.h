@@ -18,12 +18,10 @@
 #define QGSSETTINGSREGISTRYCORE_H
 
 #include "qgis_core.h"
-#include "qgis_sip.h"
 #include "qgssettingsregistry.h"
 #include "qgssettingsentry.h"
 #include "qgssettingsentryimpl.h"
 #include "qgssettingsentryenumflag.h"
-#include "qgssettingstreeelement.h"
 
 #include "qgis.h"
 
@@ -39,10 +37,6 @@
 class CORE_EXPORT QgsSettingsRegistryCore : public QgsSettingsRegistry
 {
   public:
-#ifndef SIP_RUN
-    static inline QgsSettingsTreeElement sTreeRoot = *QgsSettingsTreeElement::createRootElement();
-    static inline QgsSettingsTreeElement sTreeQgis = *QgsSettingsTreeElement::createElement( &sTreeRoot, "qgis" );
-#endif
 
     /**
       * Constructor for QgsSettingsRegistryCore.
@@ -186,11 +180,6 @@ class CORE_EXPORT QgsSettingsRegistryCore : public QgsSettingsRegistry
     //! Settings entry enable WMS tile prefetching.
     static const inline QgsSettingsEntryBool settingsEnableWMSTilePrefetching = QgsSettingsEntryBool( QStringLiteral( "enable_wms_tile_prefetch" ), QgsSettings::Prefix::WMS, false, QStringLiteral( "Whether to include WMS layers when rendering tiles adjacent to the visible map area" ) );
 #endif
-
-  private:
-    // to handle backward compatible changes
-    QStringList mOldSettingsList;
-
 };
 
 #endif // QGSSETTINGSREGISTRYCORE_H
