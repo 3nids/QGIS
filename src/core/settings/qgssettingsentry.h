@@ -40,7 +40,7 @@ class CORE_EXPORT QgsSettingsEntryGroup
 {
   public:
     //! Constructor
-    QgsSettingsEntryGroup( const QList<const QgsSettingsEntryBase *> settings )
+    QgsSettingsEntryGroup( QList<const QgsSettingsEntryBase *> settings )
       : QgsSettingsEntryGroup( settings, true )
     {}
 #ifdef SIP_RUN
@@ -53,7 +53,7 @@ class CORE_EXPORT QgsSettingsEntryGroup
 #endif
 
     //! Constructor
-    QgsSettingsEntryGroup( const QList<const QgsSettingsEntryBase *> settings, bool fatalErrorIfInvalid ) SIP_SKIP;
+    QgsSettingsEntryGroup( QList<const QgsSettingsEntryBase *> settings, bool fatalErrorIfInvalid ) SIP_SKIP;
 
     //! Returns if the group is valid (if settings share the same base key)
     bool isValid() const {return mIsValid;}
@@ -173,7 +173,10 @@ class CORE_EXPORT QgsSettingsEntryBase
     /**
      * Destructor for QgsSettingsEntryBase.
      */
-    virtual ~QgsSettingsEntryBase() {}
+    virtual ~QgsSettingsEntryBase()
+    {
+      //mParent->unregisterChildSetting( this );
+    }
 
     /**
      * Returns settings entry key.
@@ -347,7 +350,7 @@ class CORE_EXPORT QgsSettingsEntryBase
      * \arg dynamicKeyPartList is the optional dynamic key part to determine the key. It must be the same for origin and destination keys.
      * \since QGIS 3.30
      */
-    void copyValueToKey( const QString &key, const QStringList &dynamicKeyPartList ) const;
+    void copyValueToKey( const QString &key, const QStringList &dynamicKeyPartList = QStringList() ) const;
 
     /**
     * Returns the parent tree element

@@ -21,7 +21,7 @@
 
 
 
-QgsSettingsEntryGroup::QgsSettingsEntryGroup( const QList<const QgsSettingsEntryBase *> settings, bool fatalErrorIfInvalid )
+QgsSettingsEntryGroup::QgsSettingsEntryGroup( QList<const QgsSettingsEntryBase *> settings, bool fatalErrorIfInvalid )
   : mSettings( settings )
 {
   for ( const auto *setting : std::as_const( mSettings ) )
@@ -120,7 +120,7 @@ QgsSettingsEntryBase::QgsSettingsEntryBase( const QString &key, QgsSettingsTreeE
     mKey.append( QStringLiteral( "/" ) );
   mKey.append( key );
 
-  parentTreeElement->addChildSetting( this );
+  parentTreeElement->registerChildSetting( this );
 }
 
 

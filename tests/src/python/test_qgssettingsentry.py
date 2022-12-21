@@ -100,6 +100,11 @@ class TestQgsSettingsEntry(unittest.TestCase):
             settings_entry = eval('qgis_core.{}(settings_key, self.pluginName, default_value)'.format(setting_type))
             self.assertEqual(settings_entry.key(), settings_key_complete)
 
+    def test_with_parent_element(self):
+        root = QgsSettings.createPluginTreeElement(self.pluginName)
+        setting = QgsSettingsEntryInteger("my_setting", root)
+        self.assertEqual(setting.key(), f"plugins/{self.pluginName}/my_setting")
+
     def test_settings_entry_base_default_value_override(self):
         settingsKey = "settingsEntryBase/defaultValueOverride/variantValue"
         settingsKeyComplete = f"plugins/{self.pluginName}/{settingsKey}"
@@ -441,7 +446,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
         settingsEntryOld.setValue("value from old key")
         self.assertFalse(settingsEntryNew.exists())
         self.assertFalse(settingsEntryNew.copyValueFromKey(f"plugins/{self.pluginName}/a-key-which-does-not-exist"))
-        self.assertTrue(settingsEntryNew.copyValueFromKey(f"plugins/{self.pluginName}/{settingsOldKey}"), [], False)
+        self.assertTrue(settingsEntryNew.copyValueFromKey(f"plugins/{self.pluginName}/{settingsOldKey}", [], False))
         self.assertTrue(settingsEntryNew.exists())
         self.assertEqual(settingsEntryNew.value(), settingsEntryOld.value())
 
@@ -459,16 +464,16 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(settingsEntryNewDynamic.value(), "value from old key")
 
     def test_copy_to_value(self):
-        settingsNewKey = "settingsEntryMigrationNewKey"
-        settingsEntryNew = QgsSettingsEntryString(settingsNewKey, self.pluginName)
-        settingsEntryNew.remove()
-        settingsOldKey = "settingsEntryMigrationOldKey"
-        settingsEntryOld = QgsSettingsEntryString(settingsOldKey, self.pluginName)
-        settingsEntryOld.setValue("value from old key")
-        self.assertFalse(settingsEntryNew.exists())
-        settingsEntryNew.copyValueToKey(f"plugins/{self.pluginName}/{settingsNewKey}")
-        self.assertTrue(settingsEntryNew.exists())
-        self.assertEqual(settingsEntryNew.value(), settingsEntryOld.value())
+        settingsDestKey = "settingsEntryMigrationDestKey"
+        settingsEntryDest = QgsSettingsEntryString(settingsDestKey, self.pluginName)
+        settingsEntryDest.remove()
+        settingsSrcKey = "settingsEntryMigrationSrcKey"
+        settingsEntrySrc = QgsSettingsEntryString(settingsSrcKey, self.pluginName)
+        settingsEntrySrc.setValue("value from source key")
+        self.assertFalse(settingsEntryDest.exists())
+        settingsEntrySrc.copyValueToKey(f"plugins/{self.pluginName}/{settingsDestKey}")
+        self.assertTrue(settingsEntryDest.exists())
+        self.assertEqual(settingsEntryDest.value(), settingsEntryDest.value())
 
 
 if __name__ == '__main__':

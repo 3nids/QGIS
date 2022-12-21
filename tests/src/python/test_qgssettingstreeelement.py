@@ -74,6 +74,9 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(root.childrenSettings(), [setting])
         self.assertEqual(root.childrenElements(), [])
 
+        del setting
+        self.assertEqual(root.childrenSettings(), [])
+
     def test_named_list(self):
         root = QgsSettings.createPluginTreeElement(self.pluginName)
         l1 = root.createChildElement("level-1")

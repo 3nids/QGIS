@@ -148,20 +148,20 @@ QStringList QgsVectorTileProviderConnection::connectionList()
 
 QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connection( const QString &name )
 {
-  if ( !settingsUrl.exists( name ) )
+  if ( !settingsUrl->exists( name ) )
     return QgsVectorTileProviderConnection::Data();
 
   QgsVectorTileProviderConnection::Data conn;
-  conn.url = settingsUrl.value( name );
-  conn.zMin = settingsZzmin.value( name );
-  conn.zMax = settingsZmax.value( name );
-  conn.authCfg = settingsAuthcfg.value( name );
-  conn.username = settingsUsername.value( name );
-  conn.password = settingsPassword.value( name );
-  conn.styleUrl = settingsStyleUrl.value( name );
+  conn.url = settingsUrl->value( name );
+  conn.zMin = settingsZzmin->value( name );
+  conn.zMax = settingsZmax->value( name );
+  conn.authCfg = settingsAuthcfg->value( name );
+  conn.username = settingsUsername->value( name );
+  conn.password = settingsPassword->value( name );
+  conn.styleUrl = settingsStyleUrl->value( name );
 
-  if ( settingsHeaders.exists( name ) )
-    conn.httpHeaders = QgsHttpHeaders( settingsHeaders.value( name ) );
+  if ( settingsHeaders->exists( name ) )
+    conn.httpHeaders = QgsHttpHeaders( settingsHeaders->value( name ) );
   else
   {
     // TODO QGIS 4 (or before) remove compatibility import
@@ -172,7 +172,7 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
     Q_NOWARN_DEPRECATED_POP
   }
 
-  if ( settingsServiceType.exists( name ) &&  settingsServiceType.value( name ) == QLatin1String( "arcgis" ) )
+  if ( settingsServiceType->exists( name ) &&  settingsServiceType->value( name ) == QLatin1String( "arcgis" ) )
     conn.serviceType = ArcgisVectorTileService;
 
   return conn;
@@ -180,20 +180,20 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
 
 void QgsVectorTileProviderConnection::deleteConnection( const QString &name )
 {
-  settingsConnections.removeAllChildrenSettings( name );
+  sTreeConnectionVectorTile->deleteNamedEntry( name );
 }
 
 void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVectorTileProviderConnection::Data conn )
 {
-  settingsUrl.setValue( conn.url, name );
-  settingsZzmin.setValue( conn.zMin, name );
-  settingsZmax.setValue( conn.zMax, name );
-  settingsAuthcfg.setValue( conn.authCfg, name );
-  settingsUsername.setValue( conn.username, name );
-  settingsPassword.setValue( conn.password, name );
-  settingsStyleUrl.setValue( conn.styleUrl, name );
+  settingsUrl->setValue( conn.url, name );
+  settingsZzmin->setValue( conn.zMin, name );
+  settingsZmax->setValue( conn.zMax, name );
+  settingsAuthcfg->setValue( conn.authCfg, name );
+  settingsUsername->setValue( conn.username, name );
+  settingsPassword->setValue( conn.password, name );
+  settingsStyleUrl->setValue( conn.styleUrl, name );
 
-  settingsHeaders.setValue( conn.httpHeaders.headers(), name );
+  settingsHeaders->setValue( conn.httpHeaders.headers(), name );
 
 
   // TODO QGIS 4 (or before) remove compatibility import
@@ -208,19 +208,19 @@ void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVec
       break;
 
     case ArcgisVectorTileService:
-      settingsServiceType.setValue( QStringLiteral( "arcgis" ), name );
+      settingsServiceType->setValue( QStringLiteral( "arcgis" ), name );
       break;
   }
 }
 
 QString QgsVectorTileProviderConnection::selectedConnection()
 {
-  return settingsConnectionSelected.value();
+  return sTreeConnectionVectorTile->selectedNamedEntryElement();
 }
 
 void QgsVectorTileProviderConnection::setSelectedConnection( const QString &name )
 {
-  settingsConnectionSelected.setValue( name );
+  sTreeConnectionVectorTile->selectedNamedEntryElement( {name} );
 }
 
 

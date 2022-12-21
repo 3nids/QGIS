@@ -264,14 +264,14 @@ void QgsBabelFormatRegistry::reloadFromSettings()
                                  QStringLiteral( "%babel -t -i garmin -o gpx %in %out" ),
                                  QStringLiteral( "%babel -t -i gpx -o garmin %in %out" ) );
 
-  for ( const QString &device : sTreeBabelDevices.entries() )
+  for ( const QString &device : sTreeBabelDevices->entries() )
   {
     // don't leak memory if there's already a device with this name...
     delete mDevices.value( device );
 
-    mDevices[device] = new QgsBabelGpsDeviceFormat( settingsBabelWptDownload.value( device ), settingsBabelWptUpload.value( device ),
-        settingsBabelRteDownload.value( device ), settingsBabelRteUpload.value( device ),
-        settingsBabelTrkDownload.value( device ), settingsBabelTrkUpload.value( device ) );
+    mDevices[device] = new QgsBabelGpsDeviceFormat( settingsBabelWptDownload->value( device ), settingsBabelWptUpload->value( device ),
+        settingsBabelRteDownload->value( device ), settingsBabelRteUpload->value( device ),
+        settingsBabelTrkDownload->value( device ), settingsBabelTrkUpload->value( device ) );
   }
 }
 

@@ -15,23 +15,82 @@
 
 #include "qgssettingstreeelement.h"
 #include "qgssettingsentryimpl.h"
+#include "qgsexception.h"
 
-QgsSettingsTreeElement::QgsSettingsTreeElement()
-  : mType( Type::Root )
-{
-}
 
 QgsSettingsTreeElement::~QgsSettingsTreeElement()
 {
+  if ( mType != Type::Root )
+    mParent->unregisterChildElement( this );
+
+  while ( !mChildrenElements.isEmpty() )
+    delete mChildrenElements.takeFirst();
+}
+
+QgsSettingsTreeElement *QgsSettingsTreeElement::createRootElement()
+{
+  QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
+  te->mType = Type::Root;
+  return te;
+}
+
+QgsSettingsTreeElement *QgsSettingsTreeElement::createChildElement( const QString &key )
+{
+  if ( childElement( key ) )
+    throw QgsSettingsException( QObject::tr( "Settings tree element '%1' already holds the key '%2'." ).arg( this->key(), key ) );
+
+  QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
+  te->mType = Type::Normal;
+  te->init( this, key );
+  registerChildElement( te );
+  return te;
+}
+
+QgsSettingsTreeNamedListElement *QgsSettingsTreeElement::createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options )
+{
+  Q_ASSERT( !childElement( key ) );
+  QgsSettingsTreeNamedListElement *te = new QgsSettingsTreeNamedListElement();
+  te->init( this, key );
+  te->initNamedList( options );
+  registerChildElement( te );
+  return te;
+}
+
+QgsSettingsTreeElement *QgsSettingsTreeElement::childElement( const QString &key )
+{
+  for ( int i = 0; i < mChildrenElements.count(); i++ )
+  {
+    if ( mChildrenElements[i]->key() == key )
+      return mChildrenElements[i];
+  }
+  return nullptr;
+}
+
+void QgsSettingsTreeElement::unregisterChildSetting( QgsSettingsEntryBase *setting, bool deleteSettingValues, const QStringList &parentsNamedEntries )
+{
+  if ( deleteSettingValues )
+    setting->remove( parentsNamedEntries );
+  mChildrenSettings.removeAll( setting );
+}
+
+void QgsSettingsTreeElement::unregisterChildElement( QgsSettingsTreeElement *element )
+{
+  mChildrenElements.removeAll( element );
+}
+
+QList<QgsSettingsEntryBase *> QgsSettingsTreeElement::childrenSettings() const
+{
+  return mChildrenSettings;
 }
 
 void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString &key )
 {
+  mParent = parent;
   mKey = key;
   mCompleteKey = QString();
 
-  QList<const QgsSettingsTreeElement *> parents;
-  const QgsSettingsTreeElement *te = parent;
+  QList<QgsSettingsTreeElement *> parents;
+  QgsSettingsTreeElement *te = parent;
   while ( true )
   {
     parents << te;
@@ -39,13 +98,13 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
       te = te->parent();
     else
     {
-      // TODO habndle python?
+      // TODO handle python?
       Q_ASSERT( te->type() == Type::Root );
       break;
     }
   }
 
-  QList<const QgsSettingsTreeElement *>::const_iterator it = parents.constEnd();
+  QList<QgsSettingsTreeElement *>::const_iterator it = parents.constEnd();
   while ( it != parents.constBegin() )
   {
     --it;
@@ -53,10 +112,10 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
     if ( !mCompleteKey.isEmpty() )
       mCompleteKey.append( QStringLiteral( "/" ) );
 
-    if ( !te->key().isEmpty() )
+    if ( !( *it )->key().isEmpty() )
       mCompleteKey.append( QString( "%1/" ).arg( te->key() ) );
 
-    if ( te->type() == QgsSettingsTreeElement::Type::NamedList )
+    if ( ( *it )->type() == QgsSettingsTreeElement::Type::NamedList )
     {
       mNamedElementsCount++;
       mCompleteKey.append( QString( "%%1/" ).arg( mNamedElementsCount ) );
@@ -66,33 +125,14 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
   mCompleteKey.append( key );
 }
 
-QgsSettingsTreeElement *QgsSettingsTreeElement::createChildElement( const QString &key )
-{
-  QgsSettingsTreeElement *te = new QgsSettingsTreeElement();
-  te->mType = Type::Normal;
-  te->init( this, key );
-  addChildElement( te );
-  return te;
-}
 
-QgsSettingsTreeNamedListElement *QgsSettingsTreeElement::createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options )
+void QgsSettingsTreeNamedListElement::initNamedList( const QgsSettingsTreeElement::NamedListOptions &options )
 {
-  QgsSettingsTreeNamedListElement *te = new QgsSettingsTreeNamedListElement( key, this, options );
-  addChildElement( te );
-  return te;
-}
-
-
-QgsSettingsTreeNamedListElement::QgsSettingsTreeNamedListElement( const QString &key, QgsSettingsTreeElement *parent, const QgsSettingsTreeElement::NamedListOptions &options )
-{
-  mType = QgsSettingsTreeElement::Type::NamedList;
-  init( parent, key );
   if ( options.testFlag( NamedListOption::CreateCurrentItemSetting ) )
   {
     mSelectedElementSetting = new QgsSettingsEntryString( QStringLiteral( "selected" ), this );
-    addChildSetting( mSelectedElementSetting );
+    registerChildSetting( mSelectedElementSetting );
   }
-  parent->addChildElement( this );
 }
 
 QgsSettingsTreeNamedListElement::~QgsSettingsTreeNamedListElement()
@@ -112,48 +152,25 @@ const QStringList QgsSettingsTreeNamedListElement::entries( const QString &paren
   return settings.childGroups();
 }
 
-void QgsSettingsTreeNamedListElement::setSelectedNamedEntryElement( const QString &entry )
+void QgsSettingsTreeNamedListElement::setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries )
 {
-  Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == 1 );
-  mSelectedElementSetting->setValue( entry );
+  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
+  mSelectedElementSetting->setValue( entry, parentsNamedEntries );
 }
 
-void QgsSettingsTreeNamedListElement::setSelectedNamedEntryElement( const QString &parentEntry, const QString &entry )
+QString QgsSettingsTreeNamedListElement::selectedNamedEntryElement( const QStringList &parentsNamedEntries )
 {
   Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == 2 );
-  mSelectedElementSetting->setValue( entry, parentEntry );
+  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
+  return mSelectedElementSetting->value( parentsNamedEntries );
 }
 
-QString QgsSettingsTreeNamedListElement::selectedNamedEntryElement( const QString &parentEntry )
+void QgsSettingsTreeNamedListElement::deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries )
 {
   Q_ASSERT( mType == Type::NamedList );
-  if ( parentEntry.isEmpty() )
-  {
-    Q_ASSERT( namedElementsCount() == 1 );
-    return mSelectedElementSetting->value();
-  }
-  else
-  {
-    Q_ASSERT( namedElementsCount() == 2 );
-    return mSelectedElementSetting->value( parentEntry );
-  }
-}
-
-void QgsSettingsTreeNamedListElement::deleteNamedEntry( const QString &entry )
-{
-  Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == 1 );
+  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
   QString key = completeKey().arg( entry );
   QgsSettings().remove( key );
 }
 
-void QgsSettingsTreeNamedListElement::deleteNamedEntry( const QString &parentEntry, const QString &entry )
-{
-  Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == 2 );
-  QString key = completeKey().arg( parentEntry, entry );
-  QgsSettings().remove( key );
-}
 

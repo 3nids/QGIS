@@ -774,7 +774,7 @@ QVector<QgsDataItem *> QgsWmsDataItemProvider::createDataItems( const QString &p
           uri.setParam( QStringLiteral( "url" ), encodedUri );
           if ( QgsOwsConnection::settingsConnectionDpiMode.exists( serviceConnectionDetails ) )
           {
-            uri.setParam( QStringLiteral( "dpiMode" ), QString::number( static_cast<int>( QgsOwsConnection::settingsConnectionDpiMode.value( serviceConnectionDetails ) ) ) );
+            uri.setParam( QStringLiteral( "dpiMode" ), QString::number( static_cast<int>( QgsOwsConnection::settingsConnectionDpiMode->value( serviceConnectionDetails ) ) ) );
           }
 
           QgsDebugMsgLevel( QStringLiteral( "WMS full uri: '%1'." ).arg( QString( uri.encodedUri() ) ), 2 );
