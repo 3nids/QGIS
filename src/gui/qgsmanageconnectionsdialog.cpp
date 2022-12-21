@@ -832,7 +832,7 @@ void QgsManageConnectionsDialog::loadOWSConnections( const QDomDocument &doc, co
     }
 
     // check for duplicates
-    if ( QgsOwsConnection::settingsConnectionUrl.exists( {service.toLower(), connectionName} ) && prompt )
+    if ( QgsOwsConnection::settingsConnectionUrl->exists( {service.toLower(), connectionName} ) && prompt )
     {
       const int res = QMessageBox::warning( this,
                                             tr( "Loading Connections" ),
@@ -861,28 +861,28 @@ void QgsManageConnectionsDialog::loadOWSConnections( const QDomDocument &doc, co
       }
     }
 
-    if ( QgsOwsConnection::settingsConnectionUrl.exists( {service.toLower(), connectionName} ) && !overwrite )
+    if ( QgsOwsConnection::settingsConnectionUrl->exists( {service.toLower(), connectionName} ) && !overwrite )
     {
       child = child.nextSiblingElement();
       continue;
     }
 
     // no dups detected or overwrite is allowed
-    QgsOwsConnection::settingsConnectionUrl.setValue( child.attribute( QStringLiteral( "url" ) ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionIgnoreGetMapURI.setValue( child.attribute( QStringLiteral( "ignoreGetMapURI" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionIgnoreGetFeatureInfoURI.setValue( child.attribute( QStringLiteral( "ignoreGetFeatureInfoURI" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionIgnoreAxisOrientation.setValue( child.attribute( QStringLiteral( "ignoreAxisOrientation" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionInvertAxisOrientation.setValue( child.attribute( QStringLiteral( "invertAxisOrientation" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionSmoothPixmapTransform.setValue( child.attribute( QStringLiteral( "smoothPixmapTransform" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
-    QgsOwsConnection::settingsConnectionDpiMode.setValue( static_cast<Qgis::DpiMode>( child.attribute( QStringLiteral( "dpiMode" ), QStringLiteral( "7" ) ).toInt() ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionUrl->setValue( child.attribute( QStringLiteral( "url" ) ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionIgnoreGetMapURI->setValue( child.attribute( QStringLiteral( "ignoreGetMapURI" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionIgnoreGetFeatureInfoURI->setValue( child.attribute( QStringLiteral( "ignoreGetFeatureInfoURI" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionIgnoreAxisOrientation->setValue( child.attribute( QStringLiteral( "ignoreAxisOrientation" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionInvertAxisOrientation->setValue( child.attribute( QStringLiteral( "invertAxisOrientation" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionSmoothPixmapTransform->setValue( child.attribute( QStringLiteral( "smoothPixmapTransform" ) ) == QLatin1String( "true" ), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionDpiMode->setValue( static_cast<Qgis::DpiMode>( child.attribute( QStringLiteral( "dpiMode" ), QStringLiteral( "7" ) ).toInt() ), {service.toLower(), connectionName} );
 
     QgsHttpHeaders httpHeader( child );
-    QgsOwsConnection::settingsConnectionHeaders.setValue( httpHeader.headers(), {service.toLower(), connectionName} );
+    QgsOwsConnection::settingsConnectionHeaders->setValue( httpHeader.headers(), {service.toLower(), connectionName} );
 
     if ( !child.attribute( QStringLiteral( "username" ) ).isEmpty() )
     {
-      QgsOwsConnection::settingsConnectionUsername.setValue( child.attribute( QStringLiteral( "username" ) ), {service.toUpper(), connectionName} );
-      QgsOwsConnection::settingsConnectionPassword.setValue( child.attribute( QStringLiteral( "password" ) ), {service.toUpper(), connectionName} );
+      QgsOwsConnection::settingsConnectionUsername->setValue( child.attribute( QStringLiteral( "username" ) ), {service.toUpper(), connectionName} );
+      QgsOwsConnection::settingsConnectionPassword->setValue( child.attribute( QStringLiteral( "password" ) ), {service.toUpper(), connectionName} );
     }
     child = child.nextSiblingElement();
   }

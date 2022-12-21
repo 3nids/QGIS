@@ -90,17 +90,19 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
   mCompleteKey = QString();
 
   QList<QgsSettingsTreeElement *> parents;
-  QgsSettingsTreeElement *te = parent;
-  while ( true )
   {
-    parents << te;
-    if ( te->parent() )
-      te = te->parent();
-    else
+    QgsSettingsTreeElement *te = parent;
+    while ( true )
     {
-      // TODO handle python?
-      Q_ASSERT( te->type() == Type::Root );
-      break;
+      parents << te;
+      if ( te->parent() )
+        te = te->parent();
+      else
+      {
+        // TODO handle python?
+        Q_ASSERT( te->type() == Type::Root );
+        break;
+      }
     }
   }
 
@@ -113,7 +115,7 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
       mCompleteKey.append( QStringLiteral( "/" ) );
 
     if ( !( *it )->key().isEmpty() )
-      mCompleteKey.append( QString( "%1/" ).arg( te->key() ) );
+      mCompleteKey.append( QString( "%1/" ).arg( ( *it )->key() ) );
 
     if ( ( *it )->type() == QgsSettingsTreeElement::Type::NamedList )
     {

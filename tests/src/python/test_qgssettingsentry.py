@@ -458,10 +458,10 @@ class TestQgsSettingsEntry(unittest.TestCase):
         settingsEntryOldDynamic = QgsSettingsEntryString(settingsOldKeyDynamic, self.pluginName)
         settingsEntryOldDynamic.setValue("value from old key")
         self.assertFalse(settingsEntryNewDynamic.exists())
-        self.assertTrue(settingsEntryNewDynamic.copyValueFromKey(f"plugins/{self.pluginName}/{settingsOldKey}"), ["key1"], True)
+        self.assertTrue(settingsEntryNewDynamic.copyValueFromKey(f"plugins/{self.pluginName}/{settingsOldKey}", ["key1"], True))
         self.assertTrue(settingsEntryNewDynamic.exists("key1"))
         self.assertFalse(settingsEntryOldDynamic.exists("key1"))
-        self.assertEqual(settingsEntryNewDynamic.value(), "value from old key")
+        self.assertEqual(settingsEntryNewDynamic.value("key1"), "value from old key")
 
     def test_copy_to_value(self):
         settingsDestKey = "settingsEntryMigrationDestKey"
