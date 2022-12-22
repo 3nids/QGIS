@@ -33,7 +33,7 @@ class CORE_EXPORT QgsVectorTileProviderConnection : public QgsAbstractProviderCo
 
 #ifndef SIP_RUN
 
-    static inline QgsSettingsTreeNamedListElement *sTreeConnectionVectorTile = QgsSettings::sTtreeConnections->createNamedListElement( QStringLiteral( "vector-tile" ), QgsSettingsTreeNamedListElement::NamedListOption::CreateCurrentItemSetting );
+    static inline QgsSettingsTreeNamedListElement *sTreeConnectionVectorTile = QgsSettings::sTtreeConnections->createNamedListElement( QStringLiteral( "vector-tile" ), QgsSettingsTreeNamedListElement::NamedListOption::CreateSelectedEntrySetting );
 
     static inline QgsSettingsEntryString *settingsUrl = new QgsSettingsEntryString( QStringLiteral( "url" ), sTreeConnectionVectorTile );
     static inline QgsSettingsEntryInteger *settingsZzmin = new QgsSettingsEntryInteger( QStringLiteral( "zmin" ), sTreeConnectionVectorTile, -1 );

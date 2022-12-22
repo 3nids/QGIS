@@ -51,8 +51,8 @@ void QgsSettings::init()
 QgsSettingsTreeElement *QgsSettings::treeRoot()
 {
   // this must be defined in cpp code so we are sure only one instance is around
-  static QgsSettingsTreeElement sTreeRoot = *QgsSettingsTreeElement::createRootElement();
-  return &sTreeRoot;
+  static QgsSettingsTreeElement *sTreeRoot = QgsSettingsTreeElement::createRootElement();
+  return sTreeRoot;
 }
 
 QgsSettingsTreeElement *QgsSettings::createPluginTreeElement( const QString &pluginName )

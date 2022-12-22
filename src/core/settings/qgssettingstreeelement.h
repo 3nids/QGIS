@@ -41,7 +41,7 @@ class QgsSettingsEntryString;
  *
  * \since QGIS 3.30
  */
-class CORE_EXPORT QgsSettingsTreeElement SIP_NODEFAULTCTORS
+class CORE_EXPORT QgsSettingsTreeElement
 {
     Q_GADGET
 
@@ -54,15 +54,17 @@ class CORE_EXPORT QgsSettingsTreeElement SIP_NODEFAULTCTORS
     };
     Q_ENUM( Type )
 
+#ifndef SIP_RUN
     //! Options for named list elements
     enum class NamedListOption
     {
-      CreateCurrentItemSetting,
+      CreateSelectedEntrySetting,
     };
 
     Q_ENUM( NamedListOption )
     Q_DECLARE_FLAGS( NamedListOptions, NamedListOption )
     Q_FLAG( NamedListOptions )
+#endif
 
     virtual ~QgsSettingsTreeElement();
 
@@ -73,13 +75,13 @@ class CORE_EXPORT QgsSettingsTreeElement SIP_NODEFAULTCTORS
     static QgsSettingsTreeElement *createRootElement() SIP_SKIP;
 
     //! Creates a normal tree element
-    QgsSettingsTreeElement *createChildElement( const QString &key ) SIP_THROW( QgsSettingsException ) SIP_FACTORY;
+    QgsSettingsTreeElement *createChildElement( const QString &key ) SIP_THROW( QgsSettingsException ) SIP_KEEPREFERENCE;
 
     /**
      * Creates a named list tree element.
      * This is useful to register group of settings for several named entries (for instance credentials for several named services)
      */
-    QgsSettingsTreeNamedListElement *createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() ) SIP_THROW( QgsSettingsException ) SIP_FACTORY;
+    QgsSettingsTreeNamedListElement *createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() ) SIP_THROW( QgsSettingsException ) SIP_SKIP;
 
     //! Returns the existing child element if it exists at the given \a key
     QgsSettingsTreeElement *childElement( const QString &key );
@@ -150,6 +152,9 @@ class CORE_EXPORT QgsSettingsTreeElement SIP_NODEFAULTCTORS
      */
     QgsSettingsTreeElement() = default SIP_FORCE;
 
+    QgsSettingsTreeElement( const QgsSettingsTreeElement &other ) = default SIP_FORCE;
+
+
     friend class QgsSettingsTreeNamedListElement;
 
     QgsSettingsTreeElement *childElementAtKey( const QString &key );
@@ -178,39 +183,42 @@ class CORE_EXPORT QgsSettingsTreeElement SIP_NODEFAULTCTORS
  *
  * \since QGIS 3.30
  */
-class CORE_EXPORT QgsSettingsTreeNamedListElement : public QgsSettingsTreeElement SIP_NODEFAULTCTORS
+class CORE_EXPORT QgsSettingsTreeNamedListElement : public QgsSettingsTreeElement
 {
   public:
     virtual ~QgsSettingsTreeNamedListElement();
 
+    QgsSettingsTreeNamedListElement() = default; // SIP_FORCE;
+
+
     //! Init the elements with the specific \a options
-    void initNamedList( const QgsSettingsTreeElement::NamedListOptions &options );
+    void initNamedList( const QgsSettingsTreeElement::NamedListOptions &options ) SIP_SKIP;
 
     /**
      *  Returns the list of entries
     * \arg parentsNamedEntries the list of named entries in the parent named list (if any)
     */
-    const QStringList entries( const QString &parentEntry = QString() ) const;
+    const QStringList entries( const QStringList &parentsNamedEntries = QStringList() ) const SIP_THROW( QgsSettingsException );
 
 
     /**
      * Sets the selected named entry from the named list element
     * \arg parentsNamedEntries the list of named entries in the parent named list (if any)
      */
-    void setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries = QStringList() );
+    void setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries = QStringList() ) SIP_THROW( QgsSettingsException );
 
     /**
      * Returns the selected named entry from the named list element
     * \arg parentsNamedEntries the list of named entries in the parent named list (if any)
      */
-    QString selectedNamedEntryElement( const QStringList &parentsNamedEntries = QStringList() );
+    QString selectedNamedEntryElement( const QStringList &parentsNamedEntries = QStringList() ) SIP_THROW( QgsSettingsException );
 
     /**
      * Deletes a named entry from the named list element
      * \arg entry the entry to delete
     * \arg parentsNamedEntries the list of named entries in the parent named list (if any)
      */
-    void deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries = QStringList() );
+    void deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries = QStringList() ) SIP_THROW( QgsSettingsException );
 
 
 
@@ -221,12 +229,13 @@ class CORE_EXPORT QgsSettingsTreeNamedListElement : public QgsSettingsTreeElemen
      * \note This is not available in Python bindings. Use method createNamedListElement on an existing tree element.
      * \see QgsSettings.createPluginTreeElement
      */
-    QgsSettingsTreeNamedListElement() = default SIP_FORCE;
 
+    QgsSettingsTreeElement::NamedListOptions mOptions;
     QgsSettingsEntryString *mSelectedElementSetting = nullptr;
 };
 
+#ifndef SIP_RUN
 Q_DECLARE_OPERATORS_FOR_FLAGS( QgsSettingsTreeElement::NamedListOptions )
-
+#endif
 
 #endif  // QGSSETTINGSTREEELEMENT_H

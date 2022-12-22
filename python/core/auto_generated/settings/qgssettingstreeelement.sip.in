@@ -11,7 +11,7 @@
 
 
 
-class QgsSettingsTreeElement /NoDefaultCtors/
+class QgsSettingsTreeElement
 {
 %Docstring(signature="appended")
 :py:class:`QgsSettingsTreeElement` is a tree element for the settings registry
@@ -42,27 +42,15 @@ to automatically register a settings entry on its creation when a parent is prov
       NamedList,
     };
 
-    enum class NamedListOption
-    {
-      CreateCurrentItemSetting,
-    };
-
-    typedef QFlags<QgsSettingsTreeElement::NamedListOption> NamedListOptions;
-
 
     virtual ~QgsSettingsTreeElement();
 
 
-    QgsSettingsTreeElement *createChildElement( const QString &key ) throw( QgsSettingsException ) /Factory/;
+    QgsSettingsTreeElement *createChildElement( const QString &key ) throw( QgsSettingsException ) /KeepReference/;
 %Docstring
 Creates a normal tree element
 %End
 
-    QgsSettingsTreeNamedListElement *createNamedListElement( const QString &key, const QgsSettingsTreeElement::NamedListOptions &options = QgsSettingsTreeElement::NamedListOptions() ) throw( QgsSettingsException ) /Factory/;
-%Docstring
-Creates a named list tree element.
-This is useful to register group of settings for several named entries (for instance credentials for several named services)
-%End
 
     QgsSettingsTreeElement *childElement( const QString &key );
 %Docstring
@@ -150,11 +138,12 @@ Adds a child elements
 
 .. seealso:: :py:func:`QgsSettings.createPluginTreeElement`
 %End
+    QgsSettingsTreeElement( const QgsSettingsTreeElement &other );
 };
 
 
 
-class QgsSettingsTreeNamedListElement : QgsSettingsTreeElement /NoDefaultCtors/
+class QgsSettingsTreeNamedListElement : QgsSettingsTreeElement
 {
 %Docstring(signature="appended")
 :py:class:`QgsSettingsTreeNamedListElement` is a named list tree element for the settings registry
@@ -176,31 +165,30 @@ the named list element is used to store a group of settings under a dynamic name
   public:
     virtual ~QgsSettingsTreeNamedListElement();
 
-    void initNamedList( const QgsSettingsTreeElement::NamedListOptions &options );
-%Docstring
-Init the elements with the specific ``options``
-%End
+    QgsSettingsTreeNamedListElement(); //;
 
-    const QStringList entries( const QString &parentEntry = QString() ) const;
+
+
+    const QStringList entries( const QStringList &parentsNamedEntries = QStringList() ) const throw( QgsSettingsException );
 %Docstring
 Returns the list of entries
 \arg parentsNamedEntries the list of named entries in the parent named list (if any)
 %End
 
 
-    void setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries = QStringList() );
+    void setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries = QStringList() ) throw( QgsSettingsException );
 %Docstring
 Sets the selected named entry from the named list element
 \arg parentsNamedEntries the list of named entries in the parent named list (if any)
 %End
 
-    QString selectedNamedEntryElement( const QStringList &parentsNamedEntries = QStringList() );
+    QString selectedNamedEntryElement( const QStringList &parentsNamedEntries = QStringList() ) throw( QgsSettingsException );
 %Docstring
 Returns the selected named entry from the named list element
 \arg parentsNamedEntries the list of named entries in the parent named list (if any)
 %End
 
-    void deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries = QStringList() );
+    void deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries = QStringList() ) throw( QgsSettingsException );
 %Docstring
 Deletes a named entry from the named list element
 \arg entry the entry to delete
@@ -209,20 +197,7 @@ Deletes a named entry from the named list element
 
 
 
-  private:
-    QgsSettingsTreeNamedListElement();
-%Docstring
-
-.. note::
-
-   This is not available in Python bindings. Use method createNamedListElement on an existing tree element.
-
-.. seealso:: :py:func:`QgsSettings.createPluginTreeElement`
-%End
 };
-
-QFlags<QgsSettingsTreeElement::NamedListOption> operator|(QgsSettingsTreeElement::NamedListOption f1, QFlags<QgsSettingsTreeElement::NamedListOption> f2);
-
 
 
 /************************************************************************

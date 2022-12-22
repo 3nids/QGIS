@@ -34,15 +34,15 @@ class TestQgsSettingsEntry(unittest.TestCase):
         pass
 
     def test_constructor(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             QgsSettingsTreeElement()
 
         root = QgsSettings.createPluginTreeElement(self.pluginName)
         self.assertEqual(root.type(), QgsSettingsTreeElement.Type.Normal)
         pluginsElement = root.parent()
         self.assertEqual(pluginsElement.type(), QgsSettingsTreeElement.Type.Normal)
-        self.assertEqual(pluginsElement.root().type(), QgsSettingsTreeElement.Type.Root)
-        self.assertEqual(pluginsElement.root().parent(), None)
+        self.assertEqual(pluginsElement.parent().type(), QgsSettingsTreeElement.Type.Root)
+        self.assertEqual(pluginsElement.parent().parent(), None)
 
     def test_parent(self):
         root = QgsSettings.createPluginTreeElement(self.pluginName)
@@ -89,7 +89,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(nl.childrenSettings(), [])
 
         # nesting lists
-        nl2 = nl.createNamedListElement("my_nested_list", QgsSettingsTreeElement.NamedListOption.CreateCurrentItemSetting)
+        nl2 = nl.createNamedListElement("my_nested_list")  # , QgsSettingsTreeElement.NamedListOption.CreateCurrentItemSetting)
         self.assertEqual(nl2.key(), "my_nested_list")
         self.assertEqual(nl2.completeKey(), f"plugins/{self.pluginName}/level-1/my_list/%1/my_nested_list/%2")
         self.assertEqual(nl2.namedElementsCount(), 2)

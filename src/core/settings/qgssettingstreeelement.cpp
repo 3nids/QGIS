@@ -130,7 +130,8 @@ void QgsSettingsTreeElement::init( QgsSettingsTreeElement *parent, const QString
 
 void QgsSettingsTreeNamedListElement::initNamedList( const QgsSettingsTreeElement::NamedListOptions &options )
 {
-  if ( options.testFlag( NamedListOption::CreateCurrentItemSetting ) )
+  mOptions = options;
+  if ( options.testFlag( NamedListOption::CreateSelectedEntrySetting ) )
   {
     mSelectedElementSetting = new QgsSettingsEntryString( QStringLiteral( "selected" ), this );
     registerChildSetting( mSelectedElementSetting );
@@ -143,34 +144,67 @@ QgsSettingsTreeNamedListElement::~QgsSettingsTreeNamedListElement()
     delete mSelectedElementSetting;
 }
 
-const QStringList QgsSettingsTreeNamedListElement::entries( const QString &parentEntry ) const
+const QStringList QgsSettingsTreeNamedListElement::entries( const QStringList &parentsNamedEntries ) const
 {
+  if ( namedElementsCount() != parentsNamedEntries.count() )
+    throw QgsSettingsException( QObject::tr( "The number of given parent named entries (%1) doesn't match with the number of named entries in the key (%2)." ).arg( parentsNamedEntries.count(),  namedElementsCount() ) );
+
   QgsSettings settings;
-  if ( parentEntry.isEmpty() )
-    settings.beginGroup( completeKey() );
-  else
-    settings.beginGroup( completeKey().arg( parentEntry ) );
+  switch ( parentsNamedEntries.count() )
+  {
+    case 0:
+      settings.beginGroup( completeKey() );
+      break;
+    case 1:
+      settings.beginGroup( completeKey().arg( parentsNamedEntries[0] ) );
+      break;
+    case 2:
+      settings.beginGroup( completeKey().arg( parentsNamedEntries[0], parentsNamedEntries[1] ) );
+      break;
+    case 3:
+      settings.beginGroup( completeKey().arg( parentsNamedEntries[0], parentsNamedEntries[1], parentsNamedEntries[2] ) );
+      break;
+    case 4:
+      settings.beginGroup( completeKey().arg( parentsNamedEntries[0], parentsNamedEntries[1], parentsNamedEntries[2], parentsNamedEntries[3] ) );
+      break;
+    case 5:
+      settings.beginGroup( completeKey().arg( parentsNamedEntries[0], parentsNamedEntries[1], parentsNamedEntries[2], parentsNamedEntries[3], parentsNamedEntries[4] ) );
+      break;
+    default:
+      throw QgsSettingsException( QObject::tr( "Current implementation of QgsSettingsTreeNamedListElement::entries doesn't handle more than 5 parent named entries" ) );
+      break;
+  }
 
   return settings.childGroups();
 }
 
 void QgsSettingsTreeNamedListElement::setSelectedNamedEntryElement( const QString &entry, const QStringList &parentsNamedEntries )
 {
-  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
+  if ( namedElementsCount() != parentsNamedEntries.count() )
+    throw QgsSettingsException( QObject::tr( "The number of given parent named entries (%1) doesn't match with the number of named entries in the key (%2)." ).arg( parentsNamedEntries.count(),  namedElementsCount() ) );
+  if ( !mOptions.testFlag( NamedListOption::CreateSelectedEntrySetting ) )
+    throw QgsSettingsException( QObject::tr( "The  named list element has no option to set the current selected entry." ) );
+
   mSelectedElementSetting->setValue( entry, parentsNamedEntries );
 }
 
 QString QgsSettingsTreeNamedListElement::selectedNamedEntryElement( const QStringList &parentsNamedEntries )
 {
-  Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
+  if ( namedElementsCount() != parentsNamedEntries.count() )
+    throw QgsSettingsException( QObject::tr( "The number of given parent named entries (%1) doesn't match with the number of named entries in the key (%2)." ).arg( parentsNamedEntries.count(),  namedElementsCount() ) );
+  if ( !mOptions.testFlag( NamedListOption::CreateSelectedEntrySetting ) )
+    throw QgsSettingsException( QObject::tr( "The  named list element has no option to set the current selected entry." ) );
+
   return mSelectedElementSetting->value( parentsNamedEntries );
 }
 
 void QgsSettingsTreeNamedListElement::deleteNamedEntry( const QString &entry, const QStringList &parentsNamedEntries )
 {
-  Q_ASSERT( mType == Type::NamedList );
-  Q_ASSERT( namedElementsCount() == parentsNamedEntries.count() + 1 );
+  if ( namedElementsCount() != parentsNamedEntries.count() )
+    throw QgsSettingsException( QObject::tr( "The number of given parent named entries (%1) doesn't match with the number of named entries in the key (%2)." ).arg( parentsNamedEntries.count(),  namedElementsCount() ) );
+  if ( !mOptions.testFlag( NamedListOption::CreateSelectedEntrySetting ) )
+    throw QgsSettingsException( QObject::tr( "The  named list element has no option to set the current selected entry." ) );
+
   QString key = completeKey().arg( entry );
   QgsSettings().remove( key );
 }
