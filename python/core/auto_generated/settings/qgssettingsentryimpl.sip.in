@@ -69,7 +69,7 @@ The ``options`` argument specifies the options for the settings entry.
                              const QString &pluginName,
                              const QVariant &defaultValue = QVariant(),
                              const QString &description = QString(),
-                             Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException );
+                             Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryVariant.
 This constructor is intended to be used from plugins.
@@ -156,7 +156,7 @@ The ``maxLength`` argument specifies the maximal length of the string value. -1 
                             const QString &description = QString(),
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             int minLength = 0,
-                            int maxLength = -1 ) throw( QgsSettingsException );
+                            int maxLength = -1 ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryString.
 This constructor is intended to be used from plugins.
@@ -261,7 +261,7 @@ The ``options`` arguments specifies the options for the settings entry.
                                 const QString &pluginName,
                                 const QStringList &defaultValue = QStringList(),
                                 const QString &description = QString(),
-                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException );
+                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryStringList.
 This constructor is intended to be used from plugins.
@@ -339,7 +339,7 @@ The ``options`` arguments specifies the options for the settings entry.
                           const QString &pluginName,
                           bool defaultValue = false,
                           const QString &description = QString(),
-                          Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException );
+                          Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryBool.
 This constructor is intended to be used from plugins.
@@ -429,7 +429,7 @@ The ``maxValue`` argument specifies the maximal value.
                              const QString &description = QString(),
                              Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                              qlonglong minValue = LLONG_MIN,
-                             qlonglong maxValue = LLONG_MAX ) throw( QgsSettingsException );
+                             qlonglong maxValue = LLONG_MAX ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryInteger.
 This constructor is intended to be used from plugins.
@@ -554,7 +554,7 @@ for example for a QDoubleSpinBox.
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             double minValue = -DBL_MAX,
                             double maxValue = DBL_MAX,
-                            int displayDecimals = 1 ) throw( QgsSettingsException );
+                            int displayDecimals = 1 ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryDouble.
 This constructor is intended to be used from plugins.
@@ -675,7 +675,7 @@ The ``options`` arguments specifies the options for the settings entry.
                            const QString &pluginName,
                            const QColor &defaultValue = QColor(),
                            const QString &description = QString(),
-                           Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException );
+                           Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for QgsSettingsEntryColor.
 This constructor is intended to be used from plugins.
@@ -754,7 +754,7 @@ The ``options`` arguments specifies the options for the settings entry.
                                 const QString &pluginName,
                                 const QVariantMap &defaultValue = QVariantMap(),
                                 const QString &description = QString(),
-                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException );
+                                Qgis::SettingsOptions options = Qgis::SettingsOptions() ) throw( QgsSettingsException ) /Transfer/;
 %Docstring
 Constructor for :py:class:`QgsSettingsEntryStringMap`.
 This constructor is intended to be used from plugins.

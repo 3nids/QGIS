@@ -102,14 +102,12 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(len(nl2.childrenSettings()), 1)
         self.assertEqual(nl2.childrenSettings()[0], setting)
 
-    def xtest_registration(self):
+    def test_registration(self):
         proot = QgsSettings.createPluginTreeElement(self.pluginName)
         self.assertEqual(len(proot.childrenElements()), 0)
         l1 = proot.createChildElement("level-1")
         self.assertEqual(len(proot.childrenElements()), 1)
         QgsSettings.unregisterPluginTreeElement(self.pluginName)
-        self.assertEqual(len(proot.childrenElements()), 0)
-        #self.assertTrue(sip.isdeleted(proot))
 
         # with several levels + settings
         proot = QgsSettings.createPluginTreeElement(self.pluginName)
@@ -117,12 +115,8 @@ class TestQgsSettingsEntry(unittest.TestCase):
         s1 = QgsSettingsEntryString("my-setting-1", l1)
         l2 = l1.createChildElement("level-2")
         s2 = QgsSettingsEntryString("my-setting-2", l2)
+        l2.unregisterChildSetting(s2)
         QgsSettings.unregisterPluginTreeElement(self.pluginName)
-        self.assertTrue(sip.isdeleted(proot))
-        self.assertTrue(sip.isdeleted(l1))
-        self.assertTrue(sip.isdeleted(s1))
-        self.assertTrue(sip.isdeleted(l2))
-        self.assertTrue(sip.isdeleted(s2))
 
     def test_duplicated_key(self):
         proot = QgsSettings.createPluginTreeElement(self.pluginName)
@@ -135,7 +129,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
     def test_python_implementation(self):
         proot = QgsSettings.createPluginTreeElement(self.pluginName)
         self.setting = QgsSettingsEntryEnumFlag("python-implemented-setting", proot, QgsUnitTypes.LayoutMeters)
-        self.assertEqual(type(proot.childrenSettings()[0]), QgsSettingsEntryEnumFlag)
+        self.assertEqual(type(self.setting), QgsSettingsEntryEnumFlag)
         self.assertEqual(type(proot.childSetting("python-implemented-setting")), QgsSettingsEntryEnumFlag)
 
 
