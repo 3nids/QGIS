@@ -180,7 +180,7 @@ QgsVectorTileProviderConnection::Data QgsVectorTileProviderConnection::connectio
 
 void QgsVectorTileProviderConnection::deleteConnection( const QString &name )
 {
-  sTreeConnectionVectorTile->deleteNamedEntry( name );
+  sTreeConnectionVectorTile->deleteItem( name );
 }
 
 void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVectorTileProviderConnection::Data conn )
@@ -215,12 +215,12 @@ void QgsVectorTileProviderConnection::addConnection( const QString &name, QgsVec
 
 QString QgsVectorTileProviderConnection::selectedConnection()
 {
-  return sTreeConnectionVectorTile->selectedNamedEntryElement();
+  return sTreeConnectionVectorTile->selectedItem();
 }
 
 void QgsVectorTileProviderConnection::setSelectedConnection( const QString &name )
 {
-  sTreeConnectionVectorTile->selectedNamedEntryElement( {name} );
+  sTreeConnectionVectorTile->selectedItem( {name} );
 }
 
 

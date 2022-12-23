@@ -102,7 +102,7 @@ to validate set values and provide more accurate settings description for the gu
     else if ( dynamic_cast< QgsSettingsEntryColor * >( sipCpp ) )
       sipType = sipType_QgsSettingsEntryColor;
     else
-      sipType = NULL;
+      sipType = sipType_QgsSettingsEntryBase;
 %End
   public:
 
@@ -296,7 +296,7 @@ Returns settings value with an optional default value override
 Returns settings default value.
 %End
 
-    virtual Qgis::SettingsType settingsType() const = 0;
+    virtual Qgis::SettingsType settingsType() const;
 %Docstring
 Returns the settings entry type.
 %End

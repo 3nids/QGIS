@@ -1044,15 +1044,15 @@ class CORE_EXPORT QgsApplication : public QApplication
 
 #ifndef SIP_RUN
     //! Settings entry locale user locale
-    static const inline QgsSettingsEntryString settingsLocaleUserLocale = QgsSettingsEntryString( QStringLiteral( "userLocale" ), QgsSettings::sTreeLocale, QString() );
+    static inline QgsSettingsEntryString *settingsLocaleUserLocale = new QgsSettingsEntryString( QStringLiteral( "userLocale" ), QgsSettings::sTreeLocale, QString() );
     //! Settings entry locale override flag
-    static const inline QgsSettingsEntryBool settingsLocaleOverrideFlag = QgsSettingsEntryBool( QStringLiteral( "overrideFlag" ), QgsSettings::sTreeLocale, false );
+    static inline QgsSettingsEntryBool *settingsLocaleOverrideFlag = new QgsSettingsEntryBool( QStringLiteral( "overrideFlag" ), QgsSettings::sTreeLocale, false );
     //! Settings entry locale global locale
-    static const inline QgsSettingsEntryString settingsLocaleGlobalLocale = QgsSettingsEntryString( QStringLiteral( "globalLocale" ), QgsSettings::sTreeLocale, QString() );
+    static inline QgsSettingsEntryString *settingsLocaleGlobalLocale = new QgsSettingsEntryString( QStringLiteral( "globalLocale" ), QgsSettings::sTreeLocale, QString() );
     //! Settings entry locale show group separator
-    static const inline QgsSettingsEntryBool settingsLocaleShowGroupSeparator = QgsSettingsEntryBool( QStringLiteral( "showGroupSeparator" ), QgsSettings::sTreeLocale, false );
+    static inline QgsSettingsEntryBool *settingsLocaleShowGroupSeparator = new QgsSettingsEntryBool( QStringLiteral( "showGroupSeparator" ), QgsSettings::sTreeLocale, false );
     //! Settings entry search path for SVG
-    static const inline QgsSettingsEntryStringList settingsSearchPathsForSVG = QgsSettingsEntryStringList( QStringLiteral( "searchPathsForSVG" ), QgsSettings::sTreeSvg, QStringList() );
+    static inline QgsSettingsEntryStringList *settingsSearchPathsForSVG = new QgsSettingsEntryStringList( QStringLiteral( "searchPathsForSVG" ), QgsSettings::sTreeSvg, QStringList() );
 #endif
 
 #ifdef SIP_RUN

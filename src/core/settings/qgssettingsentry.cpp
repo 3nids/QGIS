@@ -17,7 +17,7 @@
 #include "qgslogger.h"
 
 #include <QRegularExpression>
-
+#include <QDir>
 
 
 
@@ -106,21 +106,26 @@ bool QgsSettingsEntryGroup::hasDynamicKey() const
 }
 
 
-/*--------------*/
-
 QgsSettingsEntryBase::QgsSettingsEntryBase( const QString &key, QgsSettingsTreeElement *parentTreeElement, const QVariant &defaultValue, const QString &description, Qgis::SettingsOptions options )
-  : mParent( parentTreeElement )
+  : mParentTreeElement( parentTreeElement )
   , mDefaultValue( defaultValue )
   , mDescription( description )
   , mPluginName()
   , mOptions( options )
 {
-  mKey = parentTreeElement->completeKey();
-  if ( !mKey.isEmpty() )
-    mKey.append( QStringLiteral( "/" ) );
-  mKey.append( key );
+  QgsDebugMsg(QString("constructor with parent for %1").arg(key));
+  mKey = QDir::cleanPath( QStringLiteral( "%1/%2" ).arg( parentTreeElement ? parentTreeElement->completeKey() : QString(), key ) );
 
-  parentTreeElement->registerChildSetting( this );
+  if ( parentTreeElement )
+  {
+    parentTreeElement->registerChildSetting( this, key );
+  }
+}
+
+QgsSettingsEntryBase::~QgsSettingsEntryBase()
+{
+  if ( mParentTreeElement )
+    mParentTreeElement->unregisterChildSetting( this );
 }
 
 

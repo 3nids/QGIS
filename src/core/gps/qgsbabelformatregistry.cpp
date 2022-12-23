@@ -264,7 +264,7 @@ void QgsBabelFormatRegistry::reloadFromSettings()
                                  QStringLiteral( "%babel -t -i garmin -o gpx %in %out" ),
                                  QStringLiteral( "%babel -t -i gpx -o garmin %in %out" ) );
 
-  for ( const QString &device : sTreeBabelDevices->entries() )
+  for ( const QString &device : sTreeBabelDevices->items() )
   {
     // don't leak memory if there's already a device with this name...
     delete mDevices.value( device );

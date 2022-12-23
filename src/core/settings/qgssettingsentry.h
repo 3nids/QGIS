@@ -121,6 +121,8 @@ class CORE_EXPORT QgsSettingsEntryBase
       sipType = sipType_QgsSettingsEntryDouble;
     else if ( dynamic_cast< QgsSettingsEntryColor * >( sipCpp ) )
       sipType = sipType_QgsSettingsEntryColor;
+    else if ( dynamic_cast< QgsSettingsEntryBase * >( sipCpp ) )
+      sipType = sipType_QgsSettingsEntryBase;
     else
       sipType = NULL;
     SIP_END
@@ -173,10 +175,7 @@ class CORE_EXPORT QgsSettingsEntryBase
     /**
      * Destructor for QgsSettingsEntryBase.
      */
-    virtual ~QgsSettingsEntryBase()
-    {
-      //mParent->unregisterChildSetting( this );
-    }
+    virtual ~QgsSettingsEntryBase();
 
     /**
      * Returns settings entry key.
@@ -315,7 +314,8 @@ class CORE_EXPORT QgsSettingsEntryBase
     /**
      * Returns the settings entry type.
      */
-    virtual Qgis::SettingsType settingsType() const = 0;
+    virtual Qgis::SettingsType settingsType() const {return Qgis::SettingsType::Custom;}
+    // This cannot be pure virtual otherwise SIP is failing
 
     /**
      * Returns the settings entry description.
@@ -356,7 +356,7 @@ class CORE_EXPORT QgsSettingsEntryBase
     * Returns the parent tree element
     * \since QGIS 3.30
     */
-    QgsSettingsTreeElement *parent() const {return mParent;}
+    QgsSettingsTreeElement *parent() const {return mParentTreeElement;}
 
   protected:
 
@@ -372,7 +372,7 @@ class CORE_EXPORT QgsSettingsEntryBase
 
     QString completeKeyPrivate( const QString &key, const QStringList &dynamicKeyPartList ) const;
 
-    QgsSettingsTreeElement *mParent = nullptr;
+    QgsSettingsTreeElement *mParentTreeElement = nullptr;
     QString mKey;
     QVariant mDefaultValue;
     QString mDescription;

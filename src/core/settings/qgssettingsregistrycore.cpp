@@ -53,12 +53,6 @@ QgsSettingsRegistryCore::QgsSettingsRegistryCore()
   addSettingsEntry( &QgsProcessing::settingsDefaultOutputVectorLayerExt );
   addSettingsEntry( &QgsProcessing::settingsDefaultOutputRasterLayerExt );
 
-  addSettingsEntry( &QgsApplication::settingsLocaleUserLocale );
-  addSettingsEntry( &QgsApplication::settingsLocaleOverrideFlag );
-  addSettingsEntry( &QgsApplication::settingsLocaleGlobalLocale );
-  addSettingsEntry( &QgsApplication::settingsLocaleShowGroupSeparator );
-  addSettingsEntry( &QgsApplication::settingsSearchPathsForSVG );
-
   addSettingsEntry( &QgsGeometryOptions::settingsGeometryValidationDefaultChecks );
 
   addSettingsEntry( &QgsLocalizedDataPathRegistry::settingsLocalizedDataPaths );
@@ -180,7 +174,7 @@ void QgsSettingsRegistryCore::migrateOldSettings()
       QgsOwsConnection::settingsConnectionAuthCfg->copyValueFromKey( QStringLiteral( "qgis/connections-%1/%2/authcfg" ), {connection.toLower(), service}, true );
     }
     if ( settings.contains( QStringLiteral( "selected" ) ) )
-      QgsOwsConnection::sTreeConnectionServices->setSelectedNamedEntryElement( settings.value( QStringLiteral( "selected" ) ).toString(), {connection.toLower()} );
+      QgsOwsConnection::sTreeConnectionServices->setSelectedItem( settings.value( QStringLiteral( "selected" ) ).toString(), {connection.toLower()} );
   }
 
   // Vector tile - added in 3.30
@@ -209,7 +203,7 @@ void QgsSettingsRegistryCore::migrateOldSettings()
 
   // babel devices settings - added in 3.30
   {
-    if ( QgsBabelFormatRegistry::sTreeBabelDevices->entries().count() == 0 )
+    if ( QgsBabelFormatRegistry::sTreeBabelDevices->items().count() == 0 )
     {
       const QStringList deviceNames = QgsSettings().value( QStringLiteral( "/Plugin-GPS/devices/deviceList" ) ).toStringList();
 
@@ -233,11 +227,11 @@ void QgsSettingsRegistryCore::backwardCompatibility()
     const QStringList connectionsList = {QStringLiteral( "WMS" ), QStringLiteral( "WFS" ), QStringLiteral( "WCS" ), QStringLiteral( "GEONODE" )};
     for ( const QString &connection : connectionsList )
     {
-      QgsSettings settings;
-      settings.beginGroup( QStringLiteral( "qgis/connections-%1" ).arg( connection.toLower() ) );
-      const QStringList services = settings.childGroups();
+      const QStringList services = QgsOwsConnection::sTreeConnectionServices->items( {connection.toLower()} );
       if ( services.count() == 0 )
         continue;
+      QgsSettings settings;
+      settings.beginGroup( QStringLiteral( "qgis/connections-%1" ).arg( connection.toLower() ) );
       for ( const QString &service : services )
       {
         QgsOwsConnection::settingsConnectionUrl->copyValueToKey( QStringLiteral( "qgis/connections-%1/%2/url" ), {connection.toLower(), service} );
@@ -267,7 +261,7 @@ void QgsSettingsRegistryCore::backwardCompatibility()
       }
 
       if ( settings.contains( QStringLiteral( "selected" ) ) )
-        QgsOwsConnection::sTreeConnectionServices->setSelectedNamedEntryElement( settings.value( QStringLiteral( "selected" ) ).toString(), {connection.toLower()} );
+        QgsOwsConnection::sTreeConnectionServices->setSelectedItem( settings.value( QStringLiteral( "selected" ) ).toString(), {connection.toLower()} );
     }
   }
 
@@ -275,7 +269,8 @@ void QgsSettingsRegistryCore::backwardCompatibility()
   {
     QgsSettings settings;
     settings.beginGroup( QStringLiteral( "qgis/connections-vector-tile" ) );
-    const QStringList services = settings.childGroups();
+
+    const QStringList services = QgsVectorTileProviderConnection::sTreeConnectionVectorTile->items();
     for ( const QString &service : services )
     {
       // do not overwrite already set setting
@@ -299,7 +294,7 @@ void QgsSettingsRegistryCore::backwardCompatibility()
 
   // babel devices settings - added in 3.30
   {
-    const QStringList devices = QgsBabelFormatRegistry::sTreeBabelDevices->entries();
+    const QStringList devices = QgsBabelFormatRegistry::sTreeBabelDevices->items();
     QgsSettings().setValue( QStringLiteral( "/Plugin-GPS/devices/deviceList" ), devices );
     for ( const QString &device : devices )
     {
