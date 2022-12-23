@@ -37,7 +37,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
 
     def test_settings_entry_base(self):
         settingsKey = "settingsEntryBase/variantValue"
-        settingsKeyComplete = f"plugins/{self.pluginName}/{settingsKey}"
+        settingsKeyComplete = f"/plugins/{self.pluginName}/{settingsKey}"
 
         # Make sure settings does not exists
         QgsSettings().remove(settingsKeyComplete)
@@ -95,7 +95,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(settings_types, list(hardcoded_types.keys()))
         for setting_type, default_value in hardcoded_types.items():
             settings_key = "settings/key_{}".format(setting_type)
-            settings_key_complete = "plugins/{}/{}".format(self.pluginName, settings_key)
+            settings_key_complete = "/plugins/{}/{}".format(self.pluginName, settings_key)
             QgsSettings().remove(settings_key_complete)
             settings_entry = eval('qgis_core.{}(settings_key, self.pluginName, default_value)'.format(setting_type))
             self.assertEqual(settings_entry.key(), settings_key_complete)
@@ -103,11 +103,11 @@ class TestQgsSettingsEntry(unittest.TestCase):
     def test_with_parent_element(self):
         root = QgsSettings.createPluginTreeElement(self.pluginName)
         setting = QgsSettingsEntryInteger("my_setting", root)
-        self.assertEqual(setting.key(), f"plugins/{self.pluginName}/my_setting")
+        self.assertEqual(setting.key(), f"/plugins/{self.pluginName}/my_setting")
 
     def test_settings_entry_base_default_value_override(self):
         settingsKey = "settingsEntryBase/defaultValueOverride/variantValue"
-        settingsKeyComplete = f"plugins/{self.pluginName}/{settingsKey}"
+        settingsKeyComplete = f"/plugins/{self.pluginName}/{settingsKey}"
 
         # Make sure settings does not exists
         QgsSettings().remove(settingsKeyComplete)
@@ -130,8 +130,8 @@ class TestQgsSettingsEntry(unittest.TestCase):
         settingsKeyDynamic = "settingsEntryBase/%1/variantValue"
         dynamicKeyPart1 = "first"
         dynamicKeyPart2 = "second"
-        settingsKeyComplete1 = "plugins/{}/{}".format(self.pluginName, settingsKeyDynamic).replace("%1", dynamicKeyPart1)
-        settingsKeyComplete2 = "plugins/{}/{}".format(self.pluginName, settingsKeyDynamic).replace("%1", dynamicKeyPart2)
+        settingsKeyComplete1 = "/plugins/{}/{}".format(self.pluginName, settingsKeyDynamic).replace("%1", dynamicKeyPart1)
+        settingsKeyComplete2 = "/plugins/{}/{}".format(self.pluginName, settingsKeyDynamic).replace("%1", dynamicKeyPart2)
 
         # Make sure settings does not exists
         QgsSettings().remove(settingsKeyComplete1)
@@ -156,7 +156,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
         settingsKeyDynamic = "settingsEntryBase/%1/anotherPart_%2/variantValue"
         dynamicKeyPart1 = "first"
         dynamicKeyPart2 = "second"
-        settingsKeyComplete = "plugins/{}/{}".format(self.pluginName, settingsKeyDynamic).replace("%1", dynamicKeyPart1).replace("%2", dynamicKeyPart2)
+        settingsKeyComplete = f"/plugins/{self.pluginName}/{settingsKeyDynamic}".replace("%1", dynamicKeyPart1).replace("%2", dynamicKeyPart2)
 
         # Make sure settings does not exists
         QgsSettings().remove(settingsKeyComplete)
@@ -174,7 +174,7 @@ class TestQgsSettingsEntry(unittest.TestCase):
 
     def test_settings_entry_variant(self):
         settingsKey = "settingsEntryVariant/variantValue"
-        settingsKeyComplete = f"plugins/{self.pluginName}/{settingsKey}"
+        settingsKeyComplete = f"/plugins/{self.pluginName}/{settingsKey}"
 
         # Make sure settings does not exists
         QgsSettings().remove(settingsKeyComplete)
@@ -370,12 +370,12 @@ class TestQgsSettingsEntry(unittest.TestCase):
         self.assertEqual(qgsSettingsValue, QgsUnitTypes.LayoutPicas)
 
         # With save as integer option
-        settingsEntryEnumAsInteger = QgsSettingsEntryEnumFlag(settingsKey, self.pluginName, defaultValue, description, Qgis.SettingsOption.SaveEnumFlagAsInt)
+        settingsEntryEnumAsInteger = QgsSettingsEntryEnumFlag("enum-value-2", self.pluginName, defaultValue, description, Qgis.SettingsOption.SaveEnumFlagAsInt)
         settingsEntryEnumAsInteger.remove()
         self.assertEqual(settingsEntryEnumAsInteger.value(), defaultValue)
         success = settingsEntryEnumAsInteger.setValue(QgsUnitTypes.LayoutFeet)
         self.assertEqual(success, True)
-        qgsSettingsValue = QgsSettings().value(settingsKeyComplete, int(QgsUnitTypes.LayoutMeters))
+        qgsSettingsValue = QgsSettings().value(f"plugins/{self.pluginName}/enum-value-2", int(QgsUnitTypes.LayoutMeters))
         self.assertEqual(qgsSettingsValue, int(QgsUnitTypes.LayoutFeet))
 
     def test_settings_entry_flag(self):
