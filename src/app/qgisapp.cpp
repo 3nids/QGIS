@@ -129,6 +129,8 @@
 
 #include "qgsdockablewidgethelper.h"
 
+#include "qgssettingstreemodel.h"
+
 #ifdef HAVE_3D
 #include "qgs3d.h"
 #include "qgs3danimationsettings.h"
@@ -3412,6 +3414,16 @@ void QgisApp::refreshProfileMenu()
   QAction *newProfileAction = mConfigMenu->addAction( tr( "New Profile…" ) );
   newProfileAction->setObjectName( "mActionNewProfile" );
   connect( newProfileAction, &QAction::triggered, this, &QgisApp::newProfile );
+
+  QAction *settings = mConfigMenu->addAction( tr( "Settings" ) );
+  settings->setObjectName( "mActionSettings" );
+  connect( settings, &QAction::triggered, this, []()
+  {
+    QgsSettingsTreeModel *model = new QgsSettingsTreeModel( QgsSettings::treeRoot() );
+    QTreeView *view = new QTreeView();
+    view->setModel( model );
+    view->show();
+  } );
 }
 
 void QgisApp::createProfileMenu()
