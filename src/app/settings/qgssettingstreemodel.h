@@ -53,6 +53,9 @@ class QgsSettingsTreeNodeData : public QObject
 
     QString value() const {return mValue;}
 
+    //! Returns if the setting exists (value is set)
+    bool exists() const {return mExists;}
+
   private:
     QgsSettingsTreeNodeData( QObject *parent ) : QObject( parent ) {}
     void addChildForTreeNode( const QgsSettingsTreeNode *node );

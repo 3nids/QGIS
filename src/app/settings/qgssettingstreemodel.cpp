@@ -13,6 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QFont>
+
 #include "qgssettingstreemodel.h"
 #include "qgssettingsentry.h"
 #include "qgssettingstreenode.h"
@@ -191,7 +193,10 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
   if ( !index.isValid() || index.column() > columnCount( index ) )
     return QVariant();
 
+  Column col = static_cast<Column>( index.column() );
+
   QgsSettingsTreeNodeData *node = index2node( index );
+
   if ( role == Qt::DisplayRole || role == Qt::EditRole )
   {
     switch ( static_cast<Column>( index.column() ) )
@@ -202,6 +207,16 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
         return node->value();
       default:
         break;
+    }
+  }
+
+  if ( role == Qt::FontRole && col == Column::Value )
+  {
+    if ( !node->exists() )
+    {
+      QFont font;
+      font.setItalic( true );
+      return font;
     }
   }
 
