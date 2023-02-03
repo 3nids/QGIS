@@ -17,7 +17,7 @@
 #define QGSSETTINGSTREEMODEL_H
 
 
-#include "qgis_app.h"
+#include "qgis_gui.h"
 
 #include <QAbstractItemModel>
 
@@ -25,7 +25,7 @@ class QgsSettingsEntryBase;
 class QgsSettingsTreeNode;
 class QgsSettingsTreeNamedListNode;
 
-class QgsSettingsTreeNodeData : public QObject
+class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
 {
     Q_OBJECT
   public:
@@ -75,7 +75,7 @@ class QgsSettingsTreeNodeData : public QObject
     const QgsSettingsEntryBase *mSetting = nullptr;
 };
 
-class APP_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
+class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
 {
   public:
 

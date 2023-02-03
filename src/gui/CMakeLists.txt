@@ -439,6 +439,7 @@ set(QGIS_GUI_SRCS
   sensor/qgssensorwidget.cpp
 
   settings/qgssettingsregistrygui.cpp
+  settings/qgssettingstreemodel.cpp
 
   tableeditor/qgstableeditordialog.cpp
   tableeditor/qgstableeditorformattingwidget.cpp
