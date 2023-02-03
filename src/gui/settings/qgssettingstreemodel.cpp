@@ -24,6 +24,7 @@
 QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent = nullptr )
 {
   QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( parent );
+  nodeData->mType = Type::RootNode;
   nodeData->mName = rootNode->key();
   nodeData->mTreeNode = rootNode;
   nodeData->fillChildren();
@@ -41,6 +42,7 @@ void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *no
   nodeData->mTreeNode = node;
   if ( node->type() == QgsSettingsTreeNode::Type::NamedList )
   {
+    nodeData->mType = Type::NamedListTreeNode;
     const QgsSettingsTreeNamedListNode *nln = dynamic_cast<const QgsSettingsTreeNamedListNode *>( node );
     const QStringList items = nln->items( mNamedParentNodes );
     for ( const QString &item : items )
@@ -50,6 +52,7 @@ void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *no
   }
   else
   {
+    nodeData->mType = Type::TreeNode;
     nodeData->fillChildren();
   }
   mChildren.append( nodeData );
@@ -58,6 +61,7 @@ void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *no
 void QgsSettingsTreeNodeData::addChildForNamedListItemNode( const QString &item, const QgsSettingsTreeNamedListNode *namedListNode )
 {
   QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( this );
+  nodeData->mType = Type::NamedListItem;
   nodeData->mParent = this;
   nodeData->mNamedParentNodes = mNamedParentNodes;
   nodeData->mNamedParentNodes.append( item );
@@ -70,11 +74,12 @@ void QgsSettingsTreeNodeData::addChildForNamedListItemNode( const QString &item,
 void QgsSettingsTreeNodeData::addChildForSetting( const QgsSettingsEntryBase *setting )
 {
   QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( this );
+  nodeData->mType = Type::Setting;
   nodeData->mParent = this;
   nodeData->mNamedParentNodes = mNamedParentNodes;
   nodeData->mSetting = setting;
   nodeData->mName = setting->name();
-  nodeData->mValue = setting->valueAsVariant( mNamedParentNodes ).toString();
+  nodeData->mValue = setting->valueAsVariant( mNamedParentNodes );
   nodeData->mExists = setting->exists( mNamedParentNodes );
 
   switch ( mNamedParentNodes.count() )
@@ -219,6 +224,29 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
       QFont font;
       font.setItalic( true );
       return font;
+    }
+  }
+
+  if ( role == Qt::BackgroundRole && col == Column::Value )
+  {
+    if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
+    {
+      switch ( node->setting()->settingsType() )
+      {
+        case Qgis::SettingsType::Custom:
+        case Qgis::SettingsType::Variant:
+        case Qgis::SettingsType::String:
+        case Qgis::SettingsType::StringList:
+        case Qgis::SettingsType::VariantMap:
+        case Qgis::SettingsType::Bool:
+        case Qgis::SettingsType::Integer:
+        case Qgis::SettingsType::Double:
+        case Qgis::SettingsType::EnumFlag:
+          break;
+
+        case Qgis::SettingsType::Color:
+          return node->value();
+      }
     }
   }
 

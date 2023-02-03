@@ -25,6 +25,19 @@ class QgsSettingsEntryBase;
 class QgsSettingsTreeNode;
 class QgsSettingsTreeNamedListNode;
 
+#ifndef SIP_RUN
+
+///@cond PRIVATE
+
+/**
+ * \ingroup gui
+ * \class QgsSettingsTreeNodeData
+ * \brief QgsSettingsTree holds data of the tree model for the settings tree.
+ *
+ * \note Not available in Python bindings
+ *
+ * \since QGIS 3.32
+ */
 class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
 {
     Q_OBJECT
@@ -33,6 +46,7 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     //! Type of tree element
     enum class Type
     {
+      RootNode,
       TreeNode,
       NamedListTreeNode,
       NamedListItem,
@@ -49,12 +63,20 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
 
     QgsSettingsTreeNodeData *parent() const {return mParent;}
 
+    Type type() const {return mType;}
+
     QString name() const {return mName;}
 
-    QString value() const {return mValue;}
+    QVariant value() const {return mValue;}
 
     //! Returns if the setting exists (value is set)
     bool exists() const {return mExists;}
+
+    /**
+     * Returns the setting of the node
+     * It returns a nullptr if the setting does not exist
+     */
+    const QgsSettingsEntryBase *setting() const {return mSetting;}
 
   private:
     QgsSettingsTreeNodeData( QObject *parent ) : QObject( parent ) {}
@@ -63,8 +85,9 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     void addChildForSetting( const QgsSettingsEntryBase *setting );
     void fillChildren();
 
+    Type mType = Type::TreeNode;
     QString mName;
-    QString mValue;
+    QVariant mValue;
     QStringList mNamedParentNodes;
     bool mExists = false;
 
@@ -75,6 +98,19 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     const QgsSettingsEntryBase *mSetting = nullptr;
 };
 
+///@endcond
+
+#endif
+
+
+
+/**
+ * \ingroup gui
+ * \class QgsSettingsTreeModel
+ * \brief QgsSettingsTreeModel is a tree model for the settings tree.
+ *
+ * \since QGIS 3.32
+ */
 class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
 {
   public:
