@@ -282,6 +282,8 @@ set(QGIS_APP_SRCS
   pluginmanager/qgspluginsortfilterproxymodel.cpp
   pluginmanager/qgspluginitemdelegate.cpp
 
+  settings/qgssettingstreemodel.cpp
+
   qgssettingstreewidget.cpp
   qgssettingsregistryapp.cpp
   qgsvariantdelegate.cpp

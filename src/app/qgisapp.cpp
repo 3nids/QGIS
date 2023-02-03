@@ -3419,7 +3419,7 @@ void QgisApp::refreshProfileMenu()
   settings->setObjectName( "mActionSettings" );
   connect( settings, &QAction::triggered, this, []()
   {
-    QgsSettingsTreeModel *model = new QgsSettingsTreeModel( QgsSettings::treeRoot() );
+    QgsSettingsTreeModel *model = new QgsSettingsTreeModel( QgsSettingsTree::treeRoot() );
     QTreeView *view = new QTreeView();
     view->setModel( model );
     view->show();

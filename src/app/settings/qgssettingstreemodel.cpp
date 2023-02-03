@@ -18,6 +18,8 @@
 #include "qgssettingstreemodel.h"
 #include "qgssettingsentry.h"
 #include "qgssettingstreenode.h"
+#include "qgslogger.h"
+
 
 QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent = nullptr )
 {
