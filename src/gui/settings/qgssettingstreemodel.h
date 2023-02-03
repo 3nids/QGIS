@@ -119,6 +119,7 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
     {
       Name,
       Value,
+      Description,
     };
 
     QgsSettingsTreeModel( QgsSettingsTreeNode *rootNode = nullptr, QObject *parent = nullptr );

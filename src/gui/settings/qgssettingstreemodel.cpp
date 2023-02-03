@@ -192,7 +192,7 @@ int QgsSettingsTreeModel::rowCount( const QModelIndex &parent ) const
 int QgsSettingsTreeModel::columnCount( const QModelIndex &parent ) const
 {
   Q_UNUSED( parent )
-  return 2;
+  return 3;
 }
 
 QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
@@ -200,54 +200,73 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
   if ( !index.isValid() || index.column() > columnCount( index ) )
     return QVariant();
 
-  Column col = static_cast<Column>( index.column() );
-
   QgsSettingsTreeNodeData *node = index2node( index );
 
-  if ( role == Qt::DisplayRole || role == Qt::EditRole )
+  switch ( static_cast<Column>( index.column() ) )
   {
-    switch ( static_cast<Column>( index.column() ) )
+    case Column::Name:
     {
-      case Column::Name:
-        return node->name();
-      case Column::Value:
-        return node->value();
-      default:
-        break;
-    }
-  }
-
-  if ( role == Qt::FontRole && col == Column::Value )
-  {
-    if ( !node->exists() )
-    {
-      QFont font;
-      font.setItalic( true );
-      return font;
-    }
-  }
-
-  if ( role == Qt::BackgroundRole && col == Column::Value )
-  {
-    if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
-    {
-      switch ( node->setting()->settingsType() )
+      if ( role == Qt::DisplayRole || role == Qt::EditRole )
       {
-        case Qgis::SettingsType::Custom:
-        case Qgis::SettingsType::Variant:
-        case Qgis::SettingsType::String:
-        case Qgis::SettingsType::StringList:
-        case Qgis::SettingsType::VariantMap:
-        case Qgis::SettingsType::Bool:
-        case Qgis::SettingsType::Integer:
-        case Qgis::SettingsType::Double:
-        case Qgis::SettingsType::EnumFlag:
-          break;
-
-        case Qgis::SettingsType::Color:
-          return node->value();
+        return node->name();
       }
+      break;
     }
+
+    case Column::Value:
+    {
+      if ( role == Qt::DisplayRole || role == Qt::EditRole )
+      {
+        return node->value();
+      }
+      if ( role == Qt::FontRole )
+      {
+        if ( !node->exists() )
+        {
+          QFont font;
+          font.setItalic( true );
+          return font;
+        }
+      }
+      if ( role == Qt::BackgroundRole )
+      {
+        if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
+        {
+          switch ( node->setting()->settingsType() )
+          {
+            case Qgis::SettingsType::Custom:
+            case Qgis::SettingsType::Variant:
+            case Qgis::SettingsType::String:
+            case Qgis::SettingsType::StringList:
+            case Qgis::SettingsType::VariantMap:
+            case Qgis::SettingsType::Bool:
+            case Qgis::SettingsType::Integer:
+            case Qgis::SettingsType::Double:
+            case Qgis::SettingsType::EnumFlag:
+              break;
+
+            case Qgis::SettingsType::Color:
+              return node->value();
+          }
+        }
+      }
+      break;
+    }
+
+    case Column::Description:
+    {
+      if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
+      {
+        if ( role == Qt::DisplayRole || role == Qt::EditRole )
+        {
+          return node->setting()->description();
+        }
+      }
+      break;
+    }
+
+    default:
+      break;
   }
 
   return QVariant();
