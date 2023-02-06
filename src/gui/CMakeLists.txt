@@ -438,6 +438,7 @@ set(QGIS_GUI_SRCS
   sensor/qgssensorguiregistry.cpp
   sensor/qgssensorwidget.cpp
 
+  settings/qgssettingseditor.cpp
   settings/qgssettingsregistrygui.cpp
   settings/qgssettingstreemodel.cpp
 
@@ -1426,10 +1427,9 @@ set(QGIS_GUI_HDRS
   symbology/qgssymbolwidgetcontext.h
   symbology/qgsvectorfieldsymbollayerwidget.h
 
-  sensor/qgssensorguiregistry.h
-  sensor/qgssensorwidget.h
-
+(??)
   settings/qgssettingsregistrygui.h
+  settings/qgssettingstreemodel.h
 
   tableeditor/qgstableeditordialog.h
   tableeditor/qgstableeditorformattingwidget.h

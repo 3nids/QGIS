@@ -273,3 +273,18 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
 }
 
 
+
+QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QObject *parent )
+{
+
+}
+
+QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const
+{
+
+}
+
+void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const
+{
+
+}

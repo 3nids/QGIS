@@ -20,6 +20,7 @@
 #include "qgis_gui.h"
 
 #include <QAbstractItemModel>
+#include <QItemDelegate>
 
 class QgsSettingsEntryBase;
 class QgsSettingsTreeNode;
@@ -101,6 +102,25 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
 ///@endcond
 
 #endif
+
+/**
+ * \ingroup gui
+ * \class QgsSettingsTreeItemDelegate
+ * \brief QgsSettingsTreeItemDelegate allows editing the settings in the settings tree
+ *
+ * \since QGIS 3.32
+ */
+class GUI_EXPORT QgsSettingsTreeItemDelegate : public QItemDelegate
+{
+    Q_OBJECT
+
+  public:
+    explicit QgsSettingsTreeItemDelegate( QObject *parent = nullptr );
+
+    QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
+    void setEditorData( QWidget *editor, const QModelIndex &index ) const override;
+    void setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const override;
+};
 
 
 
