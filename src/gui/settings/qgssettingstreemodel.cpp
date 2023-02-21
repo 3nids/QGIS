@@ -40,7 +40,7 @@ void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *no
   nodeData->mNamedParentNodes = mNamedParentNodes;
   nodeData->mName = node->key();
   nodeData->mTreeNode = node;
-  if ( node->type() == QgsSettingsTreeNode::Type::NamedList )
+  if ( node->type() == QgsSettingsTreeNode::Qgis::SettingsTreeNodeType::NamedList )
   {
     nodeData->mType = Type::NamedListTreeNode;
     const QgsSettingsTreeNamedListNode *nln = dynamic_cast<const QgsSettingsTreeNamedListNode *>( node );
@@ -280,6 +280,11 @@ QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QObject *parent )
 }
 
 QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const
+{
+
+}
+
+void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
 {
 
 }
