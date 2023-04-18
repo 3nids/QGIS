@@ -38,8 +38,8 @@
 **
 ****************************************************************************/
 
-#ifndef QGSSETTINGSTREEWIDGET_H
-#define QGSSETTINGSTREEWIDGET_H
+#ifndef QGSSETTINGSTREEWIDGETOLD_H
+#define QGSSETTINGSTREEWIDGETOLD_H
 
 #include <QIcon>
 #include <QTimer>
@@ -47,7 +47,7 @@
 
 class QgsSettings;
 
-class QgsSettingsTreeWidget : public QTreeWidget
+class QgsSettingsTreeWidgetOld : public QTreeWidget
 {
     Q_OBJECT
 
@@ -68,7 +68,7 @@ class QgsSettingsTreeWidget : public QTreeWidget
     };
     Q_ENUM( Type )
 
-    explicit QgsSettingsTreeWidget( QWidget *parent = nullptr );
+    explicit QgsSettingsTreeWidgetOld( QWidget *parent = nullptr );
 
     void setSettingsObject( QgsSettings *mSettings );
     QSize sizeHint() const override;

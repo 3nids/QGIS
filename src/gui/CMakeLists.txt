@@ -441,6 +441,7 @@ set(QGIS_GUI_SRCS
   settings/qgssettingseditor.cpp
   settings/qgssettingsregistrygui.cpp
   settings/qgssettingstreemodel.cpp
+  settings/qgssettingstreewidget.cpp
 
   tableeditor/qgstableeditordialog.cpp
   tableeditor/qgstableeditorformattingwidget.cpp
@@ -1432,6 +1433,7 @@ set(QGIS_GUI_HDRS
 
   settings/qgssettingsregistrygui.h
   settings/qgssettingstreemodel.h
+  settings/qgssettingstreewidget.h
 
   tableeditor/qgstableeditordialog.h
   tableeditor/qgstableeditorformattingwidget.h

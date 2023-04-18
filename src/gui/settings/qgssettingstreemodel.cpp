@@ -273,6 +273,25 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
 }
 
 
+QVariant QgsSettingsTreeModel::headerData( int section, Qt::Orientation orientation, int role ) const
+{
+  if ( orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole )
+  {
+    switch ( static_cast<Column>( section ) )
+    {
+      case Column::Name:
+        return tr( "Name" );
+      case Column::Value:
+        return tr( "Value" );
+      case Column::Description:
+        return tr( "Description" );
+    };
+  }
+
+  return QVariant();
+}
+
+
 
 QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QObject *parent )
 {
@@ -293,3 +312,5 @@ void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemMo
 {
 
 }
+
+

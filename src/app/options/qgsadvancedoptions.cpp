@@ -14,8 +14,8 @@
  ***************************************************************************/
 
 #include "qgsadvancedoptions.h"
+#include "qgssettingstreewidget.h"
 #include "qgsapplication.h"
-#include "qgssettings.h"
 #include "qgis.h"
 
 //

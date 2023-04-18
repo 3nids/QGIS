@@ -1167,7 +1167,7 @@ QgsOptions::QgsOptions( QWidget *parent, Qt::WindowFlags fl, const QList<QgsOpti
 
     if ( QgsAdvancedSettingsWidget *advancedPage = qobject_cast< QgsAdvancedSettingsWidget * >( page ) )
     {
-      advancedPage->settingsTree()->setSettingsObject( mSettings );
+      //advancedPage->settingsTree()->setSettingsObject( mSettings );
     }
   }
 
