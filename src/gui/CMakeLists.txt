@@ -1427,7 +1427,9 @@ set(QGIS_GUI_HDRS
   symbology/qgssymbolwidgetcontext.h
   symbology/qgsvectorfieldsymbollayerwidget.h
 
-(??)
+  sensor/qgssensorguiregistry.h
+  sensor/qgssensorwidget.h
+
   settings/qgssettingsregistrygui.h
   settings/qgssettingstreemodel.h
 
