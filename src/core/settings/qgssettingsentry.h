@@ -28,6 +28,9 @@
 class QgsSettingsTreeNode;
 
 
+static const inline QMetaEnum sSettingsTypeMetaEnum = QMetaEnum::fromType<Qgis::SettingsType>() SIP_SKIP;
+
+
 /**
  * \ingroup core
  * \class QgsSettingsEntryBase
@@ -117,6 +120,13 @@ class CORE_EXPORT QgsSettingsEntryBase
      * Destructor for QgsSettingsEntryBase.
      */
     virtual ~QgsSettingsEntryBase();
+
+    /**
+     * Returns the id of the type of settings
+     * This can be re-implemented in a custom implementation of a setting
+     * \since QGIS 3.32
+     */
+    virtual QString id() const;
 
     /**
      * Returns the name of the settings

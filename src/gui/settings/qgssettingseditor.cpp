@@ -22,57 +22,62 @@
 #include <QLineEdit>
 
 
-QgsSettingsEditor::QgsSettingsEditor(const QgsSettingsEntryBase* setting, const QStringList &dynamicKeyPartList)
-  : mDynamicKeyPartList(dynamicKeyPartList)
+QgsSettingsEditor::QgsSettingsEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
+  : mDynamicKeyPartList( dynamicKeyPartList )
 {
 }
 
 
 
-QgsSettingsEditorString::QgsSettingsEditorString(const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList )
-  : QgsSettingsEditor(setting, dynamicKeyPartList)
+QgsSettingsEditorString::QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList )
+  : QgsSettingsEditor( setting, dynamicKeyPartList )
 {}
 
-bool QgsSettingsEditorString::setEditor(QWidget *editor)
+QString QgsSettingsEditorString::id() const
 {
-  if (QLineEdit* le = qobject_cast<QLineEdit*>(editor))
-   {
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
+}
+
+bool QgsSettingsEditorString::setEditor( QWidget *editor )
+{
+  if ( QLineEdit *le = qobject_cast<QLineEdit *>( editor ) )
+  {
     mLineEditEditor = le;
     return true;
   }
   return false;
 }
 
-QWidget *QgsSettingsEditorString::createEditor(QWidget* parent) const
+QWidget *QgsSettingsEditorString::createEditor( QWidget *parent ) const
 {
-  QLineEdit* editor = new QLineEdit(parent);
+  QLineEdit *editor = new QLineEdit( parent );
   return editor;
 }
 
 bool QgsSettingsEditorString::setWidgetFromSetting() const
 {
-  if (mLineEditEditor)
+  if ( mLineEditEditor )
   {
-    mLineEditEditor->setText(mSetting->value(mDynamicKeyPartList));
+    mLineEditEditor->setText( mSetting->value( mDynamicKeyPartList ) );
     return true;
   }
   else
   {
-    QgsDebugMsg(QStringLiteral("Settings editor not set for %1").arg(mSetting->definitionKey()));
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
   }
   return false;
 }
 
 bool QgsSettingsEditorString::setSettingFromWidget() const
 {
-  if (mLineEditEditor)
+  if ( mLineEditEditor )
   {
-   mSetting->setValue(mLineEditEditor->text(), mDynamicKeyPartList);
-   return true;
+    mSetting->setValue( mLineEditEditor->text(), mDynamicKeyPartList );
+    return true;
   }
   else
   {
-    QgsDebugMsg(QStringLiteral("Settings editor not set for %1").arg(mSetting->definitionKey()));
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
   }
   return false;
 }

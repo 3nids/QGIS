@@ -12,6 +12,8 @@
 
 
 
+
+
 class QgsSettingsEntryBase
 {
 %Docstring(signature="appended")
@@ -92,6 +94,14 @@ Constructor for QgsSettingsEntryBase.
 %End
 
     virtual ~QgsSettingsEntryBase();
+
+    virtual QString id() const;
+%Docstring
+Returns the id of the type of settings
+This can be re-implemented in a custom implementation of a setting
+
+.. versionadded:: 3.32
+%End
 
     QString name() const;
 %Docstring

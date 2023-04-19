@@ -29,40 +29,44 @@ class QgsSettingsEntryString;
 
 class GUI_EXPORT QgsSettingsEditor
 {
-public:
-  QgsSettingsEditor(const QgsSettingsEntryBase* setting, const QStringList &dynamicKeyPartList = QStringList());
+  public:
+    QgsSettingsEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
-  virtual ~QgsSettingsEditor() = default;
+    virtual ~QgsSettingsEditor() = default;
 
-  virtual bool setEditor(QWidget *editor) = 0;
+    virtual QString id() const = 0;
 
-  virtual QWidget* createEditor(QWidget *parent = nullptr) const = 0;
+    virtual bool setEditor( QWidget *editor ) = 0;
 
-  virtual bool setWidgetFromSetting(  ) const = 0;
+    virtual QWidget *createEditor( QWidget *parent = nullptr ) const = 0;
 
-  virtual bool setSettingFromWidget(  ) const = 0;
+    virtual bool setWidgetFromSetting( ) const = 0;
 
-protected:
-  QStringList mDynamicKeyPartList;
+    virtual bool setSettingFromWidget( ) const = 0;
+
+  protected:
+    QStringList mDynamicKeyPartList;
 };
 
 
 class GUI_EXPORT QgsSettingsEditorString : public QgsSettingsEditor
 {
-public:
-  QgsSettingsEditorString(const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList = QStringList());
+  public:
+    QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
-  bool setEditor(QWidget *editor) override;
+    QString id() const override;
 
-  QWidget* createEditor(QWidget *parent = nullptr) const override;
+    bool setEditor( QWidget *editor ) override;
 
-  bool setWidgetFromSetting(  ) const override;
+    QWidget *createEditor( QWidget *parent = nullptr ) const override;
 
-  bool setSettingFromWidget(  ) const override;
+    bool setWidgetFromSetting( ) const override;
 
-private:
-  const QgsSettingsEntryString* mSetting = nullptr;
-  QLineEdit* mLineEditEditor = nullptr;
+    bool setSettingFromWidget( ) const override;
+
+  private:
+    const QgsSettingsEntryString *mSetting = nullptr;
+    QLineEdit *mLineEditEditor = nullptr;
 };
 
 

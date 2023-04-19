@@ -43,6 +43,11 @@ QgsSettingsEntryBase::~QgsSettingsEntryBase()
     mParentTreeElement->unregisterChildSetting( this );
 }
 
+QString QgsSettingsEntryBase::id() const
+{
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( settingsType() ) ) );
+}
+
 
 QString QgsSettingsEntryBase::key( const QString &dynamicKeyPart ) const
 {

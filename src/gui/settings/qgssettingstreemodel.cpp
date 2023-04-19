@@ -296,14 +296,24 @@ QVariant QgsSettingsTreeModel::headerData( int section, Qt::Orientation orientat
 
 
 
-QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QObject *parent )
+QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent )
+  : QItemDelegate( parent )
+  , mModel( model )
 {
 
 }
 
 QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const
 {
-
+  if ( static_cast<QgsSettingsTreeModel::Column>( index.column() ) == QgsSettingsTreeModel::Column::Value )
+  {
+    QgsSettingsTreeNodeData *nodeData = mModel->index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    {
+      const QgsSettingsEntryBase *setting = nodeData->setting();
+    }
+  }
+  return nullptr;
 }
 
 void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const

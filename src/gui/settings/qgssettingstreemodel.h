@@ -24,6 +24,7 @@
 
 class QgsSettingsEntryBase;
 class QgsSettingsTreeNode;
+class QgsSettingsTreeModel;
 class QgsSettingsTreeNamedListNode;
 
 #ifndef SIP_RUN
@@ -115,11 +116,14 @@ class GUI_EXPORT QgsSettingsTreeItemDelegate : public QItemDelegate
     Q_OBJECT
 
   public:
-    explicit QgsSettingsTreeItemDelegate( QObject *parent = nullptr );
+    explicit QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent = nullptr );
 
     QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
     void setEditorData( QWidget *editor, const QModelIndex &index ) const override;
     void setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const override;
+
+  private:
+    QgsSettingsTreeModel *mModel = nullptr;
 };
 
 
