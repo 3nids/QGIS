@@ -91,8 +91,11 @@ void QgsSettingsTreeNodeData::addChildForSetting( const QgsSettingsEntryBase *se
       QgsDebugMsg( QString( "getting %1 with %2" ).arg( setting->definitionKey(), mNamedParentNodes.at( 0 ), mNamedParentNodes.at( 1 ) ) );
       break;
     case 0:
-    default:
       QgsDebugMsg( QString( "getting %1" ).arg( setting->definitionKey() ) );
+      break;
+    default:
+      Q_ASSERT( false );
+      QgsDebugMsg( QString( "Not handling that many named parent nodes for %1" ).arg( setting->definitionKey() ) );
       break;
   }
 

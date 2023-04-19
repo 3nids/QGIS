@@ -15,25 +15,40 @@
 
 #include "qgsadvancedoptions.h"
 #include "qgssettingstreewidget.h"
+#include "qgssettingstreewidgetold.h"
 #include "qgsapplication.h"
 #include "qgis.h"
 
 //
 // QgsAdvancedSettingsWidget
 //
+const QgsSettingsEntryBool *QgsAdvancedSettingsWidget::settingsUseNewTreeWidget = new QgsSettingsEntryBool( QStringLiteral( "use-new-widget" ), sTreeSettings, true, QStringLiteral( "Use new settings widget" ) );
+const QgsSettingsEntryBool *QgsAdvancedSettingsWidget::settingsShowWarning = new QgsSettingsEntryBool( QStringLiteral( "show-warning" ), sTreeSettings, true, QStringLiteral( "Show warning before opening the settings tree" ) );
+
 
 QgsAdvancedSettingsWidget::QgsAdvancedSettingsWidget( QWidget *parent )
   : QgsOptionsPageWidget( parent )
 {
   setupUi( this );
 
+  mUseNewSettingsTree->setChecked( settingsUseNewTreeWidget->value() );
+
   layout()->setContentsMargins( 0, 0, 0, 0 );
 
-  connect( mAdvancedSettingsEnableButton, &QPushButton::clicked, this, [ = ]
+  if ( !settingsShowWarning->value() )
   {
-    mAdvancedSettingsEditor->show();
     mAdvancedSettingsWarning->hide();
-  } );
+    mGroupBox->layout()->addWidget( createSettingsTreeWidget() );
+  }
+  else
+  {
+    connect( mAdvancedSettingsEnableButton, &QPushButton::clicked, this, [ = ]
+    {
+      settingsUseNewTreeWidget->setValue( mUseNewSettingsTree->isChecked() );
+      mAdvancedSettingsWarning->hide();
+      mGroupBox->layout()->addWidget( createSettingsTreeWidget() );
+    } );
+  }
 }
 
 QgsAdvancedSettingsWidget::~QgsAdvancedSettingsWidget()
@@ -42,12 +57,20 @@ QgsAdvancedSettingsWidget::~QgsAdvancedSettingsWidget()
 
 void QgsAdvancedSettingsWidget::apply()
 {
-// nothing to do -- mAdvancedSettingsEditor applies changes immediately
+  // nothing to do -- mAdvancedSettingsEditor applies changes immediately
 }
 
-QgsSettingsTreeWidget *QgsAdvancedSettingsWidget::settingsTree()
+QWidget *QgsAdvancedSettingsWidget::createSettingsTreeWidget()
 {
-  return mAdvancedSettingsEditor;
+  if ( settingsUseNewTreeWidget->value() )
+  {
+    return new QgsSettingsTreeWidget( this );
+  }
+  else
+  {
+    return new QgsSettingsTreeWidgetOld( this );
+  }
+
 }
 
 //

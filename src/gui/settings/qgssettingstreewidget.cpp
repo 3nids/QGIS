@@ -23,14 +23,21 @@
 #include <QVBoxLayout>
 
 
-QgsSettingsTreeWidget::QgsSettingsTreeWidget( QObject *parent )
+QgsSettingsTreeWidget::QgsSettingsTreeWidget( QWidget *parent )
+  : QWidget( parent )
 {
-  QVBoxLayout *mainLayout = new QVBoxLayout();
+  QVBoxLayout *mainLayout = new QVBoxLayout( this );
+  mainLayout->setContentsMargins( 0, 0, 0, 0 );
 
   mTreeModel = new QgsSettingsTreeModel( QgsSettingsTree::treeRoot() );
+
   mTreeView = new QTreeView( this );
   mTreeView->setModel( mTreeModel );
   mTreeView->setItemDelegate( new QgsSettingsTreeItemDelegate( this ) );
+  mTreeView->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
+  mTreeView->setMinimumWidth( 400 );
+  mTreeView->resizeColumnToContents( 0 );
+
   mainLayout->addWidget( mTreeView );
 }
 

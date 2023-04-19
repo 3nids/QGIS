@@ -79,25 +79,6 @@ QgsSettingsTreeWidgetOld::QgsSettingsTreeWidgetOld( QWidget *parent )
   mContextMenu = new QMenu( this );
 }
 
-void QgsSettingsTreeWidgetOld::setSettingsObject( QgsSettings *settings )
-{
-  mSettings = settings;
-  clear();
-
-  if ( mSettings )
-  {
-    mSettings->setParent( this );
-    if ( isVisible() )
-      refresh();
-    if ( mAutoRefresh )
-      mRefreshTimer.start();
-  }
-  else
-  {
-    mRefreshTimer.stop();
-  }
-}
-
 QSize QgsSettingsTreeWidgetOld::sizeHint() const
 {
   return QSize( 800, 600 );
@@ -109,8 +90,7 @@ void QgsSettingsTreeWidgetOld::setAutoRefresh( bool autoRefresh )
   if ( mAutoRefresh )
   {
     maybeRefresh();
-    if ( mSettings )
-      mRefreshTimer.start();
+    mRefreshTimer.start();
   }
   else
   {
@@ -126,21 +106,18 @@ void QgsSettingsTreeWidgetOld::maybeRefresh()
 
 void QgsSettingsTreeWidgetOld::refresh()
 {
-  if ( !mSettings )
-    return;
-
   disconnect( this, &QTreeWidget::itemChanged,
               this, &QgsSettingsTreeWidgetOld::updateSetting );
 
-  mSettings->sync();
+  mSettings.sync();
 
   // add any settings not in QgsSettings object, so it will show up in the tree view
   QMap<QString, QStringList>::const_iterator it = mSettingsMap.constBegin();
   while ( it != mSettingsMap.constEnd() )
   {
-    if ( ! mSettings->contains( it.key() ) )
+    if ( ! mSettings.contains( it.key() ) )
     {
-      mSettings->setValue( it.key(), it.value().at( 3 ) );
+      mSettings.setValue( it.key(), it.value().at( 3 ) );
     }
     ++it;
   }
@@ -173,7 +150,7 @@ void QgsSettingsTreeWidgetOld::updateSetting( QTreeWidgetItem *item )
   if ( key.isNull() )
     return;
 
-  mSettings->setValue( key, item->data( ColumnValue, Qt::UserRole ) );
+  mSettings.setValue( key, item->data( ColumnValue, Qt::UserRole ) );
   if ( mAutoRefresh )
     refresh();
 }
@@ -202,7 +179,7 @@ void QgsSettingsTreeWidgetOld::showContextMenu( QPoint pos )
           return;
 
 
-        mSettings->remove( itemPath );
+        mSettings.remove( itemPath );
         refresh();
 
       } );
@@ -220,7 +197,7 @@ void QgsSettingsTreeWidgetOld::showContextMenu( QPoint pos )
                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) != QMessageBox::Yes )
           return;
 
-        mSettings->remove( itemPath );
+        mSettings.remove( itemPath );
         refresh();
       } );
 
@@ -237,7 +214,7 @@ void QgsSettingsTreeWidgetOld::updateChildItems( QTreeWidgetItem *parent )
 {
   int dividerIndex = 0;
 
-  const auto constChildGroups = mSettings->childGroups();
+  const auto constChildGroups = mSettings.childGroups();
   for ( const QString &group : constChildGroups )
   {
     QTreeWidgetItem *child = nullptr;
@@ -257,12 +234,12 @@ void QgsSettingsTreeWidgetOld::updateChildItems( QTreeWidgetItem *parent )
     child->setIcon( ColumnSettings, mGroupIcon );
     ++dividerIndex;
 
-    mSettings->beginGroup( group );
+    mSettings.beginGroup( group );
     updateChildItems( child );
-    mSettings->endGroup();
+    mSettings.endGroup();
   }
 
-  const auto constChildKeys = mSettings->childKeys();
+  const auto constChildKeys = mSettings.childKeys();
   for ( const QString &key : constChildKeys )
   {
     QTreeWidgetItem *child = nullptr;
@@ -289,7 +266,7 @@ void QgsSettingsTreeWidgetOld::updateChildItems( QTreeWidgetItem *parent )
       child = childAt( parent, childIndex );
     }
 
-    const QVariant value = mSettings->value( key );
+    const QVariant value = mSettings.value( key );
     if ( value.type() == QVariant::Invalid )
     {
       child->setText( ColumnType, QStringLiteral( "Invalid" ) );
@@ -325,7 +302,7 @@ QTreeWidgetItem *QgsSettingsTreeWidgetOld::createItem( const QString &text,
 
   item->setData( ColumnSettings, TypeRole, isGroup ? Group : Setting );
 
-  const QString completeSettingsPath = mSettings->group().isEmpty() ? text : mSettings->group() + '/' + text;
+  const QString completeSettingsPath = mSettings.group().isEmpty() ? text : mSettings.group() + '/' + text;
   item->setData( ColumnSettings, PathRole, completeSettingsPath );
 
   const QString key = itemKey( item );
@@ -376,7 +353,7 @@ int QgsSettingsTreeWidgetOld::childCount( QTreeWidgetItem *parent )
 }
 
 int QgsSettingsTreeWidgetOld::findChild( QTreeWidgetItem *parent, const QString &text,
-                                      int startIndex )
+    int startIndex )
 {
   for ( int i = startIndex; i < childCount( parent ); ++i )
   {

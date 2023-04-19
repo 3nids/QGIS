@@ -41,11 +41,11 @@
 #ifndef QGSSETTINGSTREEWIDGETOLD_H
 #define QGSSETTINGSTREEWIDGETOLD_H
 
+#include "qgssettings.h"
 #include <QIcon>
 #include <QTimer>
 #include <QTreeWidget>
 
-class QgsSettings;
 
 class QgsSettingsTreeWidgetOld : public QTreeWidget
 {
@@ -70,7 +70,6 @@ class QgsSettingsTreeWidgetOld : public QTreeWidget
 
     explicit QgsSettingsTreeWidgetOld( QWidget *parent = nullptr );
 
-    void setSettingsObject( QgsSettings *mSettings );
     QSize sizeHint() const override;
 
     void setSettingsMap( QMap< QString, QStringList > &map ) { mSettingsMap = map; }
@@ -107,7 +106,7 @@ class QgsSettingsTreeWidgetOld : public QTreeWidget
     int findChild( QTreeWidgetItem *parent, const QString &text, int startIndex );
     void moveItemForward( QTreeWidgetItem *parent, int oldIndex, int newIndex );
 
-    QgsSettings *mSettings = nullptr;
+    QgsSettings mSettings;
     QTimer mRefreshTimer;
     bool mAutoRefresh = false;
     QIcon mGroupIcon;

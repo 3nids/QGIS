@@ -35,7 +35,7 @@ class GUI_EXPORT QgsSettingsTreeWidget : public QWidget
 {
 
   public:
-    explicit QgsSettingsTreeWidget( QObject *parent = nullptr );
+    explicit QgsSettingsTreeWidget( QWidget *parent = nullptr );
 
   private:
     QgsSettingsTreeModel *mTreeModel = nullptr;
