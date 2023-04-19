@@ -21,7 +21,7 @@
 #include "qgis_gui.h"
 #include "qgis_sip.h"
 
-class QgsSettingsEditor;
+class QgsSettingsEditorFactory;
 
 /**
  * \ingroup gui
@@ -40,17 +40,17 @@ class GUI_EXPORT QgsSettingsEditorRegistry
      * Adds a editor to the registry
      * Returns FALSE if a editor with same id already exists.
      */
-    bool addEditor( QgsSettingsEditor *editor SIP_TRANSFER );
+    bool addEditor( QgsSettingsEditorFactory *editor SIP_TRANSFER );
 
     //! Returns a new instance of the editor for the given id
-    QgsSettingsEditor *editor( const QString &id ) SIP_FACTORY;
+    QgsSettingsEditorFactory *editor( const QString &id ) SIP_FACTORY;
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;
 
 
   private:
-    QMap<QString, QgsSettingsEditor *> mEditors;
+    QMap<QString, QgsSettingsEditorFactory *> mEditors;
 };
 
 #endif // QGSSETTINGSEDITORREGISTRY_H

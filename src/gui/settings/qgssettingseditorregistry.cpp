@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgssettingseditor.h"
+#include "qgssettingseditorfactory.h"
 #include "qgssettingseditorregistry.h"
 
 
@@ -27,7 +27,7 @@ QgsSettingsEditorRegistry::~QgsSettingsEditorRegistry()
   qDeleteAll( mEditors );
 }
 
-bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditor *editor )
+bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditorFactory *editor )
 {
   if ( mEditors.contains( editor->id() ) )
     return false;
@@ -36,23 +36,23 @@ bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditor *editor )
   return true;
 }
 
-QgsSettingsEditor *QgsSettingsEditorRegistry::editor( const QString &id )
+QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QString &id )
 {
-  QgsSettingsEditor *editor = mEditors.value( id, new QgsSettingsEditorString() );
+  QgsSettingsEditorFactory *editor = mEditors.value( id, new QgsSettingsEditorString() );
   return editor->clone();
 }
 
 QMap<QString, QString> QgsSettingsEditorRegistry::editorNames() const
 {
   QMap<QString, QString> editors;
-  for ( const QgsSettingsEditor *editor : std::as_const( mEditors ) )
+  for ( const QgsSettingsEditorFactory *editor : std::as_const( mEditors ) )
     editors.insert( editor->name(), editor->id() );
   return editors;
 }
 
 QIcon QgsSettingsEditorRegistry::icon( const QString &id ) const
 {
-  QgsSettingsEditor *editor = mEditors.value( id, nullptr );
+  QgsSettingsEditorFactory *editor = mEditors.value( id, nullptr );
   if ( editor )
     return editor->icon();
   else

@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditor.cpp
+  qgssettingseditorfactory.cpp
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 
-#include "qgssettingseditor.h"
+#include "qgssettingseditorfactory.h"
 #include "qgslogger.h"
 #include "qgssettingsentry.h"
 #include "qgssettingsentryimpl.h"
@@ -22,7 +22,7 @@
 #include <QLineEdit>
 
 
-QgsSettingsEditor::QgsSettingsEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
+QgsSettingsEditorFactory::QgsSettingsEditorFactory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
   : mDynamicKeyPartList( dynamicKeyPartList )
 {
 }
@@ -30,7 +30,7 @@ QgsSettingsEditor::QgsSettingsEditor( const QgsSettingsEntryBase *setting, const
 
 
 QgsSettingsEditorString::QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList )
-  : QgsSettingsEditor( setting, dynamicKeyPartList )
+  : QgsSettingsEditorFactory( setting, dynamicKeyPartList )
 {}
 
 QString QgsSettingsEditorString::id() const

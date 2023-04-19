@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditor.h
+  qgssettingseditorfactory.h
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -27,12 +27,12 @@ class QgsSettingsEntryInteger;
 class QgsSettingsEntryString;
 
 
-class GUI_EXPORT QgsSettingsEditor
+class GUI_EXPORT QgsSettingsEditorFactory
 {
   public:
-    QgsSettingsEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
+    QgsSettingsEditorFactory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
-    virtual ~QgsSettingsEditor() = default;
+    virtual ~QgsSettingsEditorFactory() = default;
 
     virtual QString id() const = 0;
 
@@ -49,7 +49,7 @@ class GUI_EXPORT QgsSettingsEditor
 };
 
 
-class GUI_EXPORT QgsSettingsEditorString : public QgsSettingsEditor
+class GUI_EXPORT QgsSettingsEditorString : public QgsSettingsEditorFactory
 {
   public:
     QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList = QStringList() );
