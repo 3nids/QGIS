@@ -22,39 +22,40 @@
 #include <QLineEdit>
 
 
-QgsSettingsEditorFactory::QgsSettingsEditorFactory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
-  : mDynamicKeyPartList( dynamicKeyPartList )
+QgsSettingsEditorFactory::QgsSettingsEditorFactory( )
 {
 }
 
 
 
-QgsSettingsEditorString::QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList )
-  : QgsSettingsEditorFactory( setting, dynamicKeyPartList )
+QgsSettingsEditorStringFactory::QgsSettingsEditorStringFactory( )
+  : QgsSettingsEditorFactory( )
 {}
 
-QString QgsSettingsEditorString::id() const
+QString QgsSettingsEditorStringFactory::id() const
 {
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-bool QgsSettingsEditorString::setEditor( QWidget *editor )
+QWidget *QgsSettingsEditorStringFactory::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
+{
+  QLineEdit *editor = new QLineEdit( parent );
+  configureEditor( editor, setting, dynamicKeyPartList );
+  return editor;
+}
+
+bool QgsSettingsEditorStringFactory::configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const
 {
   if ( QLineEdit *le = qobject_cast<QLineEdit *>( editor ) )
   {
-    mLineEditEditor = le;
+    editor->setProperty( "setting", QVariant::fromValue( setting ) );
+    editor->setProperty( "dynamic-key-part-list", dynamicKeyPartList );
     return true;
   }
   return false;
 }
 
-QWidget *QgsSettingsEditorString::createEditor( QWidget *parent ) const
-{
-  QLineEdit *editor = new QLineEdit( parent );
-  return editor;
-}
-
-bool QgsSettingsEditorString::setWidgetFromSetting() const
+bool QgsSettingsEditorStringFactory::setWidgetFromSetting() const
 {
   if ( mLineEditEditor )
   {
@@ -68,7 +69,7 @@ bool QgsSettingsEditorString::setWidgetFromSetting() const
   return false;
 }
 
-bool QgsSettingsEditorString::setSettingFromWidget() const
+bool QgsSettingsEditorStringFactory::setSettingFromWidget() const
 {
   if ( mLineEditEditor )
   {

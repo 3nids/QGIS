@@ -13,7 +13,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "qgslogger.h"
 #include "qgssettingseditorfactory.h"
+
 #include "qgssettingseditorregistry.h"
 
 
@@ -38,23 +40,15 @@ bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditorFactory *editor )
 
 QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QString &id )
 {
-  QgsSettingsEditorFactory *editor = mEditors.value( id, new QgsSettingsEditorString() );
-  return editor->clone();
-}
-
-QMap<QString, QString> QgsSettingsEditorRegistry::editorNames() const
-{
-  QMap<QString, QString> editors;
-  for ( const QgsSettingsEditorFactory *editor : std::as_const( mEditors ) )
-    editors.insert( editor->name(), editor->id() );
-  return editors;
-}
-
-QIcon QgsSettingsEditorRegistry::icon( const QString &id ) const
-{
-  QgsSettingsEditorFactory *editor = mEditors.value( id, nullptr );
+  QgsSettingsEditorFactory *editor = mEditors.value( id );
   if ( editor )
-    return editor->icon();
+  {
+    return editor;
+  }
   else
-    return QIcon();
+  {
+    QgsDebugMsg( QStringLiteral( "Setting editor was not found for '%1', returning the default string editor" ) );
+    return new QgsSettingsEditorStringFactory();
+  }
 }
+

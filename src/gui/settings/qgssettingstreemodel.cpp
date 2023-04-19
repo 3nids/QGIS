@@ -18,6 +18,9 @@
 #include "qgssettingstreemodel.h"
 #include "qgssettingsentry.h"
 #include "qgssettingstreenode.h"
+#include "qgssettingseditorfactory.h"
+#include "qgssettingseditorregistry.h"
+#include "qgsgui.h"
 #include "qgslogger.h"
 
 
@@ -310,7 +313,8 @@ QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyl
     QgsSettingsTreeNodeData *nodeData = mModel->index2node( index );
     if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
     {
-      const QgsSettingsEntryBase *setting = nodeData->setting();
+      QgsSettingsEditorFactory *factory = QgsGui::settingsEditorRegistry()->editor( nodeData->setting()->id() );
+      return factory->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
     }
   }
   return nullptr;

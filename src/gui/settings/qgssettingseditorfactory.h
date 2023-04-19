@@ -26,47 +26,59 @@ class QgsSettingsEntryBase;
 class QgsSettingsEntryInteger;
 class QgsSettingsEntryString;
 
-
+/**
+ * \ingroup gui
+ * \brief Base class for settings editor factories
+ *
+ * \since QGIS 3.32
+ */
 class GUI_EXPORT QgsSettingsEditorFactory
 {
   public:
-    QgsSettingsEditorFactory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
+    //! Constructor
+    QgsSettingsEditorFactory();
 
     virtual ~QgsSettingsEditorFactory() = default;
 
+    /**
+     * This id of the type of settings it handles
+     * \note This mostly correspond to the content of Qgis::SettingsType but it's a string since custom Python implementation are possible.
+     */
     virtual QString id() const = 0;
 
-    virtual bool setEditor( QWidget *editor ) = 0;
+//! Creates the editor for the given widget
+    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) const = 0;
 
-    virtual QWidget *createEditor( QWidget *parent = nullptr ) const = 0;
+    //! Configures the \a editor according the setting
+    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const;
 
     virtual bool setWidgetFromSetting( ) const = 0;
 
     virtual bool setSettingFromWidget( ) const = 0;
 
-  protected:
-    QStringList mDynamicKeyPartList;
 };
 
 
-class GUI_EXPORT QgsSettingsEditorString : public QgsSettingsEditorFactory
+/**
+ * \ingroup gui
+ * \brief This class is a factory of editor for string settings
+ *
+ * \since QGIS 3.32
+ */
+class GUI_EXPORT QgsSettingsEditorStringFactory : public QgsSettingsEditorFactory
 {
   public:
-    QgsSettingsEditorString( const QgsSettingsEntryString *setting, const QStringList &dynamicKeyPartList = QStringList() );
+    QgsSettingsEditorStringFactory( );
 
     QString id() const override;
 
-    bool setEditor( QWidget *editor ) override;
+    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) const override;
 
-    QWidget *createEditor( QWidget *parent = nullptr ) const override;
+    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const override;
 
     bool setWidgetFromSetting( ) const override;
 
     bool setSettingFromWidget( ) const override;
-
-  private:
-    const QgsSettingsEntryString *mSetting = nullptr;
-    QLineEdit *mLineEditEditor = nullptr;
 };
 
 
