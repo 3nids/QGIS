@@ -13,48 +13,48 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgssettingseditorfactoryregistry.h"
+#include "qgssettingseditorwidgetwrapperregistry.h"
 
 #include "qgslogger.h"
-#include "qgssettingseditorfactory.h"
+#include "qgssettingseditorwidgetwrapper.h"
 #include "qgssettingsentry.h"
 
-QgsSettingsEditorFactoryRegistry::QgsSettingsEditorFactoryRegistry()
+QgsSettingsEditorWidgetWrapperRegistry::QgsSettingsEditorWidgetWrapperRegistry()
 {
 
 }
 
-QgsSettingsEditorFactoryRegistry::~QgsSettingsEditorFactoryRegistry()
+QgsSettingsEditorWidgetWrapperRegistry::~QgsSettingsEditorWidgetWrapperRegistry()
 {
   qDeleteAll( mEditors );
 }
 
-bool QgsSettingsEditorFactoryRegistry::addFactory( QgsSettingsEditorFactory *factory )
+bool QgsSettingsEditorWidgetWrapperRegistry::addWrapper( QgsSettingsEditorWidgetWrapper *wrapper )
 {
-  if ( mEditors.contains( factory->id() ) )
+  if ( mEditors.contains( wrapper->id() ) )
     return false;
 
-  mEditors.insert( factory->id(), factory );
+  mEditors.insert( wrapper->id(), wrapper );
   return true;
 }
 
-QgsSettingsEditorFactory *QgsSettingsEditorFactoryRegistry::factory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const
+QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetWrapperRegistry::wrapper( const QString &id ) const
 {
-  QgsSettingsEditorFactory *factory = mEditors.value( setting->typeId() );
-  if ( factory )
+  QgsSettingsEditorWidgetWrapper *wrapper = mEditors.value( id );
+  if ( wrapper )
   {
-    return factory;
+    return wrapper;
   }
   else
   {
     QgsDebugMsg( QStringLiteral( "Setting factory was not found for '%1', returning the default string factory" ) );
-    return new QgsSettingsEditorStringFactory();
+    return new QgsSettingsStringEditorWidgetWrapper();
   }
 }
 
-QWidget *QgsSettingsEditorFactoryRegistry::createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList) const
+QWidget *QgsSettingsEditorWidgetWrapperRegistry::createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList) const
 {
-  return factory(setting,dynamicKeyPartList )->createEditor(setting,dynamicKeyPartList );
+  return wrapper(setting->typeId())->createEditor(setting,dynamicKeyPartList );
 }
 
 

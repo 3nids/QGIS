@@ -168,7 +168,7 @@ Returns the global history provider registry, used for tracking history provider
 .. versionadded:: 3.24
 %End
 
-    static QgsSettingsEditorRegistry *settingsEditorRegistry() /KeepReference/;
+    static QgsSettingsEditorWidgetRegistry *settingsEditorWidgetRegistry() /KeepReference/;
 %Docstring
 Returns the registry of settings editors.
 

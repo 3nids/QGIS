@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditorfactory.cpp
+  qgssettingseditorwidgetwrapper.cpp
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 
-#include "qgssettingseditorfactory.h"
+#include "qgssettingseditorwidgetwrapper.h"
 #include "qgslogger.h"
 #include "qgssettingsentry.h"
 #include "qgssettingsentryimpl.h"
@@ -22,38 +22,47 @@
 #include <QLineEdit>
 
 
-QgsSettingsEditorFactory::QgsSettingsEditorFactory( )
+QgsSettingsEditorWidgetWrapper::QgsSettingsEditorWidgetWrapper( )
 {
 }
 
-QgsSettingsEditorStringFactory::QgsSettingsEditorStringFactory( )
-  : QgsSettingsEditorFactory( )
+bool QgsSettingsEditorWidgetWrapper::configureEditor(QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList) const
+{
+  if( configureEditorImplementation(editor, setting))
+  {
+    EditorData* data = new EditorData(setting, dynamicKeyPartList, editor);
+    editor->setProperty( "SETTING-EDITOR-WIDGET-DATA", QVariant::fromValue( data ) );
+    return true;
+}
+  return false;
+}
+
+QgsSettingsStringEditorWidgetWrapper::QgsSettingsStringEditorWidgetWrapper( )
+  : QgsSettingsEditorWidgetWrapper( )
 {}
 
-QString QgsSettingsEditorStringFactory::id() const
+QString QgsSettingsStringEditorWidgetWrapper::id() const
 {
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-QWidget *QgsSettingsEditorStringFactory::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
+QWidget *QgsSettingsStringEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
 {
   QLineEdit *editor = new QLineEdit( parent );
   configureEditor( editor, setting, dynamicKeyPartList );
   return editor;
 }
 
-bool QgsSettingsEditorStringFactory::configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const
+bool QgsSettingsStringEditorWidgetWrapper::configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) const
 {
   if ( QLineEdit *le = qobject_cast<QLineEdit *>( editor ) )
   {
-    editor->setProperty( "SETTING", QVariant::fromValue( setting ) );
-    editor->setProperty( "DYNAMIC-KEY-PART-LIST", dynamicKeyPartList );
     return true;
   }
   return false;
 }
 
-//bool QgsSettingsEditorStringFactory::setWidgetFromSetting() const
+//bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
 //{
 //  if ( mLineEditEditor )
 //  {
@@ -67,7 +76,7 @@ bool QgsSettingsEditorStringFactory::configureEditor( QWidget *editor, const Qgs
 //  return false;
 //}
 
-//bool QgsSettingsEditorStringFactory::setSettingFromWidget() const
+//bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
 //{
 //  if ( mLineEditEditor )
 //  {

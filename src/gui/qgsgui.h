@@ -48,7 +48,7 @@ class QgsRelationWidgetRegistry;
 class QgsMapToolShapeRegistry;
 class QgsHistoryProviderRegistry;
 class QgsSensorGuiRegistry;
-class QgsSettingsEditorRegistry;
+class QgsSettingsEditorWidgetRegistry;
 
 /**
  * \ingroup gui
@@ -217,7 +217,7 @@ class GUI_EXPORT QgsGui : public QObject
      * Returns the registry of settings editors.
      * \since QGIS 3.32
      */
-    static QgsSettingsEditorRegistry *settingsEditorRegistry() SIP_KEEPREFERENCE;
+    static QgsSettingsEditorWidgetRegistry *settingsEditorWidgetRegistry() SIP_KEEPREFERENCE;
 
     /**
      * Register the widget to allow its position to be automatically saved and restored when open and closed.
@@ -328,7 +328,7 @@ class GUI_EXPORT QgsGui : public QObject
     QgsMapToolShapeRegistry *mShapeMapToolRegistry = nullptr;
     QgsHistoryProviderRegistry *mHistoryProviderRegistry = nullptr;
     QgsSensorGuiRegistry *mSensorGuiRegistry = nullptr;
-    QgsSettingsEditorRegistry *mSettingsEditorRegistry = nullptr;
+    QgsSettingsEditorWidgetRegistry *mSettingsEditorRegistry = nullptr;
     std::unique_ptr< QgsWindowManagerInterface > mWindowManager;
 
 #ifdef SIP_RUN

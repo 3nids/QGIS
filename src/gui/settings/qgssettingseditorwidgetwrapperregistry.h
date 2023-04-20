@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgssettingseditorfactoryregistry.h
+    qgssettingseditorwidgetwrapperregistry.h
     ---------------------
     begin                : April 2023
     copyright            : (C) 2023 by Denis Rouzaud
@@ -23,7 +23,7 @@
 
 class QWidget;
 class QgsSettingsEntryBase;
-class QgsSettingsEditorFactory;
+class QgsSettingsEditorWidgetWrapper;
 
 /**
  * \ingroup gui
@@ -31,31 +31,30 @@ class QgsSettingsEditorFactory;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorFactoryRegistry
+class GUI_EXPORT QgsSettingsEditorWidgetWrapperRegistry
 {
   public:
     //! Constructor
-    QgsSettingsEditorFactoryRegistry();
-    ~QgsSettingsEditorFactoryRegistry();
+    QgsSettingsEditorWidgetWrapperRegistry();
+    ~QgsSettingsEditorWidgetWrapperRegistry();
 
     /**
      * Adds a editor to the registry
      * Returns FALSE if a editor with same id already exists.
      */
-    bool addFactory( QgsSettingsEditorFactory *factory SIP_TRANSFER );
+    bool addWrapper( QgsSettingsEditorWidgetWrapper *wrapper SIP_TRANSFER );
 
     //! Returns a new instance of the editor for the given id
-    QgsSettingsEditorFactory *factory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const SIP_FACTORY;
+    QgsSettingsEditorWidgetWrapper *wrapper( const QString &id ) const;
 
     QWidget* createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const SIP_FACTORY;
-
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;
 
 
   private:
-    QMap<QString, QgsSettingsEditorFactory *> mEditors;
+    QMap<QString, QgsSettingsEditorWidgetWrapper *> mEditors;
 };
 
 #endif // QGSSETTINGSEDITORREGISTRY_H

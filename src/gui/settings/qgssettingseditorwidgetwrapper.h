@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditorfactory.h
+  qgssettingseditorwidgetwrapper.h
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -28,17 +28,17 @@ class QgsSettingsEntryString;
 
 /**
  * \ingroup gui
- * \brief Base class for settings editor factories
+ * \brief Base class for settings editor wrappers
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorFactory
+class GUI_EXPORT QgsSettingsEditorWidgetWrapper
 {
   public:
     //! Constructor
-    QgsSettingsEditorFactory();
+    QgsSettingsEditorWidgetWrapper();
 
-    virtual ~QgsSettingsEditorFactory() = default;
+    virtual ~QgsSettingsEditorWidgetWrapper() = default;
 
     /**
      * This id of the type of settings it handles
@@ -52,21 +52,27 @@ class GUI_EXPORT QgsSettingsEditorFactory
     //! Configures the \a editor according the setting
     virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const;
 
+    virtual bool configureEditorImplementation(QWidget *editor, const QgsSettingsEntryBase *setting) const = 0;
+
 //    virtual bool setWidgetFromSetting( ) const = 0;
 
 //    virtual bool setSettingFromWidget( ) const = 0;
 
+protected:
+    class EditorData : public QObject {
+    public:
+      EditorData( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QObject* parent = nullptr )
+        : QObject(parent)
+        , mSetting(setting)
+        , mDynamicKeyPartList(dynamicKeyPartList)
+      {};
+
+      const QgsSettingsEntryBase *mSetting = nullptr;
+      const QStringList &mDynamicKeyPartList;
+    };
+
 };
 
-//class QgsSettingsEditorWrapper
-//{
-//  public:
-//    QgsSettingsEditorWrapper( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
-
-//      private:
-//        const QgsSettingsEntryBase * mSetting = nullptr;
-//    const QStringList & dynamicKeyPartList;
-//};
 
 
 /**
@@ -75,16 +81,16 @@ class GUI_EXPORT QgsSettingsEditorFactory
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorStringFactory : public QgsSettingsEditorFactory
+class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapper
 {
   public:
-    QgsSettingsEditorStringFactory( );
+    QgsSettingsStringEditorWidgetWrapper( );
 
     QString id() const override;
 
     QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) const override;
 
-    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const override;
+    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) const override;
 
 //    bool setWidgetFromSetting( ) const override;
 

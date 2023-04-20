@@ -95,7 +95,7 @@ Constructor for QgsSettingsEntryBase.
 
     virtual ~QgsSettingsEntryBase();
 
-    virtual QString id() const;
+    virtual QString typeId() const;
 %Docstring
 Returns the id of the type of settings
 This can be re-implemented in a custom implementation of a setting
