@@ -33,7 +33,7 @@ QgsSettingsTreeWidget::QgsSettingsTreeWidget( QWidget *parent )
 
   mTreeView = new QTreeView( this );
   mTreeView->setModel( mTreeModel );
-  mTreeView->setItemDelegate( new QgsSettingsTreeItemDelegate( this ) );
+  mTreeView->setItemDelegate( new QgsSettingsTreeItemDelegate( mTreeModel, this ) );
   mTreeView->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   mTreeView->setMinimumWidth( 400 );
   mTreeView->resizeColumnToContents( 0 );

@@ -19,7 +19,7 @@
 #include "qgssettingsentry.h"
 #include "qgssettingstreenode.h"
 #include "qgssettingseditorwidgetwrapper.h"
-#include "qgssettingseditorwidgetwrapperregistry.h"
+#include "qgssettingseditorwidgetregistry.h"
 #include "qgsgui.h"
 #include "qgslogger.h"
 
@@ -32,6 +32,17 @@ QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsS
   nodeData->mTreeNode = rootNode;
   nodeData->fillChildren();
   return nodeData;
+}
+
+void QgsSettingsTreeNodeData::updateSettingNode()
+{
+  Q_ASSERT( type() == QgsSettingsTreeNodeData::Type::Setting );
+  int index = mParent->mChildren.indexOf( this );
+  mParent->mChildren.removeAt( index );
+  addChildForSetting( mSetting );
+  // move from last row to the correct row
+  mParent->mChildren.move( mParent->mChildren.count() - 1, index );
+  deleteLater();
 };
 
 
@@ -139,6 +150,14 @@ QgsSettingsTreeNodeData *QgsSettingsTreeModel::index2node( const QModelIndex &in
 
   QObject *obj = reinterpret_cast<QObject *>( index.internalPointer() );
   return qobject_cast<QgsSettingsTreeNodeData *>( obj );
+}
+
+void QgsSettingsTreeModel::updateSettingNodeAtIndex( const QModelIndex &index )
+{
+  QgsSettingsTreeNodeData *node = index2node( index );
+  Q_ASSERT( node->type() == QgsSettingsTreeNodeData::Type::Setting );
+  node->updateSettingNode();
+  emit dataChanged( index.parent().siblingAtColumn( 0 ), index.parent().siblingAtColumn( columnCount( index.parent() ) ) );
 }
 
 
@@ -303,18 +322,18 @@ QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *
   : QItemDelegate( parent )
   , mModel( model )
 {
-
 }
 
 QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const
 {
+  Q_UNUSED( option )
   if ( static_cast<QgsSettingsTreeModel::Column>( index.column() ) == QgsSettingsTreeModel::Column::Value )
   {
     QgsSettingsTreeNodeData *nodeData = mModel->index2node( index );
     if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
     {
-      QgsSettingsEditorWidgetWrapper *factory = QgsGui::settingsEditorRegistry()->editor( nodeData->setting()->id() );
-      return factory->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
+      QWidget *widget = QgsGui::settingsEditorWidgetRegistry()->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
+      return widget;
     }
   }
   return nullptr;
@@ -322,12 +341,18 @@ QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyl
 
 void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
 {
-
+  Q_UNUSED( index )
+  QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
+  eww->setWidgetFromSetting();
 }
 
 void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const
 {
-
+  Q_UNUSED( index )
+  Q_UNUSED( model )
+  QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
+  eww->setSettingFromWidget();
+  mModel->updateSettingNodeAtIndex( index );
 }
 
 

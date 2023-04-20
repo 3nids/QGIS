@@ -80,6 +80,12 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
      */
     const QgsSettingsEntryBase *setting() const {return mSetting;}
 
+    /**
+     * Updates the data of the setting node
+     * \note This must be called on a setting node!
+     */
+    void updateSettingNode();
+
   private:
     QgsSettingsTreeNodeData( QObject *parent ) : QObject( parent ) {}
     void addChildForTreeNode( const QgsSettingsTreeNode *node );
@@ -154,6 +160,9 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
      * Returns settings tree node for given index. Returns root node for invalid index.
      */
     QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const;
+
+    //! Updates the given node
+    void updateSettingNodeAtIndex( const QModelIndex &index );
 
     QModelIndex index( int row, int column, const QModelIndex &parent ) const override;
     QModelIndex parent( const QModelIndex &child ) const override;

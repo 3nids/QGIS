@@ -18,6 +18,7 @@
 
 #include <QVariant>
 
+#include "qgis_sip.h"
 #include "qgis_gui.h"
 
 class QLineEdit;
@@ -32,11 +33,15 @@ class QgsSettingsEntryString;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorWidgetWrapper
+class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
 {
+    Q_OBJECT
   public:
+    //! Creates a wrapper from the definition stored in a widget created by createEditor()
+    static QgsSettingsEditorWidgetWrapper *fromWidget( const QWidget *widget ) SIP_FACTORY;
+
     //! Constructor
-    QgsSettingsEditorWidgetWrapper();
+    QgsSettingsEditorWidgetWrapper( QObject *parent = nullptr );
 
     virtual ~QgsSettingsEditorWidgetWrapper() = default;
 
@@ -47,31 +52,23 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper
     virtual QString id() const = 0;
 
 //! Creates the editor for the given widget
-    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) const = 0;
+    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) = 0;
 
     //! Configures the \a editor according the setting
-    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const;
+    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
-    virtual bool configureEditorImplementation(QWidget *editor, const QgsSettingsEntryBase *setting) const = 0;
+    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
 
-//    virtual bool setWidgetFromSetting( ) const = 0;
+    virtual bool setWidgetFromSetting( ) const = 0;
 
-//    virtual bool setSettingFromWidget( ) const = 0;
+    virtual bool setSettingFromWidget( ) const = 0;
 
-protected:
-    class EditorData : public QObject {
-    public:
-      EditorData( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QObject* parent = nullptr )
-        : QObject(parent)
-        , mSetting(setting)
-        , mDynamicKeyPartList(dynamicKeyPartList)
-      {};
-
-      const QgsSettingsEntryBase *mSetting = nullptr;
-      const QStringList &mDynamicKeyPartList;
-    };
-
+  protected:
+    const QgsSettingsEntryBase *mSetting = nullptr;
+    QStringList mDynamicKeyPartList;
 };
+
+
 
 
 
@@ -88,13 +85,17 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
 
     QString id() const override;
 
-    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) const override;
+    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) override;
 
-    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) const override;
+    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) override;
 
-//    bool setWidgetFromSetting( ) const override;
+    bool setWidgetFromSetting( ) const override;
 
-//    bool setSettingFromWidget( ) const override;
+    bool setSettingFromWidget( ) const override;
+
+  private:
+    const QgsSettingsEntryString *mSettingsString = nullptr;
+    QLineEdit *mLineEdit = nullptr;
 };
 
 

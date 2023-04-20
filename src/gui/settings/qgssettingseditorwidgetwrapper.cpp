@@ -22,20 +22,37 @@
 #include <QLineEdit>
 
 
-QgsSettingsEditorWidgetWrapper::QgsSettingsEditorWidgetWrapper( )
+QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetWrapper::fromWidget( const QWidget *widget )
+{
+  QVariant editorDataVariant = widget->property( "SETTING-EDITOR-WIDGET-DATA" );
+  if ( editorDataVariant.isValid() )
+  {
+    return editorDataVariant.value<QgsSettingsEditorWidgetWrapper *>();
+  }
+
+  return nullptr;
+}
+
+QgsSettingsEditorWidgetWrapper::QgsSettingsEditorWidgetWrapper( QObject *parent )
+  : QObject( parent )
 {
 }
 
-bool QgsSettingsEditorWidgetWrapper::configureEditor(QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList) const
+bool QgsSettingsEditorWidgetWrapper::configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
 {
-  if( configureEditorImplementation(editor, setting))
-  {
-    EditorData* data = new EditorData(setting, dynamicKeyPartList, editor);
-    editor->setProperty( "SETTING-EDITOR-WIDGET-DATA", QVariant::fromValue( data ) );
-    return true;
+  mSetting = setting;
+  mDynamicKeyPartList = dynamicKeyPartList;
+
+  bool ok = configureEditorImplementation( editor, setting );
+
+  if ( ok )
+    editor->setProperty( "SETTING-EDITOR-WIDGET-PROPER", QVariant::fromValue( this ) );
+
+  return ok;
 }
-  return false;
-}
+
+
+
 
 QgsSettingsStringEditorWidgetWrapper::QgsSettingsStringEditorWidgetWrapper( )
   : QgsSettingsEditorWidgetWrapper( )
@@ -46,46 +63,47 @@ QString QgsSettingsStringEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-QWidget *QgsSettingsStringEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
+QWidget *QgsSettingsStringEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
 {
   QLineEdit *editor = new QLineEdit( parent );
   configureEditor( editor, setting, dynamicKeyPartList );
   return editor;
 }
 
-bool QgsSettingsStringEditorWidgetWrapper::configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) const
+bool QgsSettingsStringEditorWidgetWrapper::configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting )
 {
-  if ( QLineEdit *le = qobject_cast<QLineEdit *>( editor ) )
+  mSettingsString = dynamic_cast<const QgsSettingsEntryString *>( setting );
+  if ( QLineEdit *mLineEdit = qobject_cast<QLineEdit *>( editor ) )
   {
     return true;
   }
   return false;
 }
 
-//bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
-//{
-//  if ( mLineEditEditor )
-//  {
-//    mLineEditEditor->setText( mSetting->value( mDynamicKeyPartList ) );
-//    return true;
-//  }
-//  else
-//  {
-//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
-//  }
-//  return false;
-//}
+bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
+{
+  if ( mLineEdit )
+  {
+    mLineEdit->setText( mSettingsString->value( mDynamicKeyPartList ) );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
 
-//bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
-//{
-//  if ( mLineEditEditor )
-//  {
-//    mSetting->setValue( mLineEditEditor->text(), mDynamicKeyPartList );
-//    return true;
-//  }
-//  else
-//  {
-//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
-//  }
-//  return false;
-//}
+bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
+{
+  if ( mLineEdit )
+  {
+    mSettingsString->setValue( mLineEdit->text(), mDynamicKeyPartList );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}

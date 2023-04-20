@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgssettingseditorwidgetwrapperregistry.h
+    qgssettingseditorwidgetregistry.h
     ---------------------
     begin                : April 2023
     copyright            : (C) 2023 by Denis Rouzaud
@@ -31,12 +31,12 @@ class QgsSettingsEditorWidgetWrapper;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorWidgetWrapperRegistry
+class GUI_EXPORT QgsSettingsEditorWidgetRegistry
 {
   public:
     //! Constructor
-    QgsSettingsEditorWidgetWrapperRegistry();
-    ~QgsSettingsEditorWidgetWrapperRegistry();
+    QgsSettingsEditorWidgetRegistry();
+    ~QgsSettingsEditorWidgetRegistry();
 
     /**
      * Adds a editor to the registry
@@ -47,7 +47,7 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapperRegistry
     //! Returns a new instance of the editor for the given id
     QgsSettingsEditorWidgetWrapper *wrapper( const QString &id ) const;
 
-    QWidget* createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const SIP_FACTORY;
+    QWidget* createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList , QWidget *parent = nullptr) const SIP_FACTORY;
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;
