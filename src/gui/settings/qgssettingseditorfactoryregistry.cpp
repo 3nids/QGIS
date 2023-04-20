@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgssettingseditorregistry.cpp
+    qgssettingsfactoryfactoryregistry.cpp
     ---------------------
     begin                : April 2023
     copyright            : (C) 2023 by Denis Rouzaud
@@ -13,43 +13,48 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgssettingseditorfactory.h"
+#include "qgssettingseditorfactoryregistry.h"
 
 #include "qgslogger.h"
-#include "qgssettingseditorregistry.h"
+#include "qgssettingseditorfactory.h"
 #include "qgssettingsentry.h"
 
-QgsSettingsEditorRegistry::QgsSettingsEditorRegistry()
+QgsSettingsEditorFactoryRegistry::QgsSettingsEditorFactoryRegistry()
 {
 
 }
 
-QgsSettingsEditorRegistry::~QgsSettingsEditorRegistry()
+QgsSettingsEditorFactoryRegistry::~QgsSettingsEditorFactoryRegistry()
 {
   qDeleteAll( mEditors );
 }
 
-bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditorFactory *editor )
+bool QgsSettingsEditorFactoryRegistry::addFactory( QgsSettingsEditorFactory *factory )
 {
-  if ( mEditors.contains( editor->id() ) )
+  if ( mEditors.contains( factory->id() ) )
     return false;
 
-  mEditors.insert( editor->id(), editor );
+  mEditors.insert( factory->id(), factory );
   return true;
 }
 
-QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
+QgsSettingsEditorFactory *QgsSettingsEditorFactoryRegistry::factory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const
 {
-  QgsSettingsEditorFactory *editor = mEditors.value( setting->typeId() );
-  if ( editor )
+  QgsSettingsEditorFactory *factory = mEditors.value( setting->typeId() );
+  if ( factory )
   {
-    return editor;
+    return factory;
   }
   else
   {
-    QgsDebugMsg( QStringLiteral( "Setting editor was not found for '%1', returning the default string editor" ) );
+    QgsDebugMsg( QStringLiteral( "Setting factory was not found for '%1', returning the default string factory" ) );
     return new QgsSettingsEditorStringFactory();
   }
+}
+
+QWidget *QgsSettingsEditorFactoryRegistry::createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList) const
+{
+  return factory(setting,dynamicKeyPartList )->createEditor(setting,dynamicKeyPartList );
 }
 
 

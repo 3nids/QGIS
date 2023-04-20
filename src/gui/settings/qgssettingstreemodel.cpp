@@ -19,7 +19,7 @@
 #include "qgssettingsentry.h"
 #include "qgssettingstreenode.h"
 #include "qgssettingseditorfactory.h"
-#include "qgssettingseditorregistry.h"
+#include "qgssettingseditorfactoryregistry.h"
 #include "qgsgui.h"
 #include "qgslogger.h"
 

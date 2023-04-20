@@ -1,5 +1,5 @@
 /***************************************************************************
-    qgssettingseditorregistry.h
+    qgssettingseditorfactoryregistry.h
     ---------------------
     begin                : April 2023
     copyright            : (C) 2023 by Denis Rouzaud
@@ -21,6 +21,7 @@
 #include "qgis_gui.h"
 #include "qgis_sip.h"
 
+class QWidget;
 class QgsSettingsEntryBase;
 class QgsSettingsEditorFactory;
 
@@ -30,21 +31,24 @@ class QgsSettingsEditorFactory;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsEditorRegistry
+class GUI_EXPORT QgsSettingsEditorFactoryRegistry
 {
   public:
     //! Constructor
-    QgsSettingsEditorRegistry();
-    ~QgsSettingsEditorRegistry();
+    QgsSettingsEditorFactoryRegistry();
+    ~QgsSettingsEditorFactoryRegistry();
 
     /**
      * Adds a editor to the registry
      * Returns FALSE if a editor with same id already exists.
      */
-    bool addEditor( QgsSettingsEditorFactory *editor SIP_TRANSFER );
+    bool addFactory( QgsSettingsEditorFactory *factory SIP_TRANSFER );
 
     //! Returns a new instance of the editor for the given id
-    QgsSettingsEditorFactory *editor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) SIP_FACTORY;
+    QgsSettingsEditorFactory *factory( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const SIP_FACTORY;
+
+    QWidget* createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) const SIP_FACTORY;
+
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;

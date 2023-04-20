@@ -46,8 +46,8 @@ bool QgsSettingsEditorStringFactory::configureEditor( QWidget *editor, const Qgs
 {
   if ( QLineEdit *le = qobject_cast<QLineEdit *>( editor ) )
   {
-    editor->setProperty( "setting", QVariant::fromValue( setting ) );
-    editor->setProperty( "dynamic-key-part-list", dynamicKeyPartList );
+    editor->setProperty( "SETTING", QVariant::fromValue( setting ) );
+    editor->setProperty( "DYNAMIC-KEY-PART-LIST", dynamicKeyPartList );
     return true;
   }
   return false;

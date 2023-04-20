@@ -62,7 +62,7 @@
 #include "qgslayermetadatasourceselectprovider.h"
 #include "qgssensorguiregistry.h"
 #include "qgshistoryentry.h"
-#include "qgssettingseditorregistry.h"
+#include "qgssettingseditorfactoryregistry.h"
 
 #include <QPushButton>
 #include <QToolButton>
@@ -183,7 +183,7 @@ QgsHistoryProviderRegistry *QgsGui::historyProviderRegistry()
   return instance()->mHistoryProviderRegistry;
 }
 
-QgsSettingsEditorRegistry *QgsGui::settingsEditorRegistry()
+QgsSettingsEditorFactoryRegistry *QgsGui::settingsEditorRegistry()
 {
   return instance()->mSettingsEditorRegistry;
 }
@@ -295,7 +295,7 @@ QgsGui::QgsGui()
 
   mSettingsRegistryGui = new QgsSettingsRegistryGui();
 
-  mSettingsEditorRegistry = new QgsSettingsEditorRegistry();
+  mSettingsEditorRegistry = new QgsSettingsEditorFactoryRegistry();
 
   mCodeEditorColorSchemeRegistry = new QgsCodeEditorColorSchemeRegistry();
 
