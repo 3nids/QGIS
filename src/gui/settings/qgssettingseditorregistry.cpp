@@ -13,11 +13,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "qgslogger.h"
 #include "qgssettingseditorfactory.h"
 
+#include "qgslogger.h"
 #include "qgssettingseditorregistry.h"
-
+#include "qgssettingsentry.h"
 
 QgsSettingsEditorRegistry::QgsSettingsEditorRegistry()
 {
@@ -38,9 +38,9 @@ bool QgsSettingsEditorRegistry::addEditor( QgsSettingsEditorFactory *editor )
   return true;
 }
 
-QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QString &id )
+QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
 {
-  QgsSettingsEditorFactory *editor = mEditors.value( id );
+  QgsSettingsEditorFactory *editor = mEditors.value( setting->typeId() );
   if ( editor )
   {
     return editor;
@@ -51,4 +51,7 @@ QgsSettingsEditorFactory *QgsSettingsEditorRegistry::editor( const QString &id )
     return new QgsSettingsEditorStringFactory();
   }
 }
+
+
+
 

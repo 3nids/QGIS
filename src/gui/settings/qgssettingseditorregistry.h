@@ -21,6 +21,7 @@
 #include "qgis_gui.h"
 #include "qgis_sip.h"
 
+class QgsSettingsEntryBase;
 class QgsSettingsEditorFactory;
 
 /**
@@ -43,7 +44,7 @@ class GUI_EXPORT QgsSettingsEditorRegistry
     bool addEditor( QgsSettingsEditorFactory *editor SIP_TRANSFER );
 
     //! Returns a new instance of the editor for the given id
-    QgsSettingsEditorFactory *editor( const QString &id ) SIP_FACTORY;
+    QgsSettingsEditorFactory *editor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList ) SIP_FACTORY;
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;

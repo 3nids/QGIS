@@ -26,8 +26,6 @@ QgsSettingsEditorFactory::QgsSettingsEditorFactory( )
 {
 }
 
-
-
 QgsSettingsEditorStringFactory::QgsSettingsEditorStringFactory( )
   : QgsSettingsEditorFactory( )
 {}
@@ -55,30 +53,30 @@ bool QgsSettingsEditorStringFactory::configureEditor( QWidget *editor, const Qgs
   return false;
 }
 
-bool QgsSettingsEditorStringFactory::setWidgetFromSetting() const
-{
-  if ( mLineEditEditor )
-  {
-    mLineEditEditor->setText( mSetting->value( mDynamicKeyPartList ) );
-    return true;
-  }
-  else
-  {
-    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
-  }
-  return false;
-}
+//bool QgsSettingsEditorStringFactory::setWidgetFromSetting() const
+//{
+//  if ( mLineEditEditor )
+//  {
+//    mLineEditEditor->setText( mSetting->value( mDynamicKeyPartList ) );
+//    return true;
+//  }
+//  else
+//  {
+//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+//  }
+//  return false;
+//}
 
-bool QgsSettingsEditorStringFactory::setSettingFromWidget() const
-{
-  if ( mLineEditEditor )
-  {
-    mSetting->setValue( mLineEditEditor->text(), mDynamicKeyPartList );
-    return true;
-  }
-  else
-  {
-    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
-  }
-  return false;
-}
+//bool QgsSettingsEditorStringFactory::setSettingFromWidget() const
+//{
+//  if ( mLineEditEditor )
+//  {
+//    mSetting->setValue( mLineEditEditor->text(), mDynamicKeyPartList );
+//    return true;
+//  }
+//  else
+//  {
+//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+//  }
+//  return false;
+//}

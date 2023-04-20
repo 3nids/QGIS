@@ -126,7 +126,7 @@ class CORE_EXPORT QgsSettingsEntryBase
      * This can be re-implemented in a custom implementation of a setting
      * \since QGIS 3.32
      */
-    virtual QString id() const;
+    virtual QString typeId() const;
 
     /**
      * Returns the name of the settings

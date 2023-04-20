@@ -52,11 +52,21 @@ class GUI_EXPORT QgsSettingsEditorFactory
     //! Configures the \a editor according the setting
     virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const;
 
-    virtual bool setWidgetFromSetting( ) const = 0;
+//    virtual bool setWidgetFromSetting( ) const = 0;
 
-    virtual bool setSettingFromWidget( ) const = 0;
+//    virtual bool setSettingFromWidget( ) const = 0;
 
 };
+
+//class QgsSettingsEditorWrapper
+//{
+//  public:
+//    QgsSettingsEditorWrapper( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
+
+//      private:
+//        const QgsSettingsEntryBase * mSetting = nullptr;
+//    const QStringList & dynamicKeyPartList;
+//};
 
 
 /**
@@ -76,9 +86,9 @@ class GUI_EXPORT QgsSettingsEditorStringFactory : public QgsSettingsEditorFactor
 
     virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() ) const override;
 
-    bool setWidgetFromSetting( ) const override;
+//    bool setWidgetFromSetting( ) const override;
 
-    bool setSettingFromWidget( ) const override;
+//    bool setSettingFromWidget( ) const override;
 };
 
 
