@@ -1,0 +1,73 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingseditorwidgetwrapper.h                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+class QgsSettingsEditorWidgetWrapper : QObject
+{
+%Docstring(signature="appended")
+Base class for settings editor wrappers
+
+.. versionadded:: 3.32
+%End
+
+%TypeHeaderCode
+#include "qgssettingseditorwidgetwrapper.h"
+%End
+  public:
+    static QgsSettingsEditorWidgetWrapper *fromWidget( const QWidget *widget ) /Factory/;
+%Docstring
+Creates a wrapper from the definition stored in a widget created by :py:func:`~QgsSettingsEditorWidgetWrapper.createEditor`
+%End
+
+    QgsSettingsEditorWidgetWrapper( QObject *parent = 0 );
+%Docstring
+Constructor
+%End
+
+    virtual ~QgsSettingsEditorWidgetWrapper();
+
+    virtual QString id() const = 0;
+%Docstring
+This id of the type of settings it handles
+
+.. note::
+
+   This mostly correspond to the content of :py:class:`Qgis`.SettingsType but it's a string since custom Python implementation are possible.
+%End
+
+    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 ) = 0;
+%Docstring
+Creates the editor for the given widget
+%End
+
+    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
+%Docstring
+Configures the ``editor`` according the setting
+%End
+
+    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
+
+    virtual bool setWidgetFromSetting( ) const = 0;
+
+    virtual bool setSettingFromWidget( ) const = 0;
+
+  protected:
+};
+
+
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingseditorwidgetwrapper.h                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

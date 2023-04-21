@@ -439,6 +439,7 @@ set(QGIS_GUI_SRCS
   sensor/qgssensorwidget.cpp
 
   settings/qgssettingseditorwidgetwrapper.cpp
+  settings/qgssettingseditorwidgetwrapperimpl.cpp
   settings/qgssettingseditorwidgetregistry.cpp
   settings/qgssettingsregistrygui.cpp
   settings/qgssettingstreemodel.cpp
@@ -1433,6 +1434,7 @@ set(QGIS_GUI_HDRS
   sensor/qgssensorwidget.h
 
   settings/qgssettingseditorwidgetwrapper.h
+  settings/qgssettingseditorwidgetwrapperimpl.h
   settings/qgssettingseditorwidgetregistry.h
   settings/qgssettingsregistrygui.h
   settings/qgssettingstreemodel.h

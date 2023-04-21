@@ -17,6 +17,7 @@
 
 #include "qgslogger.h"
 #include "qgssettingseditorwidgetwrapper.h"
+#include "qgssettingseditorwidgetwrapperimpl.h"
 #include "qgssettingsentry.h"
 
 QgsSettingsEditorWidgetRegistry::QgsSettingsEditorWidgetRegistry()
@@ -52,9 +53,9 @@ QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const 
   }
 }
 
-QWidget *QgsSettingsEditorWidgetRegistry::createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget* parent) const
+QWidget *QgsSettingsEditorWidgetRegistry::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
 {
-  return wrapper(setting->typeId())->createEditor(setting,dynamicKeyPartList, parent );
+  return wrapper( setting->typeId() )->createEditor( setting, dynamicKeyPartList, parent );
 }
 
 

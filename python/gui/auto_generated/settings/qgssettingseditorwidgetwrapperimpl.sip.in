@@ -1,0 +1,53 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingseditorwidgetwrapperimpl.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class QgsSettingsStringEditorWidgetWrapper : QgsSettingsEditorWidgetWrapper
+{
+%Docstring(signature="appended")
+This class is a factory of editor for string settings
+
+.. versionadded:: 3.32
+%End
+
+%TypeHeaderCode
+#include "qgssettingseditorwidgetwrapperimpl.h"
+%End
+  public:
+    QgsSettingsStringEditorWidgetWrapper( );
+
+    virtual QString id() const;
+
+
+    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 );
+
+
+    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting );
+
+    virtual bool setWidgetFromSetting( ) const;
+
+
+    virtual bool setSettingFromWidget( ) const;
+
+
+};
+
+
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingseditorwidgetwrapperimpl.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

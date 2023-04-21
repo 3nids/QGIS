@@ -1,0 +1,95 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingstreemodel.h                              *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class QgsSettingsTreeItemDelegate : QItemDelegate
+{
+%Docstring(signature="appended")
+:py:class:`QgsSettingsTreeItemDelegate` allows editing the settings in the settings tree
+
+.. versionadded:: 3.32
+%End
+
+%TypeHeaderCode
+#include "qgssettingstreemodel.h"
+%End
+  public:
+    explicit QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent = 0 );
+
+    virtual QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
+
+    virtual void setEditorData( QWidget *editor, const QModelIndex &index ) const;
+
+    virtual void setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const;
+
+
+};
+
+
+
+class QgsSettingsTreeModel : QAbstractItemModel
+{
+%Docstring(signature="appended")
+:py:class:`QgsSettingsTreeModel` is a tree model for the settings tree.
+
+.. versionadded:: 3.32
+%End
+
+%TypeHeaderCode
+#include "qgssettingstreemodel.h"
+%End
+  public:
+
+    enum class Column
+    {
+      Name,
+      Value,
+      Description,
+    };
+
+    QgsSettingsTreeModel( QgsSettingsTreeNode *rootNode = 0, QObject *parent = 0 );
+
+    ~QgsSettingsTreeModel();
+
+    QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const;
+%Docstring
+Returns settings tree node for given index. Returns root node for invalid index.
+%End
+
+    void updateSettingNodeAtIndex( const QModelIndex &index );
+%Docstring
+Updates the given node
+%End
+
+    virtual QModelIndex index( int row, int column, const QModelIndex &parent ) const;
+
+    virtual QModelIndex parent( const QModelIndex &child ) const;
+
+    virtual int rowCount( const QModelIndex &parent ) const;
+
+    virtual int columnCount( const QModelIndex &parent ) const;
+
+    virtual QVariant data( const QModelIndex &index, int role ) const;
+
+    virtual QVariant headerData( int section, Qt::Orientation orientation, int role ) const;
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/settings/qgssettingstreemodel.h                              *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.pl again   *
+ ************************************************************************/

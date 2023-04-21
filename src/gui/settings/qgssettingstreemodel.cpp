@@ -157,7 +157,7 @@ void QgsSettingsTreeModel::updateSettingNodeAtIndex( const QModelIndex &index )
   QgsSettingsTreeNodeData *node = index2node( index );
   Q_ASSERT( node->type() == QgsSettingsTreeNodeData::Type::Setting );
   node->updateSettingNode();
-  emit dataChanged( index.parent().siblingAtColumn( 0 ), index.parent().siblingAtColumn( columnCount( index.parent() ) ) );
+  emit dataChanged( index.siblingAtColumn( 0 ), index.siblingAtColumn( columnCount( index.parent() ) ) );
 }
 
 
