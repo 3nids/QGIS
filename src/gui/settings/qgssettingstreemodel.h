@@ -17,6 +17,7 @@
 #define QGSSETTINGSTREEMODEL_H
 
 
+#include "qgis_sip.h"
 #include "qgis_gui.h"
 
 #include <QAbstractItemModel>
@@ -55,20 +56,28 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
       Setting
     };
 
+    //! Constructor for the tree node data
     static QgsSettingsTreeNodeData *createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent );
 
+    //! Returns if the node is the root node
     bool isRoot() const {return mParent == nullptr;}
 
+    //! Returns the dynamic key parts of the named list parent tree nodes
     QStringList namedParentNodes() const {return mNamedParentNodes;}
 
+    //! Returns the children nodes of the node (setting or tree node)
     QList<QgsSettingsTreeNodeData *> children() const {return mChildren;}
 
+    //! Returns the parent of the node
     QgsSettingsTreeNodeData *parent() const {return mParent;}
 
+    //! Returns the type of the node (setting or tree node)
     Type type() const {return mType;}
 
+    //! Returns the name of the node (setting or tree node)
     QString name() const {return mName;}
 
+    //! Returns the value of the node (setting or tree node)
     QVariant value() const {return mValue;}
 
     //! Returns if the setting exists (value is set)
@@ -87,6 +96,7 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     void updateSettingNode();
 
   private:
+    //! Private constructor, use createRootNodeData instead
     QgsSettingsTreeNodeData( QObject *parent ) : QObject( parent ) {}
     void addChildForTreeNode( const QgsSettingsTreeNode *node );
     void addChildForNamedListItemNode( const QString &item, const QgsSettingsTreeNamedListNode *namedListNode );
@@ -122,6 +132,7 @@ class GUI_EXPORT QgsSettingsTreeItemDelegate : public QItemDelegate
     Q_OBJECT
 
   public:
+    //! Constructor
     explicit QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent = nullptr );
 
     QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const override;
@@ -145,13 +156,15 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
 {
   public:
 
+    //! Columns
     enum class Column
     {
-      Name,
-      Value,
-      Description,
+      Name, //!< Name
+      Value, //!< Value
+      Description, //!< Description
     };
 
+    //! Constructor
     QgsSettingsTreeModel( QgsSettingsTreeNode *rootNode = nullptr, QObject *parent = nullptr );
 
     ~QgsSettingsTreeModel();
@@ -159,7 +172,7 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
     /**
      * Returns settings tree node for given index. Returns root node for invalid index.
      */
-    QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const;
+    QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const SIP_SKIP;
 
     //! Updates the given node
     void updateSettingNodeAtIndex( const QModelIndex &index );

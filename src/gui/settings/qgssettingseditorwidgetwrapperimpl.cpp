@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditorwidgetwrapper.cpp
+  qgssettingseditorwidgetwrapperimpl.cpp
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -16,7 +16,7 @@
 
 #include "qgssettingseditorwidgetwrapperimpl.h"
 #include "qgslogger.h"
-#include "qgssettingsentry.h"
+#include "qgssettingsentryimpl.h"
 
 #include <QLineEdit>
 

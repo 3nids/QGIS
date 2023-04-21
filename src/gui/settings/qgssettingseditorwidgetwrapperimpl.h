@@ -1,5 +1,5 @@
 /***************************************************************************
-  qgssettingseditorwidgetwrapper.h
+  qgssettingseditorwidgetwrapperimpl.h
   --------------------------------------
   Date                 : February 2023
   Copyright            : (C) 2023 by Denis Rouzaud
@@ -13,8 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSSETTINGSEDITOR_H
-#define QGSSETTINGSEDITOR_H
+#ifndef QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H
+#define QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H
 
 #include <QVariant>
 
@@ -56,4 +56,4 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
 
 
 
-#endif // QGSSETTINGSEDITOR_H
+#endif // QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H

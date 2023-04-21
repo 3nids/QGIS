@@ -13,8 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef QGSSETTINGSEDITOR_H
-#define QGSSETTINGSEDITOR_H
+#ifndef QGSSETTINGSEDITORWIDGETWRAPPER_H
+#define QGSSETTINGSEDITORWIDGETWRAPPER_H
 
 #include <QVariant>
 
@@ -66,4 +66,4 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
 
 
 
-#endif // QGSSETTINGSEDITOR_H
+#endif // QGSSETTINGSEDITORWIDGETWRAPPER_H

@@ -25,6 +25,9 @@ class QgsSettingsTreeItemDelegate : QItemDelegate
 %End
   public:
     explicit QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent = 0 );
+%Docstring
+Constructor
+%End
 
     virtual QWidget *createEditor( QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index ) const;
 
@@ -58,13 +61,12 @@ class QgsSettingsTreeModel : QAbstractItemModel
     };
 
     QgsSettingsTreeModel( QgsSettingsTreeNode *rootNode = 0, QObject *parent = 0 );
+%Docstring
+Constructor
+%End
 
     ~QgsSettingsTreeModel();
 
-    QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const;
-%Docstring
-Returns settings tree node for given index. Returns root node for invalid index.
-%End
 
     void updateSettingNodeAtIndex( const QModelIndex &index );
 %Docstring
