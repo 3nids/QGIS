@@ -170,7 +170,9 @@ QgsSettingsTreeModel::~QgsSettingsTreeModel()
 
 void QgsSettingsTreeModel::applyChanges()
 {
+  beginResetModel();
   mRootNode->applyChanges();
+  endResetModel();
 }
 
 QgsSettingsTreeModelNodeData *QgsSettingsTreeModel::index2node( const QModelIndex &index ) const
