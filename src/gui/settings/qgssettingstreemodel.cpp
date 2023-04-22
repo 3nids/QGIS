@@ -52,7 +52,7 @@ void QgsSettingsTreeModelNodeData::applyChanges()
     {
       if ( isEdited() )
       {
-        setting()->setVariantValue( value() );
+        setting()->setVariantValue( mValue, mNamedParentNodes );
       }
       break;
     }
