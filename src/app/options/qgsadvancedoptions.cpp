@@ -57,14 +57,19 @@ QgsAdvancedSettingsWidget::~QgsAdvancedSettingsWidget()
 
 void QgsAdvancedSettingsWidget::apply()
 {
-  // nothing to do -- mAdvancedSettingsEditor applies changes immediately
+  //  mAdvancedSettingsEditor applies changes immediately
+  // new settings tree is performing changes on appy
+  if ( mTreeWidget )
+    mTreeWidget->applyChanges();
+
 }
 
 QWidget *QgsAdvancedSettingsWidget::createSettingsTreeWidget()
 {
   if ( settingsUseNewTreeWidget->value() )
   {
-    return new QgsSettingsTreeWidget( this );
+    mTreeWidget = new QgsSettingsTreeWidget( this );
+    return mTreeWidget;
   }
   else
   {

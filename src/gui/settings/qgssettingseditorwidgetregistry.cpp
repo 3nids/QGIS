@@ -23,6 +23,7 @@
 QgsSettingsEditorWidgetRegistry::QgsSettingsEditorWidgetRegistry()
 {
   addWrapper( new QgsSettingsStringEditorWidgetWrapper() );
+  addWrapper( new QgsSettingsBoolEditorWidgetWrapper() );
 }
 
 QgsSettingsEditorWidgetRegistry::~QgsSettingsEditorWidgetRegistry()
@@ -49,7 +50,7 @@ QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const 
   else
   {
     QgsDebugMsg( QStringLiteral( "Setting factory was not found for '%1', returning the default string factory" ) );
-    return new QgsSettingsStringEditorWidgetWrapper();
+    return mWrappers[QStringLiteral( "String" )];
   }
 }
 

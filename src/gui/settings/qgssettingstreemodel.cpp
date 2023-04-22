@@ -24,9 +24,9 @@
 #include "qgslogger.h"
 
 
-QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent = nullptr )
+QgsSettingsTreeModelNodeData *QgsSettingsTreeModelNodeData::createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent = nullptr )
 {
-  QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( parent );
+  QgsSettingsTreeModelNodeData *nodeData = new QgsSettingsTreeModelNodeData( parent );
   nodeData->mType = Type::RootNode;
   nodeData->mName = rootNode->key();
   nodeData->mTreeNode = rootNode;
@@ -34,7 +34,32 @@ QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsS
   return nodeData;
 }
 
-bool QgsSettingsTreeNodeData::setValue( const QVariant &value )
+void QgsSettingsTreeModelNodeData::applyChanges()
+{
+  switch ( type() )
+  {
+    case Type::NamedListTreeNode:
+    case Type::RootNode:
+    case Type::TreeNode:
+    case Type::NamedListItem:
+    {
+      QList<QgsSettingsTreeModelNodeData *>::iterator it = mChildren.begin();
+      for ( ; it != mChildren.end(); ++it )
+        ( *it )->applyChanges();
+      break;
+    }
+    case Type::Setting:
+    {
+      if ( isEdited() )
+      {
+        setting()->setVariantValue( value() );
+      }
+      break;
+    }
+  }
+}
+
+bool QgsSettingsTreeModelNodeData::setValue( const QVariant &value )
 {
   Q_ASSERT( mType == Type::Setting );
   if ( !mValue.isValid() || mValue != value )
@@ -47,9 +72,9 @@ bool QgsSettingsTreeNodeData::setValue( const QVariant &value )
 }
 
 
-void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *node )
+void QgsSettingsTreeModelNodeData::addChildForTreeNode( const QgsSettingsTreeNode *node )
 {
-  QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( this );
+  QgsSettingsTreeModelNodeData *nodeData = new QgsSettingsTreeModelNodeData( this );
   nodeData->mParent = this;
   nodeData->mNamedParentNodes = mNamedParentNodes;
   nodeData->mName = node->key();
@@ -72,9 +97,9 @@ void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *no
   mChildren.append( nodeData );
 }
 
-void QgsSettingsTreeNodeData::addChildForNamedListItemNode( const QString &item, const QgsSettingsTreeNamedListNode *namedListNode )
+void QgsSettingsTreeModelNodeData::addChildForNamedListItemNode( const QString &item, const QgsSettingsTreeNamedListNode *namedListNode )
 {
-  QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( this );
+  QgsSettingsTreeModelNodeData *nodeData = new QgsSettingsTreeModelNodeData( this );
   nodeData->mType = Type::NamedListItem;
   nodeData->mParent = this;
   nodeData->mNamedParentNodes = mNamedParentNodes;
@@ -85,9 +110,9 @@ void QgsSettingsTreeNodeData::addChildForNamedListItemNode( const QString &item,
   mChildren.append( nodeData );
 }
 
-void QgsSettingsTreeNodeData::addChildForSetting( const QgsSettingsEntryBase *setting )
+void QgsSettingsTreeModelNodeData::addChildForSetting( const QgsSettingsEntryBase *setting )
 {
-  QgsSettingsTreeNodeData *nodeData = new QgsSettingsTreeNodeData( this );
+  QgsSettingsTreeModelNodeData *nodeData = new QgsSettingsTreeModelNodeData( this );
   nodeData->mType = Type::Setting;
   nodeData->mParent = this;
   nodeData->mNamedParentNodes = mNamedParentNodes;
@@ -116,7 +141,7 @@ void QgsSettingsTreeNodeData::addChildForSetting( const QgsSettingsEntryBase *se
   mChildren.append( nodeData );
 }
 
-void QgsSettingsTreeNodeData::fillChildren()
+void QgsSettingsTreeModelNodeData::fillChildren()
 {
   const QList<QgsSettingsTreeNode *> childrenNodes = mTreeNode->childrenNodes();
   for ( const QgsSettingsTreeNode *childNode : childrenNodes )
@@ -135,7 +160,7 @@ void QgsSettingsTreeNodeData::fillChildren()
 QgsSettingsTreeModel::QgsSettingsTreeModel( QgsSettingsTreeNode *rootNode, QObject *parent )
   : QAbstractItemModel( parent )
 {
-  mRootNode = QgsSettingsTreeNodeData::createRootNodeData( rootNode, this );
+  mRootNode = QgsSettingsTreeModelNodeData::createRootNodeData( rootNode, this );
 }
 
 QgsSettingsTreeModel::~QgsSettingsTreeModel()
@@ -143,13 +168,18 @@ QgsSettingsTreeModel::~QgsSettingsTreeModel()
   //delete mRootNode;
 }
 
-QgsSettingsTreeNodeData *QgsSettingsTreeModel::index2node( const QModelIndex &index ) const
+void QgsSettingsTreeModel::applyChanges()
+{
+  mRootNode->applyChanges();
+}
+
+QgsSettingsTreeModelNodeData *QgsSettingsTreeModel::index2node( const QModelIndex &index ) const
 {
   if ( !index.isValid() )
     return mRootNode;
 
   QObject *obj = reinterpret_cast<QObject *>( index.internalPointer() );
-  return qobject_cast<QgsSettingsTreeNodeData *>( obj );
+  return qobject_cast<QgsSettingsTreeModelNodeData *>( obj );
 }
 
 
@@ -159,7 +189,7 @@ QModelIndex QgsSettingsTreeModel::index( int row, int column, const QModelIndex 
        row < 0 || row >= rowCount( parent ) )
     return QModelIndex();
 
-  QgsSettingsTreeNodeData *n = index2node( parent );
+  QgsSettingsTreeModelNodeData *n = index2node( parent );
   if ( !n )
     return QModelIndex(); // have no children
 
@@ -172,7 +202,7 @@ QModelIndex QgsSettingsTreeModel::parent( const QModelIndex &child ) const
   if ( !child.isValid() )
     return QModelIndex();
 
-  if ( QgsSettingsTreeNodeData *n = index2node( child ) )
+  if ( QgsSettingsTreeModelNodeData *n = index2node( child ) )
   {
     return indexOfParentSettingsTreeNode( n->parent() ); // must not be null
   }
@@ -183,11 +213,11 @@ QModelIndex QgsSettingsTreeModel::parent( const QModelIndex &child ) const
   }
 }
 
-QModelIndex QgsSettingsTreeModel::indexOfParentSettingsTreeNode( QgsSettingsTreeNodeData *parentNode ) const
+QModelIndex QgsSettingsTreeModel::indexOfParentSettingsTreeNode( QgsSettingsTreeModelNodeData *parentNode ) const
 {
   Q_ASSERT( parentNode );
 
-  const QgsSettingsTreeNodeData *grandParentNode = parentNode->parent();
+  const QgsSettingsTreeModelNodeData *grandParentNode = parentNode->parent();
   if ( !grandParentNode )
     return QModelIndex(); // root node -> invalid index
 
@@ -199,7 +229,7 @@ QModelIndex QgsSettingsTreeModel::indexOfParentSettingsTreeNode( QgsSettingsTree
 
 int QgsSettingsTreeModel::rowCount( const QModelIndex &parent ) const
 {
-  QgsSettingsTreeNodeData *n = index2node( parent );
+  QgsSettingsTreeModelNodeData *n = index2node( parent );
   if ( !n )
     return 0;
 
@@ -217,7 +247,7 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
   if ( !index.isValid() || index.column() > columnCount( index ) )
     return QVariant();
 
-  QgsSettingsTreeNodeData *node = index2node( index );
+  QgsSettingsTreeModelNodeData *node = index2node( index );
 
   switch ( static_cast<Column>( index.column() ) )
   {
@@ -252,7 +282,7 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
       }
       else if ( role == Qt::BackgroundRole )
       {
-        if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
+        if ( node->type() == QgsSettingsTreeModelNodeData::Type::Setting )
         {
           switch ( node->setting()->settingsType() )
           {
@@ -277,7 +307,7 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
 
     case Column::Description:
     {
-      if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
+      if ( node->type() == QgsSettingsTreeModelNodeData::Type::Setting )
       {
         if ( role == Qt::DisplayRole || role == Qt::EditRole )
         {
@@ -317,8 +347,8 @@ Qt::ItemFlags QgsSettingsTreeModel::flags( const QModelIndex &index ) const
 {
   if ( index.column() == static_cast<int>( Column::Value ) )
   {
-    QgsSettingsTreeNodeData *nodeData = index2node( index );
-    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    QgsSettingsTreeModelNodeData *nodeData = index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeModelNodeData::Type::Setting )
     {
       return Qt::ItemIsEnabled | Qt::ItemIsEditable;
     }
@@ -334,8 +364,8 @@ bool QgsSettingsTreeModel::setData( const QModelIndex &index, const QVariant &va
 {
   if ( role == Qt::EditRole && index.column() == static_cast<int>( Column::Value ) )
   {
-    QgsSettingsTreeNodeData *nodeData = index2node( index );
-    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    QgsSettingsTreeModelNodeData *nodeData = index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeModelNodeData::Type::Setting )
     {
       nodeData->setValue( value );
       emit dataChanged( index, index );
@@ -357,8 +387,8 @@ QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyl
   Q_UNUSED( option )
   if ( static_cast<QgsSettingsTreeModel::Column>( index.column() ) == QgsSettingsTreeModel::Column::Value )
   {
-    QgsSettingsTreeNodeData *nodeData = mModel->index2node( index );
-    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    QgsSettingsTreeModelNodeData *nodeData = mModel->index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeModelNodeData::Type::Setting )
     {
       QWidget *widget = QgsGui::settingsEditorWidgetRegistry()->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
       return widget;

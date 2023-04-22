@@ -26,7 +26,7 @@
  * \brief A variant settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<QVariant>
+class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryBaseTemplate<QVariant>
 {
   public:
 
@@ -46,7 +46,7 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<Q
                              const QVariant &defaultValue = QVariant(),
                              const QString &description = QString(),
                              Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByReference( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     {}
 
     /**
@@ -64,7 +64,7 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<Q
                              const QVariant &defaultValue = QVariant(),
                              const QString &description = QString(),
                              Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     {}
 
 #ifdef SIP_RUN
@@ -125,7 +125,7 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryByReference<Q
  * \brief A string settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QString>
+class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryBaseTemplate<QString>
 {
   public:
 
@@ -147,7 +147,7 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             int minLength = 0,
                             int maxLength = -1 ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByReference<QString>( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate<QString>( name, parent, defaultValue, description, options )
     , mMinLength( minLength )
     , mMaxLength( maxLength )
     {}
@@ -170,7 +170,7 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
                             Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                             int minLength = 0,
                             int maxLength = -1 ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference<QString>( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate<QString>( key, section, defaultValue, description, options )
     , mMinLength( minLength )
     , mMaxLength( maxLength )
     {}
@@ -228,7 +228,7 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
  * \brief A string list settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReference<QStringList>
+class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryBaseTemplate<QStringList>
 {
   public:
 
@@ -246,7 +246,7 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReferenc
                                 const QStringList &defaultValue = QStringList(),
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByReference( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     {}
 
     /**
@@ -263,7 +263,7 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReferenc
                                 const QStringList &defaultValue = QStringList(),
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     {}
 
 
@@ -304,7 +304,7 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryByReferenc
  * \brief A boolean settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
+class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryBaseTemplate<bool>
 {
   public:
 
@@ -322,7 +322,7 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
                           bool defaultValue = false,
                           const QString &description = QString(),
                           Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByValue( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     {}
 
     /**
@@ -339,7 +339,7 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
                           bool defaultValue = false,
                           const QString &description = QString(),
                           Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     {}
 
 #ifdef SIP_RUN
@@ -379,7 +379,7 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryByValue<bool>
  * \brief An integer settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
+class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryBaseTemplate<int>
 {
   public:
 
@@ -401,7 +401,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
                              Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                              int minValue = std::numeric_limits<int>::min(),
                              int maxValue = std::numeric_limits<int>::max() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByValue( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     , mMinValue( minValue )
     , mMaxValue( maxValue )
     { }
@@ -424,7 +424,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
                              Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                              int minValue = std::numeric_limits<int>::min(),
                              int maxValue = std::numeric_limits<int>::max() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     , mMinValue( minValue )
     , mMaxValue( maxValue )
     { }
@@ -468,7 +468,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
     int maxValue() const;
 
   private:
-    bool checkValuePrivate( int value ) const override SIP_FORCE;
+    bool checkValuePrivate( const int &value ) const override SIP_FORCE;
     int convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     int mMinValue;
     int mMaxValue;
@@ -484,7 +484,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
  * \brief A 64 bits integer (long long) settings entry.
  * \since QGIS 3.30
  */
-class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlonglong>
+class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryBaseTemplate<qlonglong>
 {
   public:
 
@@ -506,7 +506,7 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlo
                                Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                                qlonglong minValue = std::numeric_limits<qlonglong>::min(),
                                qlonglong maxValue = std::numeric_limits<qlonglong>::max() ) SIP_THROW( QgsSettingsException )
-      : QgsSettingsEntryByValue( name, parent, defaultValue, description, options )
+      : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
       , mMinValue( minValue )
       , mMaxValue( maxValue )
     { }
@@ -529,7 +529,7 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlo
                                Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                                qlonglong minValue = std::numeric_limits<qlonglong>::min(),
                                qlonglong maxValue = std::numeric_limits<qlonglong>::max() )
-      : QgsSettingsEntryByValue( key, section, defaultValue, description, options )
+      : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
       , mMinValue( minValue )
       , mMaxValue( maxValue )
     { }
@@ -547,7 +547,7 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlo
     qlonglong maxValue() const;
 
   private:
-    bool checkValuePrivate( qlonglong value ) const override;
+    bool checkValuePrivate( const qlonglong &value ) const override;
     qlonglong convertFromVariant( const QVariant &value ) const override;
     qlonglong mMinValue;
     qlonglong mMaxValue;
@@ -561,7 +561,7 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlo
  * \brief A double settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double>
+class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryBaseTemplate<double>
 {
   public:
 
@@ -586,7 +586,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
                             double minValue = std::numeric_limits<double>::lowest(),
                             double maxValue = std::numeric_limits<double>::max(),
                             int displayDecimals = 1 ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByValue( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     , mMinValue( minValue )
     , mMaxValue( maxValue )
     , mDisplayHintDecimals( displayDecimals )
@@ -613,7 +613,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
                             double minValue = std::numeric_limits<double>::lowest(),
                             double maxValue = std::numeric_limits<double>::max(),
                             int displayDecimals = 1 ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByValue( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     , mMinValue( minValue )
     , mMaxValue( maxValue )
     , mDisplayHintDecimals( displayDecimals )
@@ -673,7 +673,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
     int displayHintDecimals() const;
 
   private:
-    bool checkValuePrivate( double value ) const override SIP_FORCE;
+    bool checkValuePrivate( const double &value ) const override SIP_FORCE;
     double convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     double mMinValue;
     double mMaxValue;
@@ -691,7 +691,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
  * \brief A color settings entry.
  * \since QGIS 3.20
  */
-class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QColor>
+class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryBaseTemplate<QColor>
 {
   public:
 
@@ -711,7 +711,7 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
                            const QString &description = QString(),
                            Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                            bool allowAlpha = true ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByReference( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     , mAllowAlpha( allowAlpha )
     {}
 
@@ -731,7 +731,7 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
                            const QString &description = QString(),
                            Qgis::SettingsOptions options = Qgis::SettingsOptions(),
                            bool allowAlpha = true ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     , mAllowAlpha( allowAlpha )
     {}
 
@@ -793,7 +793,7 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
  * \brief A string list settings entry.
  * \since QGIS 3.30
  */
-class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReference<QVariantMap>
+class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryBaseTemplate<QVariantMap>
 {
   public:
 
@@ -812,7 +812,7 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
                                 const QVariantMap &defaultValue = QVariantMap(),
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER
-  : QgsSettingsEntryByReference( name, parent, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( name, parent, defaultValue, description, options )
     {
     }
 
@@ -830,7 +830,7 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
                                 const QVariantMap &defaultValue = QVariantMap(),
                                 const QString &description = QString(),
                                 Qgis::SettingsOptions options = Qgis::SettingsOptions() ) SIP_THROW( QgsSettingsException ) SIP_TRANSFER SIP_MAKE_PRIVATE
-  : QgsSettingsEntryByReference( key, section, defaultValue, description, options )
+  : QgsSettingsEntryBaseTemplate( key, section, defaultValue, description, options )
     {
     }
 
@@ -862,5 +862,6 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryByReferenc
     QVariantMap convertFromVariant( const QVariant &value ) const override SIP_FORCE;
 
 };
+
 
 #endif // QGSSETTINGSENTRYIMPL_H

@@ -67,6 +67,8 @@ Constructor
 
     ~QgsSettingsTreeModel();
 
+    void applyChanges();
+
 
 
     virtual QModelIndex index( int row, int column, const QModelIndex &parent ) const;

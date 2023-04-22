@@ -60,7 +60,7 @@ Configures the ``editor`` according the setting
     virtual QVariant valueFromWidget() const = 0;
 
   protected:
-    virtual QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 ) = 0;
+    virtual QWidget *createEditorPrivate( QWidget *parent = 0 ) = 0;
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
 

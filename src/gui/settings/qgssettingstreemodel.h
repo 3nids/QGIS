@@ -41,7 +41,7 @@ class QgsSettingsTreeNamedListNode;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
+class GUI_EXPORT QgsSettingsTreeModelNodeData : public QObject
 {
     Q_OBJECT
   public:
@@ -57,7 +57,10 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     };
 
     //! Constructor for the tree node data
-    static QgsSettingsTreeNodeData *createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent );
+    static QgsSettingsTreeModelNodeData *createRootNodeData( const QgsSettingsTreeNode *rootNode, QObject *parent );
+
+    //! Apply changes to the settings
+    void applyChanges();
 
     //! Returns if the node is the root node
     bool isRoot() const {return mParent == nullptr;}
@@ -66,10 +69,10 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     QStringList namedParentNodes() const {return mNamedParentNodes;}
 
     //! Returns the children nodes of the node (setting or tree node)
-    QList<QgsSettingsTreeNodeData *> children() const {return mChildren;}
+    QList<QgsSettingsTreeModelNodeData *> children() const {return mChildren;}
 
     //! Returns the parent of the node
-    QgsSettingsTreeNodeData *parent() const {return mParent;}
+    QgsSettingsTreeModelNodeData *parent() const {return mParent;}
 
     //! Returns the type of the node (setting or tree node)
     Type type() const {return mType;}
@@ -97,7 +100,7 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
 
   private:
     //! Private constructor, use createRootNodeData instead
-    QgsSettingsTreeNodeData( QObject *parent ) : QObject( parent ) {}
+    QgsSettingsTreeModelNodeData( QObject *parent ) : QObject( parent ) {}
     void addChildForTreeNode( const QgsSettingsTreeNode *node );
     void addChildForNamedListItemNode( const QString &item, const QgsSettingsTreeNamedListNode *namedListNode );
     void addChildForSetting( const QgsSettingsEntryBase *setting );
@@ -110,8 +113,8 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     bool mExists = false;
     bool mIsEdited = false;
 
-    QList<QgsSettingsTreeNodeData *> mChildren;
-    QgsSettingsTreeNodeData *mParent = nullptr;
+    QList<QgsSettingsTreeModelNodeData *> mChildren;
+    QgsSettingsTreeModelNodeData *mParent = nullptr;
 
     const QgsSettingsTreeNode *mTreeNode = nullptr;
     const QgsSettingsEntryBase *mSetting = nullptr;
@@ -170,10 +173,12 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
 
     ~QgsSettingsTreeModel();
 
+    void applyChanges();
+
     /**
      * Returns settings tree node for given index. Returns root node for invalid index.
      */
-    QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const SIP_SKIP;
+    QgsSettingsTreeModelNodeData *index2node( const QModelIndex &index ) const SIP_SKIP;
 
 
     QModelIndex index( int row, int column, const QModelIndex &parent ) const override;
@@ -186,9 +191,9 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
     bool setData( const QModelIndex &index, const QVariant &value, int role ) override;
 
   private:
-    QModelIndex indexOfParentSettingsTreeNode( QgsSettingsTreeNodeData *parentNode ) const;
+    QModelIndex indexOfParentSettingsTreeNode( QgsSettingsTreeModelNodeData *parentNode ) const;
 
-    QgsSettingsTreeNodeData *mRootNode = nullptr;
+    QgsSettingsTreeModelNodeData *mRootNode = nullptr;
 
 };
 

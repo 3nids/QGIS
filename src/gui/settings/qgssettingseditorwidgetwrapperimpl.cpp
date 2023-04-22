@@ -19,21 +19,21 @@
 #include "qgssettingsentryimpl.h"
 
 #include <QLineEdit>
+#include <QCheckBox>
 
 
-QgsSettingsStringEditorWidgetWrapper::QgsSettingsStringEditorWidgetWrapper( )
-  : QgsSettingsEditorWidgetWrapper( )
-{}
+// *******
+// Bool
+// *******
 
 QString QgsSettingsStringEditorWidgetWrapper::id() const
 {
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-QWidget *QgsSettingsStringEditorWidgetWrapper::createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
+QWidget *QgsSettingsStringEditorWidgetWrapper::createEditorPrivate( QWidget *parent )
 {
   QLineEdit *editor = new QLineEdit( parent );
-  configureEditor( editor, setting, dynamicKeyPartList );
   return editor;
 }
 
@@ -81,6 +81,70 @@ QVariant QgsSettingsStringEditorWidgetWrapper::valueFromWidget() const
   if ( mLineEdit )
   {
     return mLineEdit->text();
+  }
+  return QVariant();
+}
+
+
+// *******
+// Boolean
+// *******
+
+QString QgsSettingsBoolEditorWidgetWrapper::id() const
+{
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Bool ) ) );
+}
+
+QWidget *QgsSettingsBoolEditorWidgetWrapper::createEditorPrivate( QWidget *parent )
+{
+  QLineEdit *editor = new QLineEdit( parent );
+  return editor;
+}
+
+bool QgsSettingsBoolEditorWidgetWrapper::configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting )
+{
+  mSettingsBool = dynamic_cast<const QgsSettingsEntryBool *>( setting );
+  mCheckBox = qobject_cast<QCheckBox *>( editor );
+  if ( mCheckBox )
+  {
+    return true;
+  }
+  return false;
+}
+
+bool QgsSettingsBoolEditorWidgetWrapper::setWidgetFromSetting() const
+{
+  if ( mCheckBox )
+  {
+    mCheckBox->setChecked( mSettingsBool->value( mDynamicKeyPartList ) );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+bool QgsSettingsBoolEditorWidgetWrapper::setSettingFromWidget() const
+{
+  if ( mCheckBox )
+  {
+    mSettingsBool->setValue( mCheckBox->isChecked(), mDynamicKeyPartList );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+QVariant QgsSettingsBoolEditorWidgetWrapper::valueFromWidget() const
+{
+  if ( mCheckBox )
+  {
+    return mCheckBox->isChecked();
   }
   return QVariant();
 }

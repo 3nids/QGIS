@@ -29,7 +29,40 @@ This class is a factory of editor for string settings
     virtual QString id() const;
 
 
-    virtual QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 );
+    virtual QWidget *createEditorPrivate( QWidget *parent = 0 );
+
+
+    virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting );
+
+
+    virtual bool setWidgetFromSetting( ) const;
+
+
+    virtual bool setSettingFromWidget( ) const;
+
+
+    virtual QVariant valueFromWidget() const;
+
+};
+
+class QgsSettingsBoolEditorWidgetWrapper : QgsSettingsEditorWidgetWrapper
+{
+%Docstring(signature="appended")
+This class is a factory of editor for boolean settings
+
+.. versionadded:: 3.32
+%End
+
+%TypeHeaderCode
+#include "qgssettingseditorwidgetwrapperimpl.h"
+%End
+  public:
+    QgsSettingsBoolEditorWidgetWrapper();
+
+    virtual QString id() const;
+
+
+    virtual QWidget *createEditorPrivate( QWidget *parent = 0 );
 
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting );

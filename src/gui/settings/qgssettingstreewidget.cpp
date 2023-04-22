@@ -41,3 +41,8 @@ QgsSettingsTreeWidget::QgsSettingsTreeWidget( QWidget *parent )
   mainLayout->addWidget( mTreeView );
 }
 
+void QgsSettingsTreeWidget::applyChanges() const
+{
+  mTreeModel->applyChanges();
+}
+

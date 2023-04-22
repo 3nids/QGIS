@@ -144,15 +144,10 @@ int QgsSettingsEntryBase::section() const
 
 bool QgsSettingsEntryBase::setVariantValue( const QVariant &value, const QString &dynamicKeyPart ) const
 {
-  return setVariantValuePrivate( value, dynamicKeyPartToList( dynamicKeyPart ) );
+  return setVariantValue( value, dynamicKeyPartToList( dynamicKeyPart ) );
 }
 
 bool QgsSettingsEntryBase::setVariantValue( const QVariant &value, const QStringList &dynamicKeyPartList ) const
-{
-  return setVariantValuePrivate( value, dynamicKeyPartList );
-}
-
-bool QgsSettingsEntryBase::setVariantValuePrivate( const QVariant &value, const QStringList &dynamicKeyPartList ) const
 {
   if ( mOptions.testFlag( Qgis::SettingsOption::SaveFormerValue ) )
   {
@@ -248,7 +243,7 @@ bool QgsSettingsEntryBase::copyValueFromKey( const QString &key, const QStringLi
   if ( settings.contains( oldCompleteKey ) )
   {
     QVariant oldValue = settings.value( oldCompleteKey, mDefaultValue );
-    setVariantValuePrivate( oldValue, dynamicKeyPartList );
+    setVariantValue( oldValue, dynamicKeyPartList );
     if ( removeSettingAtKey )
       settings.remove( oldCompleteKey );
     return true;

@@ -40,7 +40,7 @@ QgsSettingsEditorWidgetWrapper::QgsSettingsEditorWidgetWrapper( QObject *parent 
 
 QWidget *QgsSettingsEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
 {
-  QWidget *editor = createEditorPrivate( setting, dynamicKeyPartList, parent );
+  QWidget *editor = createEditorPrivate( parent );
   if ( configureEditor( editor, setting, dynamicKeyPartList ) )
     return editor;
   else

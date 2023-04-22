@@ -60,7 +60,7 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
     virtual QVariant valueFromWidget() const = 0;
 
   protected:
-    virtual QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) = 0;
+    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) = 0;
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
 

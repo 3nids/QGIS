@@ -89,7 +89,7 @@ Qgis::SettingsType QgsSettingsEntryBool::settingsType() const
 }
 
 
-bool QgsSettingsEntryInteger::checkValuePrivate( int value ) const
+bool QgsSettingsEntryInteger::checkValuePrivate( const int &value ) const
 {
   if ( value < mMinValue )
   {
@@ -130,7 +130,7 @@ int QgsSettingsEntryInteger::minValue() const
   return mMaxValue;
 }
 
-bool QgsSettingsEntryInteger64::checkValuePrivate( qlonglong value ) const
+bool QgsSettingsEntryInteger64::checkValuePrivate( const qlonglong &value ) const
 {
   if ( value < mMinValue )
   {
@@ -173,7 +173,7 @@ qlonglong QgsSettingsEntryInteger64::minValue() const
 
 
 
-bool QgsSettingsEntryDouble::checkValuePrivate( double value ) const
+bool QgsSettingsEntryDouble::checkValuePrivate( const double &value ) const
 {
   if ( value < mMinValue )
   {
@@ -263,7 +263,7 @@ bool QgsSettingsEntryColor::copyValueFromKeys( const QString &redKey, const QStr
       settings.remove( alphaKey );
     }
 
-    setVariantValuePrivate( oldValue );
+    setVariantValue( oldValue );
     return true;
   }
   return false;

@@ -20,6 +20,8 @@
 #include "qgssettingstree.h"
 #include "qgssettingsentryimpl.h"
 
+class QgsSettingsTreeWidget;
+
 /**
  * \ingroup app
  * \class QgsAdvancedSettingsWidget
@@ -48,6 +50,8 @@ class QgsAdvancedSettingsWidget : public QgsOptionsPageWidget, private Ui::QgsAd
   private:
 
     QWidget *createSettingsTreeWidget();
+
+    QgsSettingsTreeWidget *mTreeWidget = nullptr;
 
 };
 
