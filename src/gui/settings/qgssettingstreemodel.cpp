@@ -34,17 +34,17 @@ QgsSettingsTreeNodeData *QgsSettingsTreeNodeData::createRootNodeData( const QgsS
   return nodeData;
 }
 
-void QgsSettingsTreeNodeData::updateSettingNode()
+bool QgsSettingsTreeNodeData::setValue( const QVariant &value )
 {
-  Q_ASSERT( type() == QgsSettingsTreeNodeData::Type::Setting );
-  int index = mParent->mChildren.indexOf( this );
-  mParent->mChildren.removeAt( index );
-  addChildForSetting( mSetting );
-  // move from last row to the correct row
-  mParent->mChildren.move( mParent->mChildren.count() - 1, index );
-  deleteLater();
-};
-
+  Q_ASSERT( mType == Type::Setting );
+  if ( !mValue.isValid() || mValue != value )
+  {
+    mValue = value;
+    mIsEdited = true;
+  }
+  // TODO: check the value of setting is fullfilling the settings' contraints
+  return true;
+}
 
 
 void QgsSettingsTreeNodeData::addChildForTreeNode( const QgsSettingsTreeNode *node )
@@ -152,14 +152,6 @@ QgsSettingsTreeNodeData *QgsSettingsTreeModel::index2node( const QModelIndex &in
   return qobject_cast<QgsSettingsTreeNodeData *>( obj );
 }
 
-void QgsSettingsTreeModel::updateSettingNodeAtIndex( const QModelIndex &index )
-{
-  QgsSettingsTreeNodeData *node = index2node( index );
-  Q_ASSERT( node->type() == QgsSettingsTreeNodeData::Type::Setting );
-  node->updateSettingNode();
-  emit dataChanged( index.siblingAtColumn( 0 ), index.siblingAtColumn( columnCount( index.parent() ) ) );
-}
-
 
 QModelIndex QgsSettingsTreeModel::index( int row, int column, const QModelIndex &parent ) const
 {
@@ -244,7 +236,7 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
       {
         return node->value();
       }
-      if ( role == Qt::FontRole )
+      else if ( role == Qt::FontRole )
       {
         if ( !node->exists() )
         {
@@ -253,7 +245,12 @@ QVariant QgsSettingsTreeModel::data( const QModelIndex &index, int role ) const
           return font;
         }
       }
-      if ( role == Qt::BackgroundRole )
+      else if ( role == Qt::ForegroundRole )
+      {
+        if ( node->isEdited() )
+          return  QColorConstants::Red;
+      }
+      else if ( role == Qt::BackgroundRole )
       {
         if ( node->type() == QgsSettingsTreeNodeData::Type::Setting )
         {
@@ -316,6 +313,37 @@ QVariant QgsSettingsTreeModel::headerData( int section, Qt::Orientation orientat
   return QVariant();
 }
 
+Qt::ItemFlags QgsSettingsTreeModel::flags( const QModelIndex &index ) const
+{
+  if ( index.column() == static_cast<int>( Column::Value ) )
+  {
+    QgsSettingsTreeNodeData *nodeData = index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    {
+      return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    }
+  }
+  else
+  {
+    return Qt::ItemIsEnabled;
+  }
+  return Qt::NoItemFlags;
+}
+
+bool QgsSettingsTreeModel::setData( const QModelIndex &index, const QVariant &value, int role )
+{
+  if ( role == Qt::EditRole && index.column() == static_cast<int>( Column::Value ) )
+  {
+    QgsSettingsTreeNodeData *nodeData = index2node( index );
+    if ( nodeData->type() == QgsSettingsTreeNodeData::Type::Setting )
+    {
+      nodeData->setValue( value );
+      emit dataChanged( index, index );
+      return true;
+    }
+  }
+  return false;
+}
 
 
 QgsSettingsTreeItemDelegate::QgsSettingsTreeItemDelegate( QgsSettingsTreeModel *model, QObject *parent )
@@ -349,10 +377,10 @@ void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIn
 void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const
 {
   Q_UNUSED( index )
-  Q_UNUSED( model )
   QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
-  eww->setSettingFromWidget();
-  mModel->updateSettingNodeAtIndex( index );
+  model->setData( index, eww->valueFromWidget(), Qt::EditRole );
 }
+
+
 
 

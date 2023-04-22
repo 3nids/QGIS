@@ -30,17 +30,18 @@ QString QgsSettingsStringEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-QWidget *QgsSettingsStringEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
+QWidget *QgsSettingsStringEditorWidgetWrapper::createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
 {
   QLineEdit *editor = new QLineEdit( parent );
   configureEditor( editor, setting, dynamicKeyPartList );
   return editor;
 }
 
-bool QgsSettingsStringEditorWidgetWrapper::configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting )
+bool QgsSettingsStringEditorWidgetWrapper::configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting )
 {
   mSettingsString = dynamic_cast<const QgsSettingsEntryString *>( setting );
-  if ( QLineEdit *mLineEdit = qobject_cast<QLineEdit *>( editor ) )
+  mLineEdit = qobject_cast<QLineEdit *>( editor );
+  if ( mLineEdit )
   {
     return true;
   }
@@ -73,4 +74,13 @@ bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
     QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
   }
   return false;
+}
+
+QVariant QgsSettingsStringEditorWidgetWrapper::valueFromWidget() const
+{
+  if ( mLineEdit )
+  {
+    return mLineEdit->text();
+  }
+  return QVariant();
 }

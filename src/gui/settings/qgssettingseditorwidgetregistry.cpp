@@ -22,26 +22,26 @@
 
 QgsSettingsEditorWidgetRegistry::QgsSettingsEditorWidgetRegistry()
 {
-
+  addWrapper( new QgsSettingsStringEditorWidgetWrapper() );
 }
 
 QgsSettingsEditorWidgetRegistry::~QgsSettingsEditorWidgetRegistry()
 {
-  qDeleteAll( mEditors );
+  qDeleteAll( mWrappers );
 }
 
 bool QgsSettingsEditorWidgetRegistry::addWrapper( QgsSettingsEditorWidgetWrapper *wrapper )
 {
-  if ( mEditors.contains( wrapper->id() ) )
+  if ( mWrappers.contains( wrapper->id() ) )
     return false;
 
-  mEditors.insert( wrapper->id(), wrapper );
+  mWrappers.insert( wrapper->id(), wrapper );
   return true;
 }
 
 QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const QString &id ) const
 {
-  QgsSettingsEditorWidgetWrapper *wrapper = mEditors.value( id );
+  QgsSettingsEditorWidgetWrapper *wrapper = mWrappers.value( id );
   if ( wrapper )
   {
     return wrapper;

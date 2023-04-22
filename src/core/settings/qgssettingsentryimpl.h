@@ -212,7 +212,7 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryByReference<QS
     int maxLength() const;
 
   private:
-    bool checkValue( const QString &value ) const override SIP_FORCE;
+    bool checkValuePrivate( const QString &value ) const override SIP_FORCE;
     QString convertFromVariant( const QVariant &value ) const override SIP_FORCE;
 
     int mMinLength;
@@ -468,7 +468,7 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryByValue<int>
     int maxValue() const;
 
   private:
-    bool checkValue( int value ) const override SIP_FORCE;
+    bool checkValuePrivate( int value ) const override SIP_FORCE;
     int convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     int mMinValue;
     int mMaxValue;
@@ -547,7 +547,7 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryByValue<qlo
     qlonglong maxValue() const;
 
   private:
-    bool checkValue( qlonglong value ) const override;
+    bool checkValuePrivate( qlonglong value ) const override;
     qlonglong convertFromVariant( const QVariant &value ) const override;
     qlonglong mMinValue;
     qlonglong mMaxValue;
@@ -673,7 +673,7 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryByValue<double
     int displayHintDecimals() const;
 
   private:
-    bool checkValue( double value ) const override SIP_FORCE;
+    bool checkValuePrivate( double value ) const override SIP_FORCE;
     double convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     double mMinValue;
     double mMaxValue;
@@ -782,7 +782,7 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryByReference<QCo
 
   private:
     QColor convertFromVariant( const QVariant &value ) const override SIP_FORCE;
-    bool checkValue( const QColor &value ) const override SIP_FORCE;
+    bool checkValuePrivate( const QColor &value ) const override SIP_FORCE;
     bool mAllowAlpha = true;
 };
 

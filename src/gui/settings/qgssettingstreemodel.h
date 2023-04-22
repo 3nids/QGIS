@@ -80,20 +80,20 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     //! Returns the value of the node (setting or tree node)
     QVariant value() const {return mValue;}
 
+    //! Sets the value of the setting node
+    bool setValue( const QVariant &value );
+
     //! Returns if the setting exists (value is set)
     bool exists() const {return mExists;}
+
+    //! Returns if the setting is edited
+    bool isEdited() const {return mIsEdited;}
 
     /**
      * Returns the setting of the node
      * It returns a nullptr if the setting does not exist
      */
     const QgsSettingsEntryBase *setting() const {return mSetting;}
-
-    /**
-     * Updates the data of the setting node
-     * \note This must be called on a setting node!
-     */
-    void updateSettingNode();
 
   private:
     //! Private constructor, use createRootNodeData instead
@@ -108,6 +108,7 @@ class GUI_EXPORT QgsSettingsTreeNodeData : public QObject
     QVariant mValue;
     QStringList mNamedParentNodes;
     bool mExists = false;
+    bool mIsEdited = false;
 
     QList<QgsSettingsTreeNodeData *> mChildren;
     QgsSettingsTreeNodeData *mParent = nullptr;
@@ -174,8 +175,6 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
      */
     QgsSettingsTreeNodeData *index2node( const QModelIndex &index ) const SIP_SKIP;
 
-    //! Updates the given node
-    void updateSettingNodeAtIndex( const QModelIndex &index );
 
     QModelIndex index( int row, int column, const QModelIndex &parent ) const override;
     QModelIndex parent( const QModelIndex &child ) const override;
@@ -183,11 +182,14 @@ class GUI_EXPORT QgsSettingsTreeModel : public QAbstractItemModel
     int columnCount( const QModelIndex &parent ) const override;
     QVariant data( const QModelIndex &index, int role ) const override;
     QVariant headerData( int section, Qt::Orientation orientation, int role ) const override;
+    Qt::ItemFlags flags( const QModelIndex &index ) const override;
+    bool setData( const QModelIndex &index, const QVariant &value, int role ) override;
 
   private:
     QModelIndex indexOfParentSettingsTreeNode( QgsSettingsTreeNodeData *parentNode ) const;
 
     QgsSettingsTreeNodeData *mRootNode = nullptr;
+
 };
 
 #endif // QGSSETTINGSTREEMODEL_H

@@ -15,6 +15,8 @@
 
 
 #include "qgssettingseditorwidgetwrapper.h"
+
+#include "qgslogger.h"
 #include "qgssettingsentry.h"
 
 #include <QWidget>
@@ -36,12 +38,22 @@ QgsSettingsEditorWidgetWrapper::QgsSettingsEditorWidgetWrapper( QObject *parent 
 {
 }
 
+QWidget *QgsSettingsEditorWidgetWrapper::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent )
+{
+  QWidget *editor = createEditorPrivate( setting, dynamicKeyPartList, parent );
+  if ( configureEditor( editor, setting, dynamicKeyPartList ) )
+    return editor;
+  else
+    QgsDebugMsg( QStringLiteral( "editor could not be confiugured" ) );
+  return nullptr;
+}
+
 bool QgsSettingsEditorWidgetWrapper::configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
 {
   mSetting = setting;
   mDynamicKeyPartList = dynamicKeyPartList;
 
-  bool ok = configureEditorImplementation( editor, setting );
+  bool ok = configureEditorPrivate( editor, setting );
 
   if ( ok )
     editor->setProperty( "SETTING-EDITOR-WIDGET-WRAPPER", QVariant::fromValue( this ) );

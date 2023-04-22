@@ -333,6 +333,13 @@ class CORE_EXPORT QgsSettingsEntryBase
     */
     QgsSettingsTreeNode *parent() const {return mParentTreeElement;}
 
+    //! Returns TRUE if the given \a value is valid towards the setting definition
+    virtual bool checkValue( const QVariant &value ) const
+    {
+      Q_UNUSED( value )
+      return true;
+    }
+
   protected:
 
     /**
@@ -354,7 +361,6 @@ class CORE_EXPORT QgsSettingsEntryBase
     QString mDescription;
     Qgis::SettingsOptions mOptions;
 };
-
 
 /**
  * \ingroup core
@@ -499,11 +505,16 @@ class QgsSettingsEntryByReference : public QgsSettingsEntryBase
      */
     T formerValue( const QStringList &dynamicKeyPartList ) const {return convertFromVariant( formerValueAsVariant( dynamicKeyPartList ) );}
 
+    bool checkValue( const QVariant &value ) const override
+    {
+      return checkValuePrivate( convertFromVariant( value ) );
+    }
+
   protected:
     //! Sets the settings value with an optional list of dynamic parts
     bool setValuePrivate( const T &value, const QStringList &dynamicKeyPartList ) const
     {
-      if ( checkValue( value ) )
+      if ( checkValuePrivate( value ) )
         return QgsSettingsEntryBase::setVariantValuePrivate( convertToVariant( value ), dynamicKeyPartList );
       else
         return false;
@@ -519,7 +530,7 @@ class QgsSettingsEntryByReference : public QgsSettingsEntryBase
     }
 
     //! Check if the value is valid
-    virtual bool checkValue( const T &value ) const
+    virtual bool checkValuePrivate( const T &value ) const
     {
       Q_UNUSED( value )
       return true;
@@ -658,11 +669,16 @@ class QgsSettingsEntryByValue : public QgsSettingsEntryBase
      */
     T formerValue( const QStringList &dynamicKeyPartList ) const {return convertFromVariant( formerValueAsVariant( dynamicKeyPartList ) );}
 
+    bool checkValue( const QVariant &value ) const override
+    {
+      return checkValuePrivate( convertFromVariant( value ) );
+    }
+
   protected:
     //! Sets the settings value with an optional list of dynamic parts
     virtual bool setValuePrivate( T value, const QStringList &dynamicKeyPartList ) const
     {
-      if ( checkValue( value ) )
+      if ( checkValuePrivate( value ) )
         return QgsSettingsEntryBase::setVariantValuePrivate( convertToVariant( value ), dynamicKeyPartList );
       else
         return false;
@@ -678,12 +694,13 @@ class QgsSettingsEntryByValue : public QgsSettingsEntryBase
     }
 
     //! Check if the value is valid
-    virtual bool checkValue( T value ) const
+    virtual bool checkValuePrivate( T value ) const
     {
       Q_UNUSED( value )
       return true;
     }
 };
+
 
 
 #endif // QGSSETTINGSENTRY_H

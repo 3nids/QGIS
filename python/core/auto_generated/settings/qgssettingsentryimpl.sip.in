@@ -204,7 +204,7 @@ Returns the string maximum length. By -1 there is no limitation.
 %End
 
   private:
-    virtual bool checkValue( const QString &value ) const;
+    virtual bool checkValuePrivate( const QString &value ) const;
 
     virtual QString convertFromVariant( const QVariant &value ) const;
 
@@ -464,7 +464,7 @@ Returns the maximum value.
 %End
 
   private:
-    virtual bool checkValue( int value ) const;
+    virtual bool checkValuePrivate( int value ) const;
 
     virtual int convertFromVariant( const QVariant &value ) const;
 
@@ -587,7 +587,7 @@ Returns how much decimals should be shown in the Gui.
 %End
 
   private:
-    virtual bool checkValue( double value ) const;
+    virtual bool checkValuePrivate( double value ) const;
 
     virtual double convertFromVariant( const QVariant &value ) const;
 
@@ -685,7 +685,7 @@ Returns ``True`` if transparency is allowed for the color
   private:
     virtual QColor convertFromVariant( const QVariant &value ) const;
 
-    virtual bool checkValue( const QColor &value ) const;
+    virtual bool checkValuePrivate( const QColor &value ) const;
 
 };
 

@@ -48,18 +48,22 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
     virtual QString id() const = 0;
 
 //! Creates the editor for the given widget
-    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) = 0;
+    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr );
 
     //! Configures the \a editor according the setting
-    virtual bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
-
-    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
+    bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
     virtual bool setWidgetFromSetting( ) const = 0;
 
     virtual bool setSettingFromWidget( ) const = 0;
 
+    virtual QVariant valueFromWidget() const = 0;
+
   protected:
+    virtual QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) = 0;
+
+    virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
+
     const QgsSettingsEntryBase *mSetting = nullptr;
     QStringList mDynamicKeyPartList;
 };

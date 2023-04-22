@@ -340,6 +340,11 @@ Returns the parent tree element
 .. versionadded:: 3.30
 %End
 
+    virtual bool checkValue( const QVariant &value ) const;
+%Docstring
+Returns ``True`` if the given ``value`` is valid towards the setting definition
+%End
+
   protected:
 
     bool setVariantValuePrivate( const QVariant &value, const QStringList &dynamicKeyPartList = QStringList() ) const;
@@ -351,7 +356,6 @@ This should be called from any implementation as it takes care of actually calli
 %End
 
 };
-
 
 template<T>
 class QgsSettingsEntryByReference : QgsSettingsEntryBase
@@ -483,6 +487,8 @@ Returns the former value
 Returns the current value (or default) if there is no former value.
 %End
 
+    virtual bool checkValue( const QVariant &value ) const;
+
   protected:
     bool setValuePrivate( const T &value, const QStringList &dynamicKeyPartList ) const;
 %Docstring
@@ -499,7 +505,7 @@ Converts the variant value to the value type of the setting
 Converts the value to a variant
 %End
 
-    virtual bool checkValue( const T &value ) const;
+    virtual bool checkValuePrivate( const T &value ) const;
 %Docstring
 Check if the value is valid
 %End
@@ -624,6 +630,8 @@ Returns the former value
 Returns the current value (or default) if there is no former value.
 %End
 
+    virtual bool checkValue( const QVariant &value ) const;
+
   protected:
     virtual bool setValuePrivate( T value, const QStringList &dynamicKeyPartList ) const;
 %Docstring
@@ -640,11 +648,12 @@ Converts the variant value to the value type of the setting
 Converts the value to a variant
 %End
 
-    virtual bool checkValue( T value ) const;
+    virtual bool checkValuePrivate( T value ) const;
 %Docstring
 Check if the value is valid
 %End
 };
+
 
 
 /************************************************************************

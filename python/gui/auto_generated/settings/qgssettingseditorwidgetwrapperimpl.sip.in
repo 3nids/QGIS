@@ -29,16 +29,19 @@ This class is a factory of editor for string settings
     virtual QString id() const;
 
 
-    virtual QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 );
+    virtual QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 );
 
 
-    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting );
+    virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting );
+
 
     virtual bool setWidgetFromSetting( ) const;
 
 
     virtual bool setSettingFromWidget( ) const;
 
+
+    virtual QVariant valueFromWidget() const;
 
 };
 

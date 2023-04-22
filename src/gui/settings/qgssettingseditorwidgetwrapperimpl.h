@@ -41,13 +41,15 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
 
     QString id() const override;
 
-    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) override;
+    QWidget *createEditorPrivate( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr ) override;
 
-    virtual bool configureEditorImplementation( QWidget *editor, const QgsSettingsEntryBase *setting ) override;
+    bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) override;
 
     bool setWidgetFromSetting( ) const override;
 
     bool setSettingFromWidget( ) const override;
+
+    virtual QVariant valueFromWidget() const override;
 
   private:
     const QgsSettingsEntryString *mSettingsString = nullptr;

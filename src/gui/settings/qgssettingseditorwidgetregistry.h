@@ -47,14 +47,14 @@ class GUI_EXPORT QgsSettingsEditorWidgetRegistry
     //! Returns a new instance of the editor for the given id
     QgsSettingsEditorWidgetWrapper *wrapper( const QString &id ) const;
 
-    QWidget* createEditor(const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList , QWidget *parent = nullptr) const SIP_FACTORY;
+    QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent = nullptr ) const SIP_FACTORY;
 
     //! Returns a map <name, id> of all registered editors.
     QMap<QString, QString> editorNames() const;
 
 
   private:
-    QMap<QString, QgsSettingsEditorWidgetWrapper *> mEditors;
+    QMap<QString, QgsSettingsEditorWidgetWrapper *> mWrappers;
 };
 
 #endif // QGSSETTINGSEDITORREGISTRY_H
