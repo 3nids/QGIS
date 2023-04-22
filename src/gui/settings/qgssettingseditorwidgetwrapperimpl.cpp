@@ -32,11 +32,11 @@ QString QgsSettingsStringEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
+bool QgsSettingsStringEditorWidgetWrapper::setWidgetValue( const QString &value ) const
 {
   if ( mEditor )
   {
-    mEditor->setText( mSetting->value( mDynamicKeyPartList ) );
+    mEditor->setText( value );
     return true;
   }
   else
@@ -82,11 +82,11 @@ QString QgsSettingsBoolEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Bool ) ) );
 }
 
-bool QgsSettingsBoolEditorWidgetWrapper::setWidgetFromSetting() const
+bool QgsSettingsBoolEditorWidgetWrapper::setWidgetValue( const bool &value ) const
 {
   if ( mEditor )
   {
-    mEditor->setChecked( mSetting->value( mDynamicKeyPartList ) );
+    mEditor->setChecked( value );
     return true;
   }
   else
@@ -134,11 +134,11 @@ QString QgsSettingsIntegerEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Integer ) ) );
 }
 
-bool QgsSettingsIntegerEditorWidgetWrapper::setWidgetFromSetting() const
+bool QgsSettingsIntegerEditorWidgetWrapper::setWidgetValue( const int &value ) const
 {
   if ( mEditor )
   {
-    mEditor->setValue( mSetting->value( mDynamicKeyPartList ) );
+    mEditor->setValue( value );
     return true;
   }
   else
@@ -186,11 +186,11 @@ QString QgsSettingsDoubleEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Double ) ) );
 }
 
-bool QgsSettingsDoubleEditorWidgetWrapper::setWidgetFromSetting() const
+bool QgsSettingsDoubleEditorWidgetWrapper::setWidgetValue( const double &value ) const
 {
   if ( mEditor )
   {
-    mEditor->setValue( mSetting->value( mDynamicKeyPartList ) );
+    mEditor->setValue( value );
     return true;
   }
   else
@@ -236,11 +236,11 @@ QString QgsSettingsColorEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Color ) ) );
 }
 
-bool QgsSettingsColorEditorWidgetWrapper::setWidgetFromSetting() const
+bool QgsSettingsColorEditorWidgetWrapper::setWidgetValue( const QColor &value ) const
 {
   if ( mEditor )
   {
-    mEditor->setColor( mSetting->value( mDynamicKeyPartList ) );
+    mEditor->setColor( value );
     return true;
   }
   else

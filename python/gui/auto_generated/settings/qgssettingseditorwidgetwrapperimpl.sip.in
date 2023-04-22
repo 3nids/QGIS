@@ -29,9 +29,13 @@ This class is a base factory of editor for settings
     QgsSettingsEditorWidgetWrapperTemplate();
     virtual QString id() const = 0;
 
-    virtual bool setWidgetFromSetting() const = 0;
+    virtual bool setWidgetFromSetting() const;
 
     virtual bool setSettingFromWidget() const = 0;
+
+    virtual void setWidgetFromVariant( const QVariant &value ) const;
+
+    virtual bool setWidgetValue( const U &value ) const = 0;
 
     virtual QVariant variantValueFromWidget() const;
 
@@ -78,13 +82,13 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString,QLineEdit,
     virtual QString id() const;
 
 
-    virtual bool setWidgetFromSetting() const;
-
-
     virtual bool setSettingFromWidget() const;
 
 
     virtual QString valueFromWidget() const;
+
+
+    virtual bool setWidgetValue( const QString &value ) const;
 
 };
 
@@ -109,13 +113,13 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool,QCheckBox,bo
     virtual QString id() const;
 
 
-    virtual bool setWidgetFromSetting() const;
-
-
     virtual bool setSettingFromWidget() const;
 
 
     virtual bool valueFromWidget() const;
+
+
+    virtual bool setWidgetValue( const bool &value ) const;
 
 };
 
@@ -140,13 +144,13 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger,QSpinBox,
     virtual QString id() const;
 
 
-    virtual bool setWidgetFromSetting() const;
-
-
     virtual bool setSettingFromWidget() const;
 
 
     virtual int valueFromWidget() const;
+
+
+    virtual bool setWidgetValue( const int &value ) const;
 
 };
 
@@ -172,13 +176,13 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble,QDoubleSpi
     virtual QString id() const;
 
 
-    virtual bool setWidgetFromSetting() const;
-
-
     virtual bool setSettingFromWidget() const;
 
 
     virtual double valueFromWidget() const;
+
+
+    virtual bool setWidgetValue( const double &value ) const;
 
 };
 
@@ -189,7 +193,7 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor,QgsColorBut
 class QgsSettingsColorEditorWidgetWrapper : QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryColorQgsColorButtonQColorBase
 {
 %Docstring(signature="appended")
-This class is a factory of editor for boolean settings
+This class is a factory of editor for color settings
 
 .. versionadded:: 3.32
 %End
@@ -204,13 +208,13 @@ typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor,QgsColorBut
     virtual QString id() const;
 
 
-    virtual bool setWidgetFromSetting() const;
-
-
     virtual bool setSettingFromWidget() const;
 
 
     virtual QColor valueFromWidget() const;
+
+
+    virtual bool setWidgetValue( const QColor &value ) const;
 
 };
 

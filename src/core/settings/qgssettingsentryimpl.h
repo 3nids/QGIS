@@ -114,7 +114,6 @@ class CORE_EXPORT QgsSettingsEntryVariant : public QgsSettingsEntryBaseTemplate<
 
     virtual Qgis::SettingsType settingsType() const override;
 
-  private:
     QVariant convertFromVariant( const QVariant &value ) const override SIP_FORCE {return value;}
 };
 
@@ -211,9 +210,10 @@ class CORE_EXPORT QgsSettingsEntryString : public QgsSettingsEntryBaseTemplate<Q
      */
     int maxLength() const;
 
+    QString convertFromVariant( const QVariant &value ) const override SIP_FORCE;
+
   private:
     bool checkValuePrivate( const QString &value ) const override SIP_FORCE;
-    QString convertFromVariant( const QVariant &value ) const override SIP_FORCE;
 
     int mMinLength;
     int mMaxLength;
@@ -291,9 +291,7 @@ class CORE_EXPORT QgsSettingsEntryStringList : public QgsSettingsEntryBaseTempla
 
     virtual Qgis::SettingsType settingsType() const override;
 
-  private:
     QStringList convertFromVariant( const QVariant &value ) const override SIP_FORCE;
-
 };
 
 
@@ -367,7 +365,6 @@ class CORE_EXPORT QgsSettingsEntryBool : public QgsSettingsEntryBaseTemplate<boo
 
     virtual Qgis::SettingsType settingsType() const override;
 
-  private:
     bool convertFromVariant( const QVariant &value ) const override SIP_FORCE;
 };
 
@@ -467,9 +464,10 @@ class CORE_EXPORT QgsSettingsEntryInteger : public QgsSettingsEntryBaseTemplate<
      */
     int maxValue() const;
 
+    int convertFromVariant( const QVariant &value ) const override SIP_FORCE;
+
   private:
     bool checkValuePrivate( const int &value ) const override SIP_FORCE;
-    int convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     int mMinValue;
     int mMaxValue;
 };
@@ -546,9 +544,10 @@ class CORE_EXPORT QgsSettingsEntryInteger64 : public QgsSettingsEntryBaseTemplat
      */
     qlonglong maxValue() const;
 
+    qlonglong convertFromVariant( const QVariant &value ) const override;
+
   private:
     bool checkValuePrivate( const qlonglong &value ) const override;
-    qlonglong convertFromVariant( const QVariant &value ) const override;
     qlonglong mMinValue;
     qlonglong mMaxValue;
 };
@@ -672,9 +671,10 @@ class CORE_EXPORT QgsSettingsEntryDouble : public QgsSettingsEntryBaseTemplate<d
      */
     int displayHintDecimals() const;
 
+    double convertFromVariant( const QVariant &value ) const override SIP_FORCE;
+
   private:
     bool checkValuePrivate( const double &value ) const override SIP_FORCE;
-    double convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     double mMinValue;
     double mMaxValue;
 
@@ -779,9 +779,9 @@ class CORE_EXPORT QgsSettingsEntryColor : public QgsSettingsEntryBaseTemplate<QC
      */
     void copyValueToKeys( const QString &redKey, const QString &greenKey, const QString &blueKey, const QString &alphaKey = QString() ) const SIP_SKIP;
 
+    QColor convertFromVariant( const QVariant &value ) const override SIP_FORCE;
 
   private:
-    QColor convertFromVariant( const QVariant &value ) const override SIP_FORCE;
     bool checkValuePrivate( const QColor &value ) const override SIP_FORCE;
     bool mAllowAlpha = true;
 };
@@ -858,9 +858,7 @@ class CORE_EXPORT QgsSettingsEntryVariantMap : public QgsSettingsEntryBaseTempla
 
     virtual Qgis::SettingsType settingsType() const override;
 
-  private:
     QVariantMap convertFromVariant( const QVariant &value ) const override SIP_FORCE;
-
 };
 
 

@@ -392,8 +392,7 @@ QWidget *QgsSettingsTreeItemDelegate::createEditor( QWidget *parent, const QStyl
     QgsSettingsTreeModelNodeData *nodeData = mModel->index2node( index );
     if ( nodeData->type() == QgsSettingsTreeModelNodeData::Type::Setting )
     {
-      QWidget *widget = QgsGui::settingsEditorWidgetRegistry()->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
-      return widget;
+      return QgsGui::settingsEditorWidgetRegistry()->createEditor( nodeData->setting(), nodeData->namedParentNodes(), parent );
     }
   }
   return nullptr;
@@ -403,14 +402,16 @@ void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIn
 {
   Q_UNUSED( index )
   QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
-  eww->setWidgetFromSetting();
+  if ( eww )
+    eww->setWidgetFromSetting();
 }
 
 void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const
 {
   Q_UNUSED( index )
   QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
-  model->setData( index, eww->variantValueFromWidget(), Qt::EditRole );
+  if ( eww )
+    model->setData( index, eww->variantValueFromWidget(), Qt::EditRole );
 }
 
 

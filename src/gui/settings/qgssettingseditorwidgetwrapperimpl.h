@@ -20,6 +20,7 @@
 
 #include "qgis_gui.h"
 #include "qgssettingseditorwidgetwrapper.h"
+#include "qgslogger.h"
 
 #include "qgssettingsentryimpl.h"
 #include "qgscolorbutton.h"
@@ -49,9 +50,23 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEdit
 
     virtual QString id() const override = 0;
 
-    virtual bool setWidgetFromSetting() const override = 0;
+    virtual bool setWidgetFromSetting() const override
+    {
+      if ( mSetting )
+        return setWidgetValue( mSetting->value( mDynamicKeyPartList ) );
+
+      QgsDebugMsg( "editor is not configured" );
+      return false;
+    }
 
     virtual bool setSettingFromWidget() const override = 0;
+
+    void setWidgetFromVariant( const QVariant &value ) const override
+    {
+      setWidgetValue( mSetting->convertFromVariant( value ) );
+    }
+
+    virtual bool setWidgetValue( const U &value ) const = 0;
 
     QVariant variantValueFromWidget() const override
     {
@@ -105,11 +120,11 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
 
     QString id() const override;
 
-    bool setWidgetFromSetting() const override;
-
     bool setSettingFromWidget() const override;
 
     QString valueFromWidget() const override;
+
+    bool setWidgetValue( const QString &value ) const override;
 };
 
 /**
@@ -126,11 +141,11 @@ class GUI_EXPORT QgsSettingsBoolEditorWidgetWrapper : public QgsSettingsEditorWi
 
     QString id() const override;
 
-    bool setWidgetFromSetting() const override;
-
     bool setSettingFromWidget() const override;
 
     bool valueFromWidget() const override;
+
+    bool setWidgetValue( const bool &value ) const override;
 };
 
 /**
@@ -147,11 +162,11 @@ class GUI_EXPORT QgsSettingsIntegerEditorWidgetWrapper : public QgsSettingsEdito
 
     QString id() const override;
 
-    bool setWidgetFromSetting() const override;
-
     bool setSettingFromWidget() const override;
 
     int valueFromWidget() const override;
+
+    bool setWidgetValue( const int &value ) const override;
 };
 
 
@@ -169,17 +184,17 @@ class GUI_EXPORT QgsSettingsDoubleEditorWidgetWrapper : public QgsSettingsEditor
 
     QString id() const override;
 
-    bool setWidgetFromSetting() const override;
-
     bool setSettingFromWidget() const override;
 
     double valueFromWidget() const override;
+
+    bool setWidgetValue( const double &value ) const override;
 };
 
 
 /**
  * \ingroup gui
- * \brief This class is a factory of editor for boolean settings
+ * \brief This class is a factory of editor for color settings
  *
  * \since QGIS 3.32
  */
@@ -191,11 +206,11 @@ class GUI_EXPORT QgsSettingsColorEditorWidgetWrapper : public QgsSettingsEditorW
 
     QString id() const override;
 
-    bool setWidgetFromSetting() const override;
-
     bool setSettingFromWidget() const override;
 
     QColor valueFromWidget() const override;
+
+    bool setWidgetValue( const QColor &value ) const override;
 };
 
 ///**

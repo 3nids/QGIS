@@ -107,7 +107,6 @@ Returns settings value.
 
     virtual Qgis::SettingsType settingsType() const;
 
-  private:
     virtual QVariant convertFromVariant( const QVariant &value ) const;
 };
 
@@ -203,10 +202,11 @@ Returns the string minimum length.
 Returns the string maximum length. By -1 there is no limitation.
 %End
 
+    virtual QString convertFromVariant( const QVariant &value ) const;
+
+
   private:
     virtual bool checkValuePrivate( const QString &value ) const;
-
-    virtual QString convertFromVariant( const QVariant &value ) const;
 
 };
 
@@ -284,7 +284,6 @@ This constructor is intended to be used from plugins.
 
     virtual Qgis::SettingsType settingsType() const;
 
-  private:
     virtual QStringList convertFromVariant( const QVariant &value ) const;
 
 };
@@ -363,7 +362,6 @@ This constructor is intended to be used from plugins.
 
     virtual Qgis::SettingsType settingsType() const;
 
-  private:
     virtual bool convertFromVariant( const QVariant &value ) const;
 
 };
@@ -463,10 +461,11 @@ Returns the minimum value.
 Returns the maximum value.
 %End
 
+    virtual int convertFromVariant( const QVariant &value ) const;
+
+
   private:
     virtual bool checkValuePrivate( const int &value ) const;
-
-    virtual int convertFromVariant( const QVariant &value ) const;
 
 };
 
@@ -586,10 +585,11 @@ displayHintDecimals The number of decimals that should be shown in the Gui.
 Returns how much decimals should be shown in the Gui.
 %End
 
+    virtual double convertFromVariant( const QVariant &value ) const;
+
+
   private:
     virtual bool checkValuePrivate( const double &value ) const;
-
-    virtual double convertFromVariant( const QVariant &value ) const;
 
 };
 
@@ -681,10 +681,10 @@ Returns ``True`` if transparency is allowed for the color
 
 
 
-
-  private:
     virtual QColor convertFromVariant( const QVariant &value ) const;
 
+
+  private:
     virtual bool checkValuePrivate( const QColor &value ) const;
 
 };
@@ -762,7 +762,6 @@ This constructor is intended to be used from plugins.
 
     virtual Qgis::SettingsType settingsType() const;
 
-  private:
     virtual QVariantMap convertFromVariant( const QVariant &value ) const;
 
 };

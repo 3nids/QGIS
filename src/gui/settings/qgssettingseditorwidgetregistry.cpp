@@ -49,14 +49,18 @@ QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const 
   }
   else
   {
-    QgsDebugMsg( QStringLiteral( "Setting factory was not found for '%1', returning the default string factory" ) );
-    return mWrappers[QStringLiteral( "String" )];
+    QgsDebugMsg( QStringLiteral( "Setting factory was not found for '%1', returning the default string factory" ).arg( id ) );
+    return nullptr;
   }
 }
 
 QWidget *QgsSettingsEditorWidgetRegistry::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
 {
-  return wrapper( setting->typeId() )->createEditor( setting, dynamicKeyPartList, parent );
+  QgsSettingsEditorWidgetWrapper *eww = wrapper( setting->typeId() );
+  if (eww)
+    return eww->createEditor( setting, dynamicKeyPartList, parent );
+  else
+    return nullptr;
 }
 
 

@@ -53,11 +53,30 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
     //! Configures the \a editor according the setting
     bool configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList() );
 
-    virtual bool setWidgetFromSetting( ) const = 0;
+    /**
+     * Sets the widget value from the setting value
+     * The wrapper must be configured before calling this medthod
+     */
+    virtual bool setWidgetFromSetting() const = 0;
 
-    virtual bool setSettingFromWidget( ) const = 0;
+    /**
+     * SDets the setting value from the widget value
+     * The wrapper must be configured before calling this medthod
+     */
+    virtual bool setSettingFromWidget() const = 0;
 
+    /**
+     * Returns the value from the widget as a variant
+     * The wrapper must be configured before calling this medthod
+     */
     virtual QVariant variantValueFromWidget() const = 0;
+
+    /**
+     * Sets the value of the widget
+     * The wrapper must be configured before calling this medthod
+     */
+    virtual void setWidgetFromVariant( const QVariant &value ) const = 0;
+
 
   protected:
     virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) = 0;

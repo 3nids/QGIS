@@ -475,6 +475,9 @@ class QgsSettingsEntryBaseTemplate : public QgsSettingsEntryBase
       return checkValuePrivate( convertFromVariant( value ) );
     }
 
+    //! Converts the variant value to the value type of the setting
+    virtual T convertFromVariant( const QVariant &value ) const = 0;
+
   protected:
     //! Sets the settings value with an optional list of dynamic parts
     virtual bool setValuePrivate( const T &value, const QStringList &dynamicKeyPartList ) const
@@ -484,9 +487,6 @@ class QgsSettingsEntryBaseTemplate : public QgsSettingsEntryBase
       else
         return false;
     }
-
-    //! Converts the variant value to the value type of the setting
-    virtual T convertFromVariant( const QVariant &value ) const = 0;
 
     //! Converts the value to a variant
     virtual QVariant convertToVariant( const T &value ) const
