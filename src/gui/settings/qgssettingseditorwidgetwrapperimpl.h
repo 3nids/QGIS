@@ -84,7 +84,9 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEdit
   protected:
     virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) override
     {
-      return new V( parent );
+      V *editor = new V( parent );
+      editor->setAutoFillBackground( true );
+      return editor;
     }
 
     bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) override

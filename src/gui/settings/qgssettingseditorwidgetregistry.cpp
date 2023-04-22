@@ -24,6 +24,10 @@ QgsSettingsEditorWidgetRegistry::QgsSettingsEditorWidgetRegistry()
 {
   addWrapper( new QgsSettingsStringEditorWidgetWrapper() );
   addWrapper( new QgsSettingsBoolEditorWidgetWrapper() );
+  addWrapper( new QgsSettingsIntegerEditorWidgetWrapper() );
+  addWrapper( new QgsSettingsDoubleEditorWidgetWrapper() );
+  addWrapper( new QgsSettingsColorEditorWidgetWrapper() );
+
 }
 
 QgsSettingsEditorWidgetRegistry::~QgsSettingsEditorWidgetRegistry()
@@ -57,7 +61,7 @@ QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const 
 QWidget *QgsSettingsEditorWidgetRegistry::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
 {
   QgsSettingsEditorWidgetWrapper *eww = wrapper( setting->typeId() );
-  if (eww)
+  if ( eww )
     return eww->createEditor( setting, dynamicKeyPartList, parent );
   else
     return nullptr;
