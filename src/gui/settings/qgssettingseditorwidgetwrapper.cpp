@@ -50,7 +50,6 @@ QWidget *QgsSettingsEditorWidgetWrapper::createEditor( const QgsSettingsEntryBas
 
 bool QgsSettingsEditorWidgetWrapper::configureEditor( QWidget *editor, const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList )
 {
-  mSetting = setting;
   mDynamicKeyPartList = dynamicKeyPartList;
 
   bool ok = configureEditorPrivate( editor, setting );

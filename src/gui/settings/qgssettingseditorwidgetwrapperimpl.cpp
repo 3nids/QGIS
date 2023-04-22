@@ -17,13 +17,14 @@
 #include "qgssettingseditorwidgetwrapperimpl.h"
 #include "qgslogger.h"
 #include "qgssettingsentryimpl.h"
+#include "qgscolorbutton.h"
 
 #include <QLineEdit>
 #include <QCheckBox>
 
 
 // *******
-// Bool
+// String
 // *******
 
 QString QgsSettingsStringEditorWidgetWrapper::id() const
@@ -31,28 +32,11 @@ QString QgsSettingsStringEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::String ) ) );
 }
 
-QWidget *QgsSettingsStringEditorWidgetWrapper::createEditorPrivate( QWidget *parent )
-{
-  QLineEdit *editor = new QLineEdit( parent );
-  return editor;
-}
-
-bool QgsSettingsStringEditorWidgetWrapper::configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting )
-{
-  mSettingsString = dynamic_cast<const QgsSettingsEntryString *>( setting );
-  mLineEdit = qobject_cast<QLineEdit *>( editor );
-  if ( mLineEdit )
-  {
-    return true;
-  }
-  return false;
-}
-
 bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
 {
-  if ( mLineEdit )
+  if ( mEditor )
   {
-    mLineEdit->setText( mSettingsString->value( mDynamicKeyPartList ) );
+    mEditor->setText( mSetting->value( mDynamicKeyPartList ) );
     return true;
   }
   else
@@ -64,9 +48,9 @@ bool QgsSettingsStringEditorWidgetWrapper::setWidgetFromSetting() const
 
 bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
 {
-  if ( mLineEdit )
+  if ( mEditor )
   {
-    mSettingsString->setValue( mLineEdit->text(), mDynamicKeyPartList );
+    mSetting->setValue( mEditor->text(), mDynamicKeyPartList );
     return true;
   }
   else
@@ -76,15 +60,18 @@ bool QgsSettingsStringEditorWidgetWrapper::setSettingFromWidget() const
   return false;
 }
 
-QVariant QgsSettingsStringEditorWidgetWrapper::valueFromWidget() const
+QString QgsSettingsStringEditorWidgetWrapper::valueFromWidget() const
 {
-  if ( mLineEdit )
+  if ( mEditor )
   {
-    return mLineEdit->text();
+    return mEditor->text();
   }
-  return QVariant();
+  else
+  {
+    QgsDebugMsg( QString( "editor is not set, returning a non-existing value" ) );
+  }
+  return QString();
 }
-
 
 // *******
 // Boolean
@@ -95,28 +82,11 @@ QString QgsSettingsBoolEditorWidgetWrapper::id() const
   return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Bool ) ) );
 }
 
-QWidget *QgsSettingsBoolEditorWidgetWrapper::createEditorPrivate( QWidget *parent )
-{
-  QLineEdit *editor = new QLineEdit( parent );
-  return editor;
-}
-
-bool QgsSettingsBoolEditorWidgetWrapper::configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting )
-{
-  mSettingsBool = dynamic_cast<const QgsSettingsEntryBool *>( setting );
-  mCheckBox = qobject_cast<QCheckBox *>( editor );
-  if ( mCheckBox )
-  {
-    return true;
-  }
-  return false;
-}
-
 bool QgsSettingsBoolEditorWidgetWrapper::setWidgetFromSetting() const
 {
-  if ( mCheckBox )
+  if ( mEditor )
   {
-    mCheckBox->setChecked( mSettingsBool->value( mDynamicKeyPartList ) );
+    mEditor->setChecked( mSetting->value( mDynamicKeyPartList ) );
     return true;
   }
   else
@@ -128,9 +98,9 @@ bool QgsSettingsBoolEditorWidgetWrapper::setWidgetFromSetting() const
 
 bool QgsSettingsBoolEditorWidgetWrapper::setSettingFromWidget() const
 {
-  if ( mCheckBox )
+  if ( mEditor )
   {
-    mSettingsBool->setValue( mCheckBox->isChecked(), mDynamicKeyPartList );
+    mSetting->setValue( mEditor->isChecked(), mDynamicKeyPartList );
     return true;
   }
   else
@@ -140,11 +110,219 @@ bool QgsSettingsBoolEditorWidgetWrapper::setSettingFromWidget() const
   return false;
 }
 
-QVariant QgsSettingsBoolEditorWidgetWrapper::valueFromWidget() const
+bool QgsSettingsBoolEditorWidgetWrapper::valueFromWidget() const
 {
-  if ( mCheckBox )
+
+  if ( mEditor )
   {
-    return mCheckBox->isChecked();
+    return mEditor->isChecked();
   }
-  return QVariant();
+  else
+  {
+    QgsDebugMsg( QString( "editor is not set, returning a non-existing value" ) );
+  }
+  return false;
 }
+
+
+// *******
+// Integer
+// *******
+
+QString QgsSettingsIntegerEditorWidgetWrapper::id() const
+{
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Integer ) ) );
+}
+
+bool QgsSettingsIntegerEditorWidgetWrapper::setWidgetFromSetting() const
+{
+  if ( mEditor )
+  {
+    mEditor->setValue( mSetting->value( mDynamicKeyPartList ) );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+bool QgsSettingsIntegerEditorWidgetWrapper::setSettingFromWidget() const
+{
+  if ( mEditor )
+  {
+    mSetting->setValue( mEditor->value(), mDynamicKeyPartList );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+int QgsSettingsIntegerEditorWidgetWrapper::valueFromWidget() const
+{
+  if ( mEditor )
+  {
+    return mEditor->value();
+  }
+  else
+  {
+    QgsDebugMsg( QString( "editor is not set, returning a non-existing value" ) );
+  }
+  return std::numeric_limits<int>::quiet_NaN();
+}
+
+
+
+// *******
+// Double
+// *******
+
+QString QgsSettingsDoubleEditorWidgetWrapper::id() const
+{
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Double ) ) );
+}
+
+bool QgsSettingsDoubleEditorWidgetWrapper::setWidgetFromSetting() const
+{
+  if ( mEditor )
+  {
+    mEditor->setValue( mSetting->value( mDynamicKeyPartList ) );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+bool QgsSettingsDoubleEditorWidgetWrapper::setSettingFromWidget() const
+{
+  if ( mEditor )
+  {
+    mSetting->setValue( mEditor->value(), mDynamicKeyPartList );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+double QgsSettingsDoubleEditorWidgetWrapper::valueFromWidget() const
+{
+  if ( mEditor )
+  {
+    return mEditor->value();
+  }
+  else
+  {
+    QgsDebugMsg( QString( "editor is not set, returning a non-existing value" ) );
+  }
+  return std::numeric_limits<double>::quiet_NaN();
+}
+
+// *******
+// Color
+// *******
+
+QString QgsSettingsColorEditorWidgetWrapper::id() const
+{
+  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::Color ) ) );
+}
+
+bool QgsSettingsColorEditorWidgetWrapper::setWidgetFromSetting() const
+{
+  if ( mEditor )
+  {
+    mEditor->setColor( mSetting->value( mDynamicKeyPartList ) );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+bool QgsSettingsColorEditorWidgetWrapper::setSettingFromWidget() const
+{
+  if ( mEditor )
+  {
+    mSetting->setValue( mEditor->color(), mDynamicKeyPartList );
+    return true;
+  }
+  else
+  {
+    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+  }
+  return false;
+}
+
+QColor QgsSettingsColorEditorWidgetWrapper::valueFromWidget() const
+{
+  if ( mEditor )
+  {
+    return mEditor->color();
+  }
+  else
+  {
+    QgsDebugMsg( QString( "editor is not set, returning a non-existing value" ) );
+  }
+  return QColor();
+}
+
+// *******
+// StringList
+// *******
+
+//QString QgsSettingsStringListEditorWidgetWrapper::id() const
+//{
+//  return QString::fromUtf8( sSettingsTypeMetaEnum.valueToKey( static_cast<int>( Qgis::SettingsType::StringList ) ) );
+//}
+
+//bool QgsSettingsStringListEditorWidgetWrapper::setWidgetFromSetting() const
+//{
+//  if ( mEditor )
+//  {
+//    mEditor->setValue( mSetting->value( mDynamicKeyPartList ) );
+//    return true;
+//  }
+//  else
+//  {
+//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+//  }
+//  return false;
+//}
+
+//bool QgsSettingsStringListEditorWidgetWrapper::setSettingFromWidget() const
+//{
+//  if ( mEditor )
+//  {
+//    mSetting->setValue( mEditor->value(), mDynamicKeyPartList );
+//    return true;
+//  }
+//  else
+//  {
+//    QgsDebugMsg( QStringLiteral( "Settings editor not set for %1" ).arg( mSetting->definitionKey() ) );
+//  }
+//  return false;
+//}
+
+//QVariant QgsSettingsStringListEditorWidgetWrapper::valueFromWidget() const
+//{
+//  if ( mEditor )
+//  {
+//    return mEditor->value();
+//  }
+//  else
+//  {
+//    QgsDebugMsg(QString("editor is not set, returning a non-existing value"));
+//  }
+//  return QStringList();
+//}

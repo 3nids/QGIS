@@ -57,7 +57,7 @@ Configures the ``editor`` according the setting
 
     virtual bool setSettingFromWidget( ) const = 0;
 
-    virtual QVariant valueFromWidget() const = 0;
+    virtual QVariant variantValueFromWidget() const = 0;
 
   protected:
     virtual QWidget *createEditorPrivate( QWidget *parent = 0 ) = 0;

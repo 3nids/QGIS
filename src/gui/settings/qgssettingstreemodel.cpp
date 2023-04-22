@@ -408,7 +408,7 @@ void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemMo
 {
   Q_UNUSED( index )
   QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
-  model->setData( index, eww->valueFromWidget(), Qt::EditRole );
+  model->setData( index, eww->variantValueFromWidget(), Qt::EditRole );
 }
 
 

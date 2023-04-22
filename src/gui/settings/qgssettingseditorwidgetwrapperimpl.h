@@ -16,18 +16,79 @@
 #ifndef QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H
 #define QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H
 
-#include <QVariant>
+#include <QColor>
 
 #include "qgis_gui.h"
 #include "qgssettingseditorwidgetwrapper.h"
 
-class QCheckBox;
-class QLineEdit;
+#include "qgssettingsentryimpl.h"
+#include "qgscolorbutton.h"
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QTableWidget>
 
-class QgsSettingsEntryBase;
-class QgsSettingsEntryInteger;
-class QgsSettingsEntryBool;
-class QgsSettingsEntryString;
+
+//TODO variant map, enum
+
+class QgsColorButton;
+
+/**
+ * \ingroup gui
+ * \brief This class is a base factory of editor for settings
+ *
+ * \since QGIS 3.32
+ */
+template<class T, class V, class U>
+class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEditorWidgetWrapper
+{
+  public:
+    QgsSettingsEditorWidgetWrapperTemplate()
+      : QgsSettingsEditorWidgetWrapper() {}
+
+    virtual QString id() const override = 0;
+
+    virtual bool setWidgetFromSetting() const override = 0;
+
+    virtual bool setSettingFromWidget() const override = 0;
+
+    QVariant variantValueFromWidget() const override
+    {
+      return valueFromWidget();
+    };
+
+    virtual U valueFromWidget() const = 0;
+
+    //! Returns the editor
+    V *editor() const {return mEditor;}
+
+    //! Returns the setting
+    const T *setting() const {return mSetting;}
+
+  protected:
+    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) override
+    {
+      return new V( parent );
+    }
+
+    bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) override
+    {
+      mSetting = dynamic_cast<const T *>( setting );
+      mEditor = qobject_cast<V *>( editor );
+      if ( mEditor )
+      {
+        configureEditorPrivateImplementation();
+        return true;
+      }
+      return false;
+    }
+
+    virtual void configureEditorPrivateImplementation() {}
+
+    const T *mSetting = nullptr;
+    V *mEditor = nullptr;
+};
 
 
 /**
@@ -36,28 +97,19 @@ class QgsSettingsEntryString;
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapper
+class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString, QLineEdit, QString>
 {
   public:
-    QgsSettingsStringEditorWidgetWrapper( )
-      : QgsSettingsEditorWidgetWrapper( )
-    {}
+    QgsSettingsStringEditorWidgetWrapper()
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString, QLineEdit, QString>() {}
 
     QString id() const override;
 
-    QWidget *createEditorPrivate( QWidget *parent = nullptr ) override;
+    bool setWidgetFromSetting() const override;
 
-    bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) override;
+    bool setSettingFromWidget() const override;
 
-    bool setWidgetFromSetting( ) const override;
-
-    bool setSettingFromWidget( ) const override;
-
-    virtual QVariant valueFromWidget() const override;
-
-  private:
-    const QgsSettingsEntryString *mSettingsString = nullptr;
-    QLineEdit *mLineEdit = nullptr;
+    QString valueFromWidget() const override;
 };
 
 /**
@@ -66,30 +118,106 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
  *
  * \since QGIS 3.32
  */
-class GUI_EXPORT QgsSettingsBoolEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapper
+class GUI_EXPORT QgsSettingsBoolEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool, QCheckBox, bool>
 {
   public:
     QgsSettingsBoolEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapper( )
-    {}
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool, QCheckBox, bool>() {}
 
     QString id() const override;
 
-    QWidget *createEditorPrivate( QWidget *parent = nullptr ) override;
+    bool setWidgetFromSetting() const override;
 
-    bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) override;
+    bool setSettingFromWidget() const override;
 
-    bool setWidgetFromSetting( ) const override;
-
-    bool setSettingFromWidget( ) const override;
-
-    virtual QVariant valueFromWidget() const override;
-
-  private:
-    const QgsSettingsEntryBool *mSettingsBool = nullptr;
-    QCheckBox *mCheckBox = nullptr;
+    bool valueFromWidget() const override;
 };
 
+/**
+ * \ingroup gui
+ * \brief This class is a factory of editor for integer settings
+ *
+ * \since QGIS 3.32
+ */
+class GUI_EXPORT QgsSettingsIntegerEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger, QSpinBox, int>
+{
+  public:
+    QgsSettingsIntegerEditorWidgetWrapper()
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger, QSpinBox, int>() {}
+
+    QString id() const override;
+
+    bool setWidgetFromSetting() const override;
+
+    bool setSettingFromWidget() const override;
+
+    int valueFromWidget() const override;
+};
+
+
+/**
+ * \ingroup gui
+ * \brief This class is a factory of editor for double settings
+ *
+ * \since QGIS 3.32
+ */
+class GUI_EXPORT QgsSettingsDoubleEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble, QDoubleSpinBox, double>
+{
+  public:
+    QgsSettingsDoubleEditorWidgetWrapper()
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble, QDoubleSpinBox, double>() {}
+
+    QString id() const override;
+
+    bool setWidgetFromSetting() const override;
+
+    bool setSettingFromWidget() const override;
+
+    double valueFromWidget() const override;
+};
+
+
+/**
+ * \ingroup gui
+ * \brief This class is a factory of editor for boolean settings
+ *
+ * \since QGIS 3.32
+ */
+class GUI_EXPORT QgsSettingsColorEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor, QgsColorButton, QColor>
+{
+  public:
+    QgsSettingsColorEditorWidgetWrapper()
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor, QgsColorButton, QColor>() {}
+
+    QString id() const override;
+
+    bool setWidgetFromSetting() const override;
+
+    bool setSettingFromWidget() const override;
+
+    QColor valueFromWidget() const override;
+};
+
+///**
+// * \ingroup gui
+// * \brief This class is a factory of editor for boolean settings
+// *
+// * \since QGIS 3.32
+// */
+//class GUI_EXPORT QgsSettingsStringListEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryStringList, QTableWidget, QStringList>
+//{
+//  public:
+//    QgsSettingsStringListEditorWidgetWrapper()
+//      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryStringList, QTableWidget, QStringList>() {}
+
+//    QString id() const override;
+
+//    bool setWidgetFromSetting() const override;
+
+//    bool setSettingFromWidget() const override;
+
+//    QStringList valueFromWidget() const override;
+//};
 
 
 #endif // QGSSETTINGSEDITORWIDGETWRAPPERIMPL_H
