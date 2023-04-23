@@ -62,10 +62,16 @@ void QgsSettingsTreeModelNodeData::applyChanges()
 bool QgsSettingsTreeModelNodeData::setValue( const QVariant &value )
 {
   Q_ASSERT( mType == Type::Setting );
-  if ( !mValue.isValid() || mValue != value )
+  if ( !value.isValid() && mValue.isValid() )
+  {
+    mExists = false;
+    mIsEdited = true;
+    mValue = QVariant();
+  }
+  else if ( !mValue.isValid() || mValue != value )
   {
     mValue = value;
-    mIsEdited = true;
+    mIsEdited = ( value != mOriginalValue );
   }
   // TODO: check the value of setting is fullfilling the settings' contraints
   return true;
@@ -119,6 +125,7 @@ void QgsSettingsTreeModelNodeData::addChildForSetting( const QgsSettingsEntryBas
   nodeData->mSetting = setting;
   nodeData->mName = setting->name();
   nodeData->mValue = setting->valueAsVariant( mNamedParentNodes );
+  nodeData->mOriginalValue = nodeData->mValue;
   nodeData->mExists = setting->exists( mNamedParentNodes );
 
   switch ( mNamedParentNodes.count() )
@@ -403,7 +410,7 @@ void QgsSettingsTreeItemDelegate::setEditorData( QWidget *editor, const QModelIn
   Q_UNUSED( index )
   QgsSettingsEditorWidgetWrapper *eww = QgsSettingsEditorWidgetWrapper::fromWidget( editor );
   if ( eww )
-    eww->setWidgetFromSetting();
+    eww->setWidgetFromVariant( mModel->data( index, Qt::DisplayRole ) );
 }
 
 void QgsSettingsTreeItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model, const QModelIndex &index ) const

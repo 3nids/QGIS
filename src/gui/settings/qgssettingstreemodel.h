@@ -83,6 +83,9 @@ class GUI_EXPORT QgsSettingsTreeModelNodeData : public QObject
     //! Returns the value of the node (setting or tree node)
     QVariant value() const {return mValue;}
 
+    //! Returns the value of the node (setting or tree node)
+    QVariant originalValue() const {return mOriginalValue;}
+
     //! Sets the value of the setting node
     bool setValue( const QVariant &value );
 
@@ -109,6 +112,7 @@ class GUI_EXPORT QgsSettingsTreeModelNodeData : public QObject
     Type mType = Type::TreeNode;
     QString mName;
     QVariant mValue;
+    QVariant mOriginalValue;
     QStringList mNamedParentNodes;
     bool mExists = false;
     bool mIsEdited = false;
@@ -120,14 +124,13 @@ class GUI_EXPORT QgsSettingsTreeModelNodeData : public QObject
     const QgsSettingsEntryBase *mSetting = nullptr;
 };
 
-///@endcond
-
-#endif
 
 /**
  * \ingroup gui
  * \class QgsSettingsTreeItemDelegate
  * \brief QgsSettingsTreeItemDelegate allows editing the settings in the settings tree
+ *
+ * \note Not available in Python bindings
  *
  * \since QGIS 3.32
  */
@@ -147,6 +150,9 @@ class GUI_EXPORT QgsSettingsTreeItemDelegate : public QItemDelegate
     QgsSettingsTreeModel *mModel = nullptr;
 };
 
+///@endcond
+
+#endif
 
 
 /**
