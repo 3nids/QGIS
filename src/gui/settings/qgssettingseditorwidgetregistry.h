@@ -16,6 +16,7 @@
 #ifndef QGSSETTINGSEDITORREGISTRY_H
 #define QGSSETTINGSEDITORREGISTRY_H
 
+#include <QObject>
 #include <QMap>
 
 #include "qgis_gui.h"
@@ -45,8 +46,9 @@ class GUI_EXPORT QgsSettingsEditorWidgetRegistry
     bool addWrapper( QgsSettingsEditorWidgetWrapper *wrapper SIP_TRANSFER );
 
     //! Returns a new instance of the editor for the given id
-    QgsSettingsEditorWidgetWrapper *wrapper( const QString &id ) const;
+    QgsSettingsEditorWidgetWrapper *createWrapper( const QString &id, QObject *parent ) const;
 
+    //! Creates the editor for the given settings using the corresponding registered wrapper
     QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent = nullptr ) const SIP_FACTORY;
 
     //! Returns a map <name, id> of all registered editors.

@@ -45,8 +45,8 @@ template<class T, class V, class U>
 class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEditorWidgetWrapper
 {
   public:
-    QgsSettingsEditorWidgetWrapperTemplate()
-      : QgsSettingsEditorWidgetWrapper() {}
+    QgsSettingsEditorWidgetWrapperTemplate( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapper( parent ) {}
 
     virtual QString id() const override = 0;
 
@@ -81,8 +81,10 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEdit
     //! Returns the setting
     const T *setting() const {return mSetting;}
 
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override = 0;
+
   protected:
-    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) override
+    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) const override
     {
       V *editor = new V( parent );
       editor->setAutoFillBackground( true );
@@ -117,8 +119,10 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapperTemplate : public QgsSettingsEdit
 class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString, QLineEdit, QString>
 {
   public:
-    QgsSettingsStringEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString, QLineEdit, QString>() {}
+    QgsSettingsStringEditorWidgetWrapper( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString, QLineEdit, QString>( parent ) {}
+
+    QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override {return new QgsSettingsStringEditorWidgetWrapper( parent );}
 
     QString id() const override;
 
@@ -138,8 +142,10 @@ class GUI_EXPORT QgsSettingsStringEditorWidgetWrapper : public QgsSettingsEditor
 class GUI_EXPORT QgsSettingsBoolEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool, QCheckBox, bool>
 {
   public:
-    QgsSettingsBoolEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool, QCheckBox, bool>() {}
+    QgsSettingsBoolEditorWidgetWrapper( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool, QCheckBox, bool>( parent ) {}
+
+    QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override {return new QgsSettingsBoolEditorWidgetWrapper( parent );}
 
     QString id() const override;
 
@@ -159,8 +165,10 @@ class GUI_EXPORT QgsSettingsBoolEditorWidgetWrapper : public QgsSettingsEditorWi
 class GUI_EXPORT QgsSettingsIntegerEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger, QSpinBox, int>
 {
   public:
-    QgsSettingsIntegerEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger, QSpinBox, int>() {}
+    QgsSettingsIntegerEditorWidgetWrapper( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger, QSpinBox, int>( parent ) {}
+
+    QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override {return new QgsSettingsIntegerEditorWidgetWrapper( parent );}
 
     QString id() const override;
 
@@ -181,8 +189,10 @@ class GUI_EXPORT QgsSettingsIntegerEditorWidgetWrapper : public QgsSettingsEdito
 class GUI_EXPORT QgsSettingsDoubleEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble, QDoubleSpinBox, double>
 {
   public:
-    QgsSettingsDoubleEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble, QDoubleSpinBox, double>() {}
+    QgsSettingsDoubleEditorWidgetWrapper( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble, QDoubleSpinBox, double>( parent ) {}
+
+    QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override {return new QgsSettingsDoubleEditorWidgetWrapper( parent );}
 
     QString id() const override;
 
@@ -203,8 +213,10 @@ class GUI_EXPORT QgsSettingsDoubleEditorWidgetWrapper : public QgsSettingsEditor
 class GUI_EXPORT QgsSettingsColorEditorWidgetWrapper : public QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor, QgsColorButton, QColor>
 {
   public:
-    QgsSettingsColorEditorWidgetWrapper()
-      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor, QgsColorButton, QColor>() {}
+    QgsSettingsColorEditorWidgetWrapper( QObject *parent = nullptr )
+      : QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor, QgsColorButton, QColor>( parent ) {}
+
+    QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const override {return new QgsSettingsColorEditorWidgetWrapper( parent );}
 
     QString id() const override;
 

@@ -26,7 +26,7 @@ This class is a base factory of editor for settings
 #include "qgssettingseditorwidgetwrapperimpl.h"
 %End
   public:
-    QgsSettingsEditorWidgetWrapperTemplate();
+    QgsSettingsEditorWidgetWrapperTemplate( QObject *parent = 0 );
     virtual QString id() const = 0;
 
     virtual bool setWidgetFromSetting() const;
@@ -51,8 +51,10 @@ Returns the editor
 Returns the setting
 %End
 
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const = 0;
+
   protected:
-    virtual QWidget *createEditorPrivate( QWidget *parent = 0 );
+    virtual QWidget *createEditorPrivate( QWidget *parent = 0 ) const;
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting );
 
@@ -77,7 +79,9 @@ This class is a factory of editor for string settings
 typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryString,QLineEdit,QString> QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryStringQLineEditQStringBase;
 %End
   public:
-    QgsSettingsStringEditorWidgetWrapper();
+    QgsSettingsStringEditorWidgetWrapper( QObject *parent = 0 );
+
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const;
 
     virtual QString id() const;
 
@@ -108,7 +112,9 @@ This class is a factory of editor for boolean settings
 typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryBool,QCheckBox,bool> QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryBoolQCheckBoxboolBase;
 %End
   public:
-    QgsSettingsBoolEditorWidgetWrapper();
+    QgsSettingsBoolEditorWidgetWrapper( QObject *parent = 0 );
+
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const;
 
     virtual QString id() const;
 
@@ -139,7 +145,9 @@ This class is a factory of editor for integer settings
 typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryInteger,QSpinBox,int> QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryIntegerQSpinBoxintBase;
 %End
   public:
-    QgsSettingsIntegerEditorWidgetWrapper();
+    QgsSettingsIntegerEditorWidgetWrapper( QObject *parent = 0 );
+
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const;
 
     virtual QString id() const;
 
@@ -171,7 +179,9 @@ This class is a factory of editor for double settings
 typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryDouble,QDoubleSpinBox,double> QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryDoubleQDoubleSpinBoxdoubleBase;
 %End
   public:
-    QgsSettingsDoubleEditorWidgetWrapper();
+    QgsSettingsDoubleEditorWidgetWrapper( QObject *parent = 0 );
+
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const;
 
     virtual QString id() const;
 
@@ -203,7 +213,9 @@ This class is a factory of editor for color settings
 typedef QgsSettingsEditorWidgetWrapperTemplate<QgsSettingsEntryColor,QgsColorButton,QColor> QgsSettingsEditorWidgetWrapperTemplateQgsSettingsEntryColorQgsColorButtonQColorBase;
 %End
   public:
-    QgsSettingsColorEditorWidgetWrapper();
+    QgsSettingsColorEditorWidgetWrapper( QObject *parent = 0 );
+
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const;
 
     virtual QString id() const;
 

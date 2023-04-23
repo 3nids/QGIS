@@ -44,12 +44,12 @@ bool QgsSettingsEditorWidgetRegistry::addWrapper( QgsSettingsEditorWidgetWrapper
   return true;
 }
 
-QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const QString &id ) const
+QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::createWrapper( const QString &id, QObject *parent ) const
 {
   QgsSettingsEditorWidgetWrapper *wrapper = mWrappers.value( id );
   if ( wrapper )
   {
-    return wrapper;
+    return wrapper->createWrapper( parent );
   }
   else
   {
@@ -60,7 +60,7 @@ QgsSettingsEditorWidgetWrapper *QgsSettingsEditorWidgetRegistry::wrapper( const 
 
 QWidget *QgsSettingsEditorWidgetRegistry::createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList, QWidget *parent ) const
 {
-  QgsSettingsEditorWidgetWrapper *eww = wrapper( setting->typeId() );
+  QgsSettingsEditorWidgetWrapper *eww = createWrapper( setting->typeId(), parent );
   if ( eww )
     return eww->createEditor( setting, dynamicKeyPartList, parent );
   else

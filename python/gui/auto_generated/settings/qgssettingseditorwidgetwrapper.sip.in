@@ -43,6 +43,11 @@ This id of the type of settings it handles
    This mostly correspond to the content of :py:class:`Qgis`.SettingsType but it's a string since custom Python implementation are possible.
 %End
 
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = 0 ) const = 0;
+%Docstring
+Creates a new instance of the editor wrapper so it can be configured for a widget and a setting
+%End
+
     QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = 0 );
 %Docstring
 Creates the editor for the given widget
@@ -79,7 +84,7 @@ The wrapper must be configured before calling this medthod
 
 
   protected:
-    virtual QWidget *createEditorPrivate( QWidget *parent = 0 ) = 0;
+    virtual QWidget *createEditorPrivate( QWidget *parent = 0 ) const = 0;
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
 

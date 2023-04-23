@@ -47,6 +47,9 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
      */
     virtual QString id() const = 0;
 
+    //! Creates a new instance of the editor wrapper so it can be configured for a widget and a setting
+    virtual QgsSettingsEditorWidgetWrapper *createWrapper( QObject *parent = nullptr ) const = 0;
+
 //! Creates the editor for the given widget
     QWidget *createEditor( const QgsSettingsEntryBase *setting, const QStringList &dynamicKeyPartList = QStringList(), QWidget *parent = nullptr );
 
@@ -79,7 +82,7 @@ class GUI_EXPORT QgsSettingsEditorWidgetWrapper : public QObject
 
 
   protected:
-    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) = 0;
+    virtual QWidget *createEditorPrivate( QWidget *parent = nullptr ) const = 0;
 
     virtual bool configureEditorPrivate( QWidget *editor, const QgsSettingsEntryBase *setting ) = 0;
 
