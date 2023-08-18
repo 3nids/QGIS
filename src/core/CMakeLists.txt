@@ -356,6 +356,7 @@ set(QGIS_CORE_SRCS
   qgis.cpp
   qgsabstractcontentcache.cpp
   qgsabstractgeopdfexporter.cpp
+  qgsadvanceddigitizingguidelayer.cpp
   qgsapplication.cpp
   qgsaggregatecalculator.cpp
   qgsanimatedicon.cpp

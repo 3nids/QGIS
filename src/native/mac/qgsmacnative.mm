@@ -106,10 +106,12 @@ QgsNative::NotificationResult QgsMacNative::showDesktopNotification( const QStri
     const QPixmap px = QPixmap::fromImage( settings.image );
     image = [[NSImage alloc] initWithCGImage:px.toImage().toCGImage() size:NSZeroSize];
   }
+  /*
   notification.contentImage = image;
 
   [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification: notification];
   [notification autorelease];
+  */
 
   //[userCenterDelegate dealloc];
 

@@ -513,6 +513,7 @@ set(QGIS_GUI_SRCS
   qgscolorwidgets.cpp
   qgscompoundcolorwidget.cpp
   qgsconfigureshortcutsdialog.cpp
+  qgsadvanceddigitizingguidesmaptool.cpp
   qgscoordinateboundspreviewmapwidget.cpp
   qgscoordinateoperationwidget.cpp
   qgscoordinatereferencesystemmodel.cpp
@@ -785,6 +786,7 @@ set(QGIS_GUI_HDRS
   qgscolorwidgets.h
   qgscompoundcolorwidget.h
   qgsconfigureshortcutsdialog.h
+  qgsadvanceddigitizingguidesmaptool.h
   qgscoordinateboundspreviewmapwidget.h
   qgscoordinateoperationwidget.h
   qgscoordinatereferencesystemmodel.h

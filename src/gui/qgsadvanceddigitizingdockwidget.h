@@ -37,6 +37,7 @@ class QgsMapCanvas;
 class QgsMapTool;
 class QgsMapToolAdvancedDigitizing;
 class QgsMapMouseEvent;
+class QgsAdvancedDigitizingGuidesMapTool;
 
 /**
  * \ingroup gui
@@ -237,6 +238,17 @@ class GUI_EXPORT QgsAdvancedDigitizingDockWidget : public QgsDockWidget, private
         int mPrecision = 6;
         Qgis::CadConstraintType mCadConstraintType = Qgis::CadConstraintType::Generic;
         QgsMapCanvas *mMapCanvas = nullptr;
+    };
+
+
+    class GUI_EXPORT CadConstructionItems
+    {
+      public:
+        CadConstructionItems() {}
+
+      private:
+        QList<QgsPointXY> mPoints;
+        QList<std::pair<QgsPoint, double>> mLines;
     };
 
     /**
@@ -954,7 +966,7 @@ class GUI_EXPORT QgsAdvancedDigitizingDockWidget : public QgsDockWidget, private
     void setConstructionMode( bool enabled );
 
     //! settings button triggered
-    void settingsButtonTriggered( QAction *action );
+    void angleSoftLockButtonTriggered( QAction *action );
 
   private:
 
@@ -1022,6 +1034,8 @@ class GUI_EXPORT QgsAdvancedDigitizingDockWidget : public QgsDockWidget, private
      */
     void toggleLockedSnapVertex( const QgsPointLocator::Match &snapMatch, QgsPointLocator::Match previouslySnap );
 
+    void enableGuideMapTool();
+
     QgsMapCanvas *mMapCanvas = nullptr;
     QgsAdvancedDigitizingCanvasItem *mCadPaintItem = nullptr;
     //! Snapping indicator
@@ -1058,6 +1072,9 @@ class GUI_EXPORT QgsAdvancedDigitizingDockWidget : public QgsDockWidget, private
     QList<QgsPoint> mCadPointList;
     QList<QgsPointXY> mSnappedSegment;
 
+    // List of construction map toos
+    QMap<QToolButton *, QgsAdvancedDigitizingGuidesMapTool *> mGuidesMapTools;
+
     bool mSessionActive = false;
 
     // error message
@@ -1065,8 +1082,10 @@ class GUI_EXPORT QgsAdvancedDigitizingDockWidget : public QgsDockWidget, private
 
     // UI
     QMap< double, QAction *> mCommonAngleActions; // map the common angle actions with their angle values
-    QAction *mLineExtensionAction;
-    QAction *mXyVertexAction;
+    QAction *mLineExtensionAction = nullptr;
+    QAction *mXyVertexAction = nullptr;
+    QAction *mConstructionMapToolDistanceToPointAlongLine = nullptr;
+    QAction *mConstructionMapToolDistanceToPoints = nullptr;
 
     // Snap indicator
     QgsPointLocator::Match mSnapMatch;

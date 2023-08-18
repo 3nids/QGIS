@@ -1304,6 +1304,14 @@ should appear above all map layers.
 .. versionadded:: 3.16
 %End
 
+    QgsAdvancedDigitizingGuideLayer *advancedDigitizingGuideLayer();
+%Docstring
+Returns the advanced digitizing guide layer
+
+.. versionadded:: 3.34
+%End
+
+
     void removeAllMapLayers();
 %Docstring
 Removes all registered layers. If the registry has ownership
