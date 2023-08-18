@@ -17,6 +17,7 @@
 
 #include "qgsproject.h"
 
+#include "qgsadvanceddigitizingguidelayer.h"
 #include "qgsdatasourceuri.h"
 #include "qgslabelingenginesettings.h"
 #include "qgslayertree.h"
@@ -397,6 +398,9 @@ QgsProject::QgsProject( QObject *parent, Qgis::ProjectCapabilities capabilities 
 
   mMainAnnotationLayer = new QgsAnnotationLayer( QObject::tr( "Annotations" ), QgsAnnotationLayer::LayerOptions( mTransformContext ) );
   mMainAnnotationLayer->setParent( this );
+
+  mAdvancedDigitizingGuidesLayer = new QgsAdvancedDigitizingGuideLayer( QObject::tr( "Advanced Digitizing Guides" ), QgsAnnotationLayer::LayerOptions( mTransformContext ) );
+  mAdvancedDigitizingGuidesLayer->setParent( this );
 
   clear();
 
@@ -960,6 +964,9 @@ void QgsProject::setCrs( const QgsCoordinateReferenceSystem &crs, bool adjustEll
     if ( !mMainAnnotationLayer->crs().isValid() || mMainAnnotationLayer->isEmpty() )
       mMainAnnotationLayer->setCrs( crs );
 
+    if ( !mAdvancedDigitizingGuidesLayer->crs().isValid() || mAdvancedDigitizingGuidesLayer->isEmpty() )
+      mAdvancedDigitizingGuidesLayer->setCrs( crs );
+
     setDirty( true );
     emit crsChanged();
   }
@@ -1010,6 +1017,7 @@ void QgsProject::setTransformContext( const QgsCoordinateTransformContext &conte
   mProjectScope.reset();
 
   mMainAnnotationLayer->setTransformContext( context );
+  mAdvancedDigitizingGuidesLayer->setTransformContext( context );
   for ( auto &layer : mLayerStore.get()->mapLayers() )
   {
     layer->setTransformContext( context );
@@ -1125,6 +1133,8 @@ void QgsProject::clear()
   mRootGroup->clear();
   if ( mMainAnnotationLayer )
     mMainAnnotationLayer->reset();
+  if ( mAdvancedDigitizingGuidesLayer )
+    mAdvancedDigitizingGuidesLayer->reset();
 
   snapSingleBlocker.release();
 
@@ -2127,6 +2137,9 @@ bool QgsProject::readProjectFile( const QString &filename, Qgis::ProjectReadFlag
   mMainAnnotationLayer->readLayerXml( doc->documentElement().firstChildElement( QStringLiteral( "main-annotation-layer" ) ), context );
   mMainAnnotationLayer->setTransformContext( mTransformContext );
 
+  mAdvancedDigitizingGuidesLayer->readLayerXml( doc->documentElement().firstChildElement( QStringLiteral( "advanced-digitizing-guides" ) ), context );
+  mAdvancedDigitizingGuidesLayer->setTransformContext( mTransformContext );
+
   // load embedded groups and layers
   profile.switchTask( tr( "Loading embedded layers" ) );
   loadEmbeddedNodes( mRootGroup, flags );
@@ -3028,6 +3041,10 @@ bool QgsProject::writeProjectFile( const QString &filename )
   QDomElement annotationLayerNode = doc->createElement( QStringLiteral( "main-annotation-layer" ) );
   mMainAnnotationLayer->writeLayerXml( annotationLayerNode, *doc, context );
   qgisNode.appendChild( annotationLayerNode );
+
+  QDomElement advDigitGuidesLayerNode = doc->createElement( QStringLiteral( "advanced-digitizing-guides" ) );
+  mAdvancedDigitizingGuidesLayer->writeLayerXml( advDigitGuidesLayerNode, *doc, context );
+  qgisNode.appendChild( advDigitGuidesLayerNode );
 
   // Iterate over layers in zOrder
   // Call writeXml() on each
@@ -4550,6 +4567,13 @@ QgsAnnotationLayer *QgsProject::mainAnnotationLayer()
   QGIS_PROTECT_QOBJECT_THREAD_ACCESS
 
   return mMainAnnotationLayer;
+}
+
+QgsAdvancedDigitizingGuideLayer *QgsProject::advancedDigitizingGuideLayer()
+{
+  QGIS_PROTECT_QOBJECT_THREAD_ACCESS
+
+  return mAdvancedDigitizingGuidesLayer;
 }
 
 void QgsProject::removeAllMapLayers()

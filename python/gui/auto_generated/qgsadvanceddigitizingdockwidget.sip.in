@@ -200,6 +200,18 @@ Sets the map canvas to ``mapCanvas``
 
     };
 
+
+    class CadConstructionItems
+{
+
+%TypeHeaderCode
+#include "qgsadvanceddigitizingdockwidget.h"
+%End
+      public:
+        CadConstructionItems();
+
+    };
+
     explicit QgsAdvancedDigitizingDockWidget( QgsMapCanvas *canvas, QWidget *parent = 0 );
 %Docstring
 Create an advanced digitizing dock widget
