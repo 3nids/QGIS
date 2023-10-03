@@ -26,15 +26,22 @@ QgsAdvancedDigitizingGuideLayer::QgsAdvancedDigitizingGuideLayer( const QString 
 {
 }
 
-void QgsAdvancedDigitizingGuideLayer::addPoint( const QgsPoint &point )
+void QgsAdvancedDigitizingGuideLayer::addPointDistanceToPoints( const QgsPoint &point, const QList<std::pair<QgsPointXY, double>> &distances )
+{
+  QString uuid = addPoint( point );
+
+  mItems << GuideItem( tr( "Distance to points" ), uuid );
+}
+
+QString QgsAdvancedDigitizingGuideLayer::addPoint( const QgsPoint &point )
 {
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( point );
 
-  QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer(Qgis::MarkerShape::Cross);
+  QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
   //markerSymbolLayer->setColor( markerColor );
 
   QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
-  item->setSymbol(markerSymbol);
+  item->setSymbol( markerSymbol );
 
-  QString uuid = addItem( item );
+  return addItem( item );
 }

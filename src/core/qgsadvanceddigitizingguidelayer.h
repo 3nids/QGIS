@@ -34,8 +34,25 @@ class CORE_EXPORT QgsAdvancedDigitizingGuideLayer : public QgsAnnotationLayer
     //! Constructor
     QgsAdvancedDigitizingGuideLayer( const QString &name, const QgsAnnotationLayer::LayerOptions &options );
 
+    class GuideItem
+    {
+      public:
+        GuideItem( const QString &title, const QString &mainItemUuid, const QList<QString> &additionalItemsUuids = QList<QString>() )
+          : mTitle( title ), mUuid( mainItemUuid ), mAdditionalItems( additionalItemsUuids ) {}
+
+      private:
+        QString mTitle;
+        QString mUuid;
+        QList<QString> mAdditionalItems;
+    };
+
     //! Adds a point guide
-    void addPoint( const QgsPoint &point );
+    void addPointDistanceToPoints( const QgsPoint &point, const QList<std::pair<QgsPointXY, double> > &distances );
+
+  private:
+    QString addPoint( const QgsPoint &point );
+
+    QList<GuideItem> mItems;
 };
 
 #endif // QGSADVANCEDDIGITIZINGGUIDELAYER_H

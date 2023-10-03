@@ -215,9 +215,11 @@ QgsAdvancedDigitizingDockWidget::QgsAdvancedDigitizingDockWidget( QgsMapCanvas *
   mConstructionAction->setToolTip( tr( "Construction Tools" ) );
 
   // Map Guides
-  connect( mGuidesMapToolAction, &QAction::toggled, this, [=](bool checked = true){
-      QgsProject::instance()->advancedDigitizingGuideLayer()->setOpacity( checked ? 1 : 0 );
-  });
+  connect( mGuidesMapToolAction, &QAction::toggled, this, [ = ]( bool checked = true )
+  {
+    QgsProject::instance()->advancedDigitizingGuideLayer()->setOpacity( checked ? 1 : 0 );
+    QgsProject::instance()->advancedDigitizingGuideLayer()->triggerRepaint();
+  } );
 
   connect( mDistanceToPointsButton, &QToolButton::clicked, this, &QgsAdvancedDigitizingDockWidget::enableGuideMapTool );
   mGuidesMapTools.insert( mDistanceToPointsButton, new QgsConstructionMapToolDistanceToPoints( canvas ) );

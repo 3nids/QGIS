@@ -182,8 +182,8 @@ void QgsConstructionMapToolDistanceToPoints::canvasReleaseEvent( QgsMapMouseEven
       QgsPoint solution = intersectionSolution( e );
       if ( !solution.isEmpty() )
       {
+        QgsProject::instance()->advancedDigitizingGuideLayer()->addPointDistanceToPoints( solution, mPoints );
         mPoints.clear();
-        QgsProject::instance()->advancedDigitizingGuideLayer()->addPoint( solution );
         restorePreviousMapTool();
         return;
       }
