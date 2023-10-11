@@ -188,9 +188,6 @@ QgsRelationEditorWidget::QgsRelationEditorWidget( const QVariantMap &config, QWi
   mMultiEditInfoLabel = new QLabel( this );
   buttonLayout->addWidget( mMultiEditInfoLabel );
 
-  // add buttons layout
-  rootLayout->addLayout( buttonLayout );
-
   // add stacked widget
   mStackedWidget = new QStackedWidget( this );
 
@@ -198,6 +195,10 @@ QgsRelationEditorWidget::QgsRelationEditorWidget( const QVariantMap &config, QWi
   mDualView = new QgsDualView( this );
   mDualView->setView( mViewMode );
   connect( mDualView, &QgsDualView::showContextMenuExternally, this, &QgsRelationEditorWidget::showContextMenu );
+
+  QVBoxLayout *dualViewLeftLayout = qobject_cast<QVBoxLayout*>( mView->layout() );
+  Q_ASSERT( dualViewLeftLayout );
+  dualViewLeftLayout->insertLayout( buttonLayout );
 
   // add multi feature editing page
   mMultiEditStackedWidgetPage = new QWidget( this );

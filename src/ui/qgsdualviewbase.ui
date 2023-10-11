@@ -71,7 +71,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QWidget" name="listViewWdg" native="true">
+      <widget class="QWidget" name="mListViewWdg" native="true">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
          <number>2</number>
