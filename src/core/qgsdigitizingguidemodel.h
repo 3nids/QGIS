@@ -37,6 +37,22 @@ class CORE_EXPORT QgsDigitizingGuideModel : public QAbstractTableModel
     Q_OBJECT
 
   public:
+    class Guide
+    {
+      public:
+        Guide( const QString &guideId, const QDateTime &creation = QDateTime::currentDateTime() )
+          : mGuideItemId( guideId )
+          , mCreation( creation )
+        {}
+
+        QString mType;
+        QString mGuideItemId;
+        QString mTitle;
+        QString mTitleItemId;
+        bool mEnabled = true;
+        QStringList mDetails;
+        QDateTime mCreation;
+    };
     //! Constructor
     explicit QgsDigitizingGuideModel( QgsDigitizingGuideLayer *guideLayer );
 
@@ -82,6 +98,8 @@ class CORE_EXPORT QgsDigitizingGuideModel : public QAbstractTableModel
     void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
 
 
+    QList<Guide> guides() const;
+
   private:
     friend class QgsDigitizingGuideLayer;
 
@@ -101,6 +119,41 @@ class CORE_EXPORT QgsDigitizingGuideModel : public QAbstractTableModel
         QStringList mDetails;
         QDateTime mCreation;
     };
+    //! Constructor
+    explicit QgsDigitizingGuideModel( QgsDigitizingGuideLayer *guideLayer );
+
+    /**
+     * Adds a point guide to the model
+     * \arg point the point guide added
+     * \arg title an optional title for the point
+     * \arg details detail items displaying how the guide was constructed
+     */
+    void addPointGuide( const QString &guideItemId,
+                        const QString &title = QString(),
+                        const QString &titleItemId = QString(),
+                        QStringList details = QStringList(),
+                        const QDateTime &creation = QDateTime::currentDateTime() );
+
+    //! Clears the model
+    void clear();
+
+    //! Removes guides at the given ids
+    bool removeGuides( const QModelIndexList &indexList );
+
+    int rowCount( const QModelIndex &parent ) const override;
+    int columnCount( const QModelIndex &parent ) const override;
+    QVariant data( const QModelIndex &index, int role ) const override;
+    Qt::ItemFlags flags( const QModelIndex &index ) const override;
+    bool setData( const QModelIndex &index, const QVariant &value, int role ) override;
+
+    //! Handles selection changes to highlight guides on the map
+    void selectionChanged( const QItemSelection &selected, const QItemSelection &deselected );
+
+
+    QList<Guide> guides() const;
+
+  private:
+    friend class QgsDigitizingGuideLayer;
 
     QgsDigitizingGuideLayer *mGuideLayer = nullptr;
     QList<Guide> mGuides;

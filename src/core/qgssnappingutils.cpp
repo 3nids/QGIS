@@ -17,8 +17,11 @@
 #include "qgsgeometry.h"
 #include "qgsproject.h"
 #include "qgsvectorlayer.h"
+#include "qgsannotationitem.h"
+#include "qgsannotationmarkeritem.h"
 #include "qgslogger.h"
 #include "qgsrendercontext.h"
+#include "qgsdigitizingguidelayer.h"
 
 QgsSnappingUtils::QgsSnappingUtils( QObject *parent, bool enableSnappingForInvisibleFeature )
   : QObject( parent )
@@ -247,6 +250,30 @@ static void _updateBestMatch( QgsPointLocator::Match &bestMatch, const QgsPointX
   }
 }
 
+static void _snapToGuides( QgsPointLocator::Match &bestMatch, const QgsPointXY &pointMap, double tolerance, QgsDigitizingGuideLayer *guideLayer, QgsCoordinateReferenceSystem destinationCrs )
+{
+  double bestDistance = bestMatch.distance();
+  QgsCoordinateTransform transform( guideLayer->crs(), destinationCrs, QgsProject::instance()->transformContext() );
+
+  if ( guideLayer )
+  {
+    const QList<QgsAnnotationItem *> guides = guideLayer->items().values();
+    for ( QgsAnnotationItem *item : guides )
+    {
+      if ( QgsAnnotationMarkerItem *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
+      {
+        QgsPointXY point = transform.transform( marker->geometry() );
+        double distance = point.distance( pointMap );
+        if ( distance < tolerance && ( distance < bestDistance || !bestMatch.isValid() ) )
+        {
+          bestMatch = QgsPointLocator::Match( QgsPointLocator::Vertex, nullptr, FID_NULL, distance, point );
+
+          bestDistance = distance;
+        }
+      }
+    }
+  }
+}
 
 static QgsPointLocator::Types _snappingTypeToPointLocatorType( Qgis::SnappingTypes type )
 {
@@ -311,6 +338,8 @@ QgsPointLocator::Match QgsSnappingUtils::snapToMap( const QgsPointXY &pointMap, 
     {
       _replaceIfBetter( bestMatch, _findClosestSegmentIntersection( pointMap, edges ), tolerance );
     }
+
+    _snapToGuides( bestMatch, pointMap, tolerance, mGuideLayer, destinationCrs() );
 
     return bestMatch;
   }
@@ -379,6 +408,8 @@ QgsPointLocator::Match QgsSnappingUtils::snapToMap( const QgsPointXY &pointMap, 
     if ( mSnappingConfig.intersectionSnapping() )
       _replaceIfBetter( bestMatch, _findClosestSegmentIntersection( pointMap, edges ), maxTolerance );
 
+    _snapToGuides( bestMatch, pointMap, maxTolerance, mGuideLayer, destinationCrs() );
+
     return bestMatch;
   }
   else if ( mSnappingConfig.mode() == Qgis::SnappingMode::AllLayers )
@@ -420,6 +451,8 @@ QgsPointLocator::Match QgsSnappingUtils::snapToMap( const QgsPointXY &pointMap, 
 
     if ( mSnappingConfig.intersectionSnapping() )
       _replaceIfBetter( bestMatch, _findClosestSegmentIntersection( pointMap, edges ), tolerance );
+
+    _snapToGuides( bestMatch, pointMap, tolerance, mGuideLayer, destinationCrs() );
 
     return bestMatch;
   }
@@ -544,6 +577,16 @@ void QgsSnappingUtils::prepareIndex( const QList<LayerAndAreaOfInterest> &layers
       QgsDebugMsgLevel( QStringLiteral( "Prepare index total: %1 ms" ).arg( t.elapsed() ), 2 );
     }
   }
+}
+
+QgsDigitizingGuideLayer *QgsSnappingUtils::guideLayer() const
+{
+  return mGuideLayer;
+}
+
+void QgsSnappingUtils::setGuideLayer( QgsDigitizingGuideLayer *guideLayer )
+{
+  mGuideLayer = guideLayer;
 }
 
 QgsSnappingConfig QgsSnappingUtils::config() const

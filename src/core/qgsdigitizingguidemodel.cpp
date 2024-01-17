@@ -213,3 +213,8 @@ void QgsDigitizingGuideModel::selectionChanged( const QItemSelection &selected, 
   mGuideLayer->triggerRepaint();
 }
 
+QList<QgsDigitizingGuideModel::Guide> QgsDigitizingGuideModel::guides() const
+{
+  return mGuides;
+}
+
