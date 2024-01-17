@@ -48,24 +48,31 @@ class CORE_EXPORT QgsDigitizingGuideLayer : public QgsAnnotationLayer
     void setEnabled( bool enabled );
 
     //! Adds a point guide
-    void addPointGuide(const QgsPoint& point, const QString &title, QList<QgsAnnotationItem*> details = QList<QgsAnnotationItem*>(), const QDateTime &creation= QDateTime::currentDateTime() );
+    void addPointGuide( const QgsPoint &point, const QString &title, QList<QgsAnnotationItem *> details = QList<QgsAnnotationItem *>(), const QDateTime &creation = QDateTime::currentDateTime() );
 
     //! Adds a line guide
-    void addLineGuide(QgsCurve *curve SIP_TRANSFER, const QString &title, QList<QgsAnnotationItem*> details = QList<QgsAnnotationItem*>(), const QDateTime &creation= QDateTime::currentDateTime() );
+    void addLineGuide( QgsCurve *curve SIP_TRANSFER, const QString &title, QList<QgsAnnotationItem *> details = QList<QgsAnnotationItem *>(), const QDateTime &creation = QDateTime::currentDateTime() );
 
-      //! Returns the model
+    //! Return the guides
+    std::pair<QList<QgsPointXY>, QList<const QgsCurve *> > guides() const;
+
+    //! Returns the model
     QgsDigitizingGuideModel *model() const {return mModel;}
 
-    //! Creates an additional point guide without adding it to the annotation layer
-    //! Additional items are not shown by default on the map
-    QgsAnnotationItem* createDetailsPoint(const QgsPoint &point );
+    /**
+     * Creates an additional point guide without adding it to the annotation layer
+     * Additional items are not shown by default on the map
+     */
+    QgsAnnotationItem *createDetailsPoint( const QgsPoint &point );
 
-    //! Creates an additional line guide without adding it to the annotation layer
-    //! Additional items are not shown by default on the map
-    QgsAnnotationItem* createDetailsLine( QgsCurve *curve  );
+    /**
+     * Creates an additional line guide without adding it to the annotation layer
+     * Additional items are not shown by default on the map
+     */
+    QgsAnnotationItem *createDetailsLine( QgsCurve *curve );
 
     //! Creates an additional text line item without adding to the annotation layer
-    QgsAnnotationItem* createDetailsPointTextGuide( const QString &text, const QgsPoint &point, double angle );
+    QgsAnnotationItem *createDetailsPointTextGuide( const QString &text, const QgsPoint &point, double angle );
 
     //! Highlights or removes highlight of a guide in the map
     void setGuideHighlight( const QString &guideId = QString() );
@@ -73,11 +80,11 @@ class CORE_EXPORT QgsDigitizingGuideLayer : public QgsAnnotationLayer
     virtual void clear() override;
 
   protected:
-    virtual bool readXml(const QDomNode &node, QgsReadWriteContext &context) override;
-    virtual bool writeXml(QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context) const override;
+    virtual bool readXml( const QDomNode &node, QgsReadWriteContext &context ) override;
+    virtual bool writeXml( QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context ) const override;
 
   private:
-    QStringList addDetails(QList<QgsAnnotationItem*> details);
+    QStringList addDetails( QList<QgsAnnotationItem *> details );
 
     QgsMarkerSymbol *pointGuideSymbol() const;
     QgsMarkerSymbol *highlightedPointGuideSymbol() const;
@@ -87,7 +94,7 @@ class CORE_EXPORT QgsDigitizingGuideLayer : public QgsAnnotationLayer
     QgsLineSymbol *highlightedLineGuideSymbol() const;
     QgsLineSymbol *detailsLineSymbol() const;
 
-    QgsDigitizingGuideModel* mModel = nullptr;
+    QgsDigitizingGuideModel *mModel = nullptr;
     QString mHighlightItemId;
 
 };

@@ -255,22 +255,37 @@ static void _snapToGuides( QgsPointLocator::Match &bestMatch, const QgsPointXY &
   double bestDistance = bestMatch.distance();
   QgsCoordinateTransform transform( guideLayer->crs(), destinationCrs, QgsProject::instance()->transformContext() );
 
-  if ( guideLayer )
-  {
-    const QList<QgsAnnotationItem *> guides = guideLayer->items().values();
-    for ( QgsAnnotationItem *item : guides )
-    {
-      if ( QgsAnnotationMarkerItem *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
-      {
-        QgsPointXY point = transform.transform( marker->geometry() );
-        double distance = point.distance( pointMap );
-        if ( distance < tolerance && ( distance < bestDistance || !bestMatch.isValid() ) )
-        {
-          bestMatch = QgsPointLocator::Match( QgsPointLocator::Vertex, nullptr, FID_NULL, distance, point );
+  if ( !guideLayer )
+    return;
 
-          bestDistance = distance;
-        }
-      }
+  std::pair<QList<QgsPointXY>, QList<const QgsCurve *> > guides = guideLayer->guides();
+
+  for ( auto it = guides.second.constBegin(); it != guides.second.constEnd(); it++ )
+  {
+    const QgsCurve *c = ( *it );
+    if ( guideLayer->crs() != destinationCrs )
+    {
+      QgsCurve *tr = ( *it )->clone();
+      tr->transform( transform );
+      c = tr;
+    }
+    QgsPointXY point = QgsGeometryUtils::closestPoint( *c, QgsPoint( pointMap ) );
+    double distance = point.distance( pointMap );
+    if ( distance < tolerance && ( distance < bestDistance || !bestMatch.isValid() ) )
+    {
+      bestMatch = QgsPointLocator::Match( QgsPointLocator::Edge, nullptr, FID_NULL, distance, point );
+      bestDistance = distance;
+    }
+  }
+
+  for ( auto it = guides.first.constBegin(); it != guides.first.constEnd(); it++ )
+  {
+    QgsPointXY point = transform.transform( *it );
+    double distance = point.distance( pointMap );
+    if ( distance < tolerance && ( distance < bestDistance || !bestMatch.isValid() ) )
+    {
+      bestMatch = QgsPointLocator::Match( QgsPointLocator::Vertex, nullptr, FID_NULL, distance, point );
+      bestDistance = distance;
     }
   }
 }

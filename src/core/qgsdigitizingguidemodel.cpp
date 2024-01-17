@@ -35,7 +35,7 @@ void QgsDigitizingGuideModel::addPointGuide( const QString &guideItemId,
     const QDateTime &creation )
 {
   beginInsertRows( QModelIndex(), mGuides.count(), mGuides.count() );
-  Guide item( guideItemId, creation );
+  GuideInfo item( guideItemId, creation );
   item.mType = QStringLiteral( "point-guide" );
   item.mTitle = title;
   item.mTitleItemId = titleItemId;
@@ -51,7 +51,7 @@ void QgsDigitizingGuideModel::addLineGuide( const QString &guideItemId,
     const QDateTime &creation )
 {
   beginInsertRows( QModelIndex(), mGuides.count(), mGuides.count() );
-  Guide item( guideItemId, creation );
+  GuideInfo item( guideItemId, creation );
   item.mType = QStringLiteral( "line-guide" );
   item.mTitle = title;
   item.mTitleItemId = titleItemId;
@@ -83,7 +83,7 @@ bool QgsDigitizingGuideModel::removeGuides( const QModelIndexList &indexList )
 
     ok = true;
 
-    Guide guide = mGuides.at( index.row() );
+    GuideInfo guide = mGuides.at( index.row() );
 
     mGuideLayer->removeItem( guide.mGuideItemId );
     mGuideLayer->removeItem( guide.mTitleItemId );
@@ -116,7 +116,7 @@ QVariant QgsDigitizingGuideModel::data( const QModelIndex &index, int role ) con
   if ( !index.isValid() )
     return QVariant();
 
-  const Guide &item = mGuides.at( index.row() );
+  const GuideInfo &item = mGuides.at( index.row() );
 
   if ( index.column() == 0 && role == Qt::DisplayRole )
     return item.mTitle;
@@ -172,7 +172,7 @@ void QgsDigitizingGuideModel::selectionChanged( const QItemSelection &selected, 
   {
     if ( index.isValid() )
     {
-      Guide guide = mGuides.at( index.row() );
+      GuideInfo guide = mGuides.at( index.row() );
       QgsAnnotationItem *titleItem = mGuideLayer->item( guide.mTitleItemId );
       if ( titleItem )
         titleItem->setEnabled( false );
@@ -192,7 +192,7 @@ void QgsDigitizingGuideModel::selectionChanged( const QItemSelection &selected, 
     {
       if ( index.isValid() )
       {
-        Guide guide = mGuides.at( index.row() );
+        GuideInfo guide = mGuides.at( index.row() );
         QgsAnnotationItem *titleItem = mGuideLayer->item( guide.mTitleItemId );
         if ( titleItem )
           titleItem->setEnabled( true );
@@ -213,8 +213,4 @@ void QgsDigitizingGuideModel::selectionChanged( const QItemSelection &selected, 
   mGuideLayer->triggerRepaint();
 }
 
-QList<QgsDigitizingGuideModel::Guide> QgsDigitizingGuideModel::guides() const
-{
-  return mGuides;
-}
 

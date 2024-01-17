@@ -70,7 +70,7 @@ void QgsDigitizingGuideLayer::addLineGuide( QgsCurve *curve, const QString &titl
   if ( !title.isEmpty() )
   {
     // cloning first, curve will be transferred in the main annotation
-    QgsAnnotationLineTextItem *titleItem = new QgsAnnotationLineTextItem(title, curve->clone() );
+    QgsAnnotationLineTextItem *titleItem = new QgsAnnotationLineTextItem( title, curve->clone() );
     titleItem->setEnabled( false );
     titleItemId = addItem( titleItem );
   }
@@ -143,6 +143,29 @@ void QgsDigitizingGuideLayer::clear()
 {
   mModel->clear();
   QgsAnnotationLayer::clear();
+}
+
+std::pair<QList<QgsPointXY>, QList<const QgsCurve *> > QgsDigitizingGuideLayer::guides() const
+{
+  std::pair<QList<QgsPointXY>, QList<const QgsCurve *> > guides;
+  for ( auto it = mModel->mGuides.constBegin(); it != mModel->mGuides.constEnd(); it++ )
+  {
+    if ( it->mType == QStringLiteral( "point-guide" ) )
+    {
+      const QgsAnnotationMarkerItem *guideItem = dynamic_cast<const QgsAnnotationMarkerItem *>( item( it->mGuideItemId ) );
+      if ( !guideItem )
+        continue;
+      guides.first.append( guideItem->geometry() );
+    }
+    else if ( it->mType == QStringLiteral( "line-guide" ) )
+    {
+      const QgsAnnotationLineItem *guideItem = dynamic_cast<const QgsAnnotationLineItem *>( item( it->mGuideItemId ) );
+      if ( !guideItem )
+        continue;
+      guides.second.append( guideItem->geometry() );
+    }
+  }
+  return guides;
 }
 
 bool QgsDigitizingGuideLayer::readXml( const QDomNode &node, QgsReadWriteContext &context )
