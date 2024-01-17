@@ -17,6 +17,7 @@
 #include "qgsdigitizingguidelayer.h"
 
 #include "qgsannotationlineitem.h"
+#include "qgsannotationlinetextitem.h"
 #include "qgsannotationmarkeritem.h"
 #include "qgsannotationpointtextitem.h"
 #include "qgscurve.h"
@@ -44,98 +45,107 @@ void QgsDigitizingGuideLayer::setEnabled( bool enabled )
   triggerRepaint();
 }
 
-void QgsDigitizingGuideLayer::addPointGuide( const QgsPoint& point, const QString &title, QList<QgsAnnotationItem*> details, const QDateTime &creation )
+void QgsDigitizingGuideLayer::addPointGuide( const QgsPoint &point, const QString &title, QList<QgsAnnotationItem *> details, const QDateTime &creation )
 {
-    QgsAnnotationMarkerItem *guideItem = new QgsAnnotationMarkerItem( point );
-    guideItem->setSymbol( pointGuideSymbol() );
-    QString guideItemId = addItem( guideItem );
+  QgsAnnotationMarkerItem *guideItem = new QgsAnnotationMarkerItem( point );
+  guideItem->setSymbol( pointGuideSymbol() );
+  QString guideItemId = addItem( guideItem );
 
-    QString titleItemId;
-    if (!title.isEmpty())
-    {
-    QgsAnnotationPointTextItem *titleItem = new QgsAnnotationPointTextItem(title, point);
-    titleItem->setEnabled(false);
+  QString titleItemId;
+  if ( !title.isEmpty() )
+  {
+    QgsAnnotationPointTextItem *titleItem = new QgsAnnotationPointTextItem( title, point );
+    titleItem->setEnabled( false );
     titleItemId = addItem( titleItem );
-    }
+  }
 
-    QStringList detailItemIds = addDetails(details);
-    
-    mModel->addPointGuide( guideItemId, title, titleItemId, detailItemIds, creation );
+  QStringList detailItemIds = addDetails( details );
+
+  mModel->addPointGuide( guideItemId, title, titleItemId, detailItemIds, creation );
 }
 
-void QgsDigitizingGuideLayer::addLineGuide(QgsCurve *curve, const QString &title, QList<QgsAnnotationItem*> details , const QDateTime &creation)
+void QgsDigitizingGuideLayer::addLineGuide( QgsCurve *curve, const QString &title, QList<QgsAnnotationItem *> details, const QDateTime &creation )
 {
-    QgsAnnotationLineItem *guideItem = new QgsAnnotationLineItem( curve );
-    QString guideItemId = addItem( guideItem );
+  QString titleItemId;
+  if ( !title.isEmpty() )
+  {
+    // cloning first, curve will be transferred in the main annotation
+    QgsAnnotationLineTextItem *titleItem = new QgsAnnotationLineTextItem(title, curve->clone() );
+    titleItem->setEnabled( false );
+    titleItemId = addItem( titleItem );
+  }
 
-    QStringList detailItemIds = addDetails(details);
+  QgsAnnotationLineItem *guideItem = new QgsAnnotationLineItem( curve );
+  QString guideItemId = addItem( guideItem );
 
-  // TODO mModel->addLineGuide( curve, title, detailItemIds );
+  QStringList detailItemIds = addDetails( details );
+
+  mModel->addLineGuide( guideItemId, title, titleItemId, detailItemIds, creation );
 }
 
-QgsAnnotationItem* QgsDigitizingGuideLayer::createDetailsPoint( const QgsPoint &point )
+QgsAnnotationItem *QgsDigitizingGuideLayer::createDetailsPoint( const QgsPoint &point )
 {
-    QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( point );
-    item->setSymbol( detailsPointSymbol() );
-    item->setEnabled(false);
-    return item;
-}
-
-QgsAnnotationItem* QgsDigitizingGuideLayer::createDetailsLine(QgsCurve *curve)
-{
-  QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
-  item->setSymbol( detailsLineSymbol() );
-  item->setEnabled(false);
+  QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( point );
+  item->setSymbol( detailsPointSymbol() );
+  item->setEnabled( false );
   return item;
 }
 
-QgsAnnotationItem* QgsDigitizingGuideLayer::createDetailsPointTextGuide( const QString &text, const QgsPoint &point, double angle )
+QgsAnnotationItem *QgsDigitizingGuideLayer::createDetailsLine( QgsCurve *curve )
 {
-    QgsAnnotationPointTextItem *item = new QgsAnnotationPointTextItem(text, point);
-    item->setAngle(angle);
-    item->setRotationMode(Qgis::SymbolRotationMode::RespectMapRotation);
-    item->setEnabled(false);
-    return item;
+  QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
+  item->setSymbol( detailsLineSymbol() );
+  item->setEnabled( false );
+  return item;
 }
 
-void QgsDigitizingGuideLayer::setGuideHighlight(const QString &guideId)
+QgsAnnotationItem *QgsDigitizingGuideLayer::createDetailsPointTextGuide( const QString &text, const QgsPoint &point, double angle )
 {
-  if (!mHighlightItemId.isEmpty())
-    removeItem(mHighlightItemId);
+  QgsAnnotationPointTextItem *item = new QgsAnnotationPointTextItem( text, point );
+  item->setAngle( angle );
+  item->setRotationMode( Qgis::SymbolRotationMode::RespectMapRotation );
+  item->setEnabled( false );
+  return item;
+}
 
-  const QgsAnnotationItem *guide = item(guideId);
-  if (!guide)
-      return;
+void QgsDigitizingGuideLayer::setGuideHighlight( const QString &guideId )
+{
+  if ( !mHighlightItemId.isEmpty() )
+    removeItem( mHighlightItemId );
 
-  if (guide->type() == QStringLiteral( "marker" ))
+  const QgsAnnotationItem *guide = item( guideId );
+  if ( !guide )
+    return;
+
+  if ( guide->type() == QStringLiteral( "marker" ) )
   {
-    QgsAnnotationMarkerItem *pointGuide = dynamic_cast<QgsAnnotationMarkerItem*>(guide->clone());
-    if (pointGuide)
+    QgsAnnotationMarkerItem *pointGuide = dynamic_cast<QgsAnnotationMarkerItem *>( guide->clone() );
+    if ( pointGuide )
     {
       pointGuide = pointGuide->clone();
-      pointGuide->setSymbol(highlightedPointGuideSymbol());
-      mHighlightItemId = addItem(pointGuide);
+      pointGuide->setSymbol( highlightedPointGuideSymbol() );
+      mHighlightItemId = addItem( pointGuide );
     }
   }
-/*
-    if (guide->type() == QStringLiteral( "linestring" ))
-    {
-        const QgsAnnotationLineItem *lineGuide = dynamic_cast<const QgsAnnotationLineItem*>(guide);
-        if (lineGuide)
-        {
+  /*
+      if (guide->type() == QStringLiteral( "linestring" ))
+      {
+          const QgsAnnotationLineItem *lineGuide = dynamic_cast<const QgsAnnotationLineItem*>(guide);
+          if (lineGuide)
+          {
 
-        }
-    }
-*/
+          }
+      }
+  */
 }
 
 void QgsDigitizingGuideLayer::clear()
 {
- mModel->clear();
- QgsAnnotationLayer::clear();
+  mModel->clear();
+  QgsAnnotationLayer::clear();
 }
 
-bool QgsDigitizingGuideLayer::readXml(const QDomNode &node, QgsReadWriteContext &context)
+bool QgsDigitizingGuideLayer::readXml( const QDomNode &node, QgsReadWriteContext &context )
 {
   QGIS_PROTECT_QOBJECT_THREAD_ACCESS
 
@@ -159,41 +169,41 @@ bool QgsDigitizingGuideLayer::readXml(const QDomNode &node, QgsReadWriteContext 
     const QString wkt = itemElement.attribute( QStringLiteral( "wkt" ) );
     const QgsGeometry geometry = QgsGeometry::fromWkt( wkt );
 
-    QList<QgsAnnotationItem*> detailItems;
+    QList<QgsAnnotationItem *> detailItems;
     const QDomNodeList detailsElements = itemElement.elementsByTagName( QStringLiteral( "details" ) );
     const QDomNodeList details = detailsElements.at( 0 ).childNodes();
     for ( int j = 0; j < details.size(); ++j )
     {
       const QDomElement detailElement = details.at( j ).toElement();
       const QString detailType = detailElement.attribute( QStringLiteral( "type" ) );
-      QgsAnnotationItem* detailItem = QgsApplication::annotationItemRegistry()->createItem( detailType );
+      QgsAnnotationItem *detailItem = QgsApplication::annotationItemRegistry()->createItem( detailType );
       if ( detailItem )
       {
-         detailItem->readXml( detailElement, context );
-         detailItem->setEnabled(false);
-         detailItems << detailItem;
+        detailItem->readXml( detailElement, context );
+        detailItem->setEnabled( false );
+        detailItems << detailItem;
       }
     }
 
-    if (type == QStringLiteral("point-guide"))
+    if ( type == QStringLiteral( "point-guide" ) )
     {
-      addPointGuide(QgsPoint(geometry.asPoint()), title, detailItems, creation );
+      addPointGuide( QgsPoint( geometry.asPoint() ), title, detailItems, creation );
     }
-    else if (type == QStringLiteral("line-guide"))
+    else if ( type == QStringLiteral( "line-guide" ) )
     {
       QgsCurve *curve = qgsgeometry_cast< QgsCurve *>( geometry.constGet() );
-      if (curve)
-        addLineGuide(curve, title, detailItems, creation );
+      if ( curve )
+        addLineGuide( curve, title, detailItems, creation );
     }
 
   }
 
-  triggerRepaint(true);
+  triggerRepaint( true );
 
   return true;
 }
 
-bool QgsDigitizingGuideLayer::writeXml(QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context) const
+bool QgsDigitizingGuideLayer::writeXml( QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context ) const
 {
   QGIS_PROTECT_QOBJECT_THREAD_ACCESS
 
@@ -216,17 +226,17 @@ bool QgsDigitizingGuideLayer::writeXml(QDomNode &layer_node, QDomDocument &doc, 
     guideElement.setAttribute( QStringLiteral( "creation" ), it->mCreation.toString( Qt::DateFormat::ISODate ) );
     guideElement.setAttribute( QStringLiteral( "type" ), it->mType );
 
-    if (it->mType == QStringLiteral("point-guide"))
+    if ( it->mType == QStringLiteral( "point-guide" ) )
     {
-      const QgsAnnotationMarkerItem* guideItem = dynamic_cast<const QgsAnnotationMarkerItem*>(item(it->mGuideItemId));
-      if (!guideItem)
+      const QgsAnnotationMarkerItem *guideItem = dynamic_cast<const QgsAnnotationMarkerItem *>( item( it->mGuideItemId ) );
+      if ( !guideItem )
         continue;
       guideElement.setAttribute( QStringLiteral( "wkt" ), guideItem->geometry().asWkt() );
     }
-    else if (it->mType == QStringLiteral("line-guide"))
+    else if ( it->mType == QStringLiteral( "line-guide" ) )
     {
-      const QgsAnnotationLineItem* guideItem = dynamic_cast<const QgsAnnotationLineItem*>(item(it->mGuideItemId));
-      if (!guideItem)
+      const QgsAnnotationLineItem *guideItem = dynamic_cast<const QgsAnnotationLineItem *>( item( it->mGuideItemId ) );
+      if ( !guideItem )
         continue;
       guideElement.setAttribute( QStringLiteral( "wkt" ), guideItem->geometry()->asWkt() );
     }
@@ -240,8 +250,8 @@ bool QgsDigitizingGuideLayer::writeXml(QDomNode &layer_node, QDomDocument &doc, 
     {
       QDomElement detailElement = doc.createElement( QStringLiteral( "detail" ) );
 
-      const QgsAnnotationItem* detailItem = item(detailId);
-      if (!detailItem)
+      const QgsAnnotationItem *detailItem = item( detailId );
+      if ( !detailItem )
         continue;
       detailElement.setAttribute( QStringLiteral( "type" ), detailItem->type() );
       detailItem->writeXml( detailElement, doc, context );
@@ -259,60 +269,60 @@ bool QgsDigitizingGuideLayer::writeXml(QDomNode &layer_node, QDomDocument &doc, 
   return writeSymbology( layer_node, doc, errorMsg, context );
 }
 
-QStringList QgsDigitizingGuideLayer::addDetails( QList<QgsAnnotationItem*> details)
+QStringList QgsDigitizingGuideLayer::addDetails( QList<QgsAnnotationItem *> details )
 {
   QStringList detailItemIds;
-  while (!details.isEmpty())
+  while ( !details.isEmpty() )
   {
-    detailItemIds << addItem(details.takeFirst());
+    detailItemIds << addItem( details.takeFirst() );
   }
   return detailItemIds;
 }
 
 QgsMarkerSymbol *QgsDigitizingGuideLayer::pointGuideSymbol() const
 {
-    QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
-    markerSymbolLayer->setSize(3);
-    markerSymbolLayer->setColor( Qt::red );
-    QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
-    return markerSymbol;
+  QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
+  markerSymbolLayer->setSize( 3 );
+  markerSymbolLayer->setColor( Qt::red );
+  QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
+  return markerSymbol;
 }
 
 QgsMarkerSymbol *QgsDigitizingGuideLayer::highlightedPointGuideSymbol() const
 {
-    QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
-    markerSymbolLayer->setSize(5);
-    markerSymbolLayer->setColor( Qt::blue );
-    QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
-    return markerSymbol;
+  QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
+  markerSymbolLayer->setSize( 5 );
+  markerSymbolLayer->setColor( Qt::blue );
+  QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
+  return markerSymbol;
 }
 
 QgsMarkerSymbol *QgsDigitizingGuideLayer::detailsPointSymbol() const
 {
-    QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
-    markerSymbolLayer->setSize(2);
-    markerSymbolLayer->setColor( Qt::gray );
-    QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
-    return markerSymbol;
+  QgsSimpleMarkerSymbolLayer *markerSymbolLayer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross );
+  markerSymbolLayer->setSize( 2 );
+  markerSymbolLayer->setColor( Qt::gray );
+  QgsMarkerSymbol *markerSymbol = new QgsMarkerSymbol( QgsSymbolLayerList() << markerSymbolLayer );
+  return markerSymbol;
 }
 
 QgsLineSymbol *QgsDigitizingGuideLayer::lineGuideSymbol() const
 {
-  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer(QColor(Qt::gray), 0.1, Qt::PenStyle::DashLine );
+  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer( QColor( Qt::gray ), 0.1, Qt::PenStyle::DashLine );
   QgsLineSymbol *lineSymbol = new QgsLineSymbol( QgsSymbolLayerList() << lineSymbolLayer );
   return lineSymbol;
 }
 
 QgsLineSymbol *QgsDigitizingGuideLayer::highlightedLineGuideSymbol() const
 {
-  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer(QColor(Qt::blue), 0.2 );
+  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer( QColor( Qt::blue ), 0.2 );
   QgsLineSymbol *lineSymbol = new QgsLineSymbol( QgsSymbolLayerList() << lineSymbolLayer );
   return lineSymbol;
 }
 
 QgsLineSymbol *QgsDigitizingGuideLayer::detailsLineSymbol() const
 {
-  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer(QColor(Qt::gray), 0.2, Qt::PenStyle::DashLine );
+  QgsSimpleLineSymbolLayer *lineSymbolLayer = new QgsSimpleLineSymbolLayer( QColor( Qt::gray ), 0.2, Qt::PenStyle::DashLine );
   QgsLineSymbol *lineSymbol = new QgsLineSymbol( QgsSymbolLayerList() << lineSymbolLayer );
   return lineSymbol;
 }

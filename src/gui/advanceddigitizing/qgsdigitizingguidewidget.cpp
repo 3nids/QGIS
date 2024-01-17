@@ -24,30 +24,31 @@
 
 #include <QMessageBox>
 
-QgsDigitizingGuideWidget::QgsDigitizingGuideWidget(QgsMapCanvas* canvas, QWidget *parent)
+QgsDigitizingGuideWidget::QgsDigitizingGuideWidget( QgsMapCanvas *canvas, QWidget *parent )
   : QWidget{parent}
   , mCanvas( canvas )
   , mGuideLayer( QgsProject::instance()->digitizingGuideLayer() )
 {
-  setupUi(this);
+  setupUi( this );
 
-  mGuidesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-  mGuidesTable->verticalHeader()->setVisible(false);
-  mGuidesTable->horizontalHeader()->setVisible(false);
-  mGuidesTable->horizontalHeader()->setStretchLastSection(true);
+  mGuidesTable->setSelectionBehavior( QAbstractItemView::SelectRows );
+  mGuidesTable->verticalHeader()->setVisible( false );
+  mGuidesTable->horizontalHeader()->setVisible( false );
+  mGuidesTable->horizontalHeader()->setStretchLastSection( true );
 
-  mGuidesTable->setModel(mGuideLayer->model());
+  mGuidesTable->setModel( mGuideLayer->model() );
 
-  mRemoveGuideButton->setEnabled(false);
-  connect(mRemoveGuideButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::removeButtonClicked);
+  mRemoveGuideButton->setEnabled( false );
+  connect( mRemoveGuideButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::removeButtonClicked );
 
-  connect(mGuidesTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsDigitizingGuideWidget::guideSelectionChanged );
+  connect( mGuidesTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsDigitizingGuideWidget::guideSelectionChanged );
 
   connect( mDistanceToPointsButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::enableGuideMapTool );
   mGuidesMapTools.insert( mDistanceToPointsButton, new QgsDigitizingGuideMapToolDistanceToPoints( canvas ) );
 
-  //mConstructionMapToolDistanceToPointAlongLine = new QAction( tr("Distance to point along line"), constructionMapToolMenu);
-  //constructionMapToolMenu->addAction( mConstructionMapToolDistanceToPointAlongLine );
+  connect( mLineExtensionButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::enableGuideMapTool );
+  mGuidesMapTools.insert( mLineExtensionButton, new QgsDigitizingGuideMapToolLineExtension( canvas ) );
+
 }
 
 void QgsDigitizingGuideWidget::enableGuideMapTool( )
@@ -59,11 +60,11 @@ void QgsDigitizingGuideWidget::enableGuideMapTool( )
     mCanvas->setMapTool( mapTool );
 }
 
-void QgsDigitizingGuideWidget::guideSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void QgsDigitizingGuideWidget::guideSelectionChanged( const QItemSelection &selected, const QItemSelection &deselected )
 {
-  mGuideLayer->model()->selectionChanged(selected, deselected);
+  mGuideLayer->model()->selectionChanged( selected, deselected );
 
-  mRemoveGuideButton->setEnabled(selected.indexes().count() > 0);
+  mRemoveGuideButton->setEnabled( selected.indexes().count() > 0 );
 }
 
 void QgsDigitizingGuideWidget::removeButtonClicked()
@@ -72,8 +73,8 @@ void QgsDigitizingGuideWidget::removeButtonClicked()
   QItemSelectionModel *selectionModel = mGuidesTable->selectionModel();
   if ( selectionModel && selectionModel->hasSelection() )
   {
-     QMessageBox::StandardButton bt = QMessageBox::question(nullptr, tr("Digitizing Guides"), tr("Remove %1 guide(s) ?").arg(selectionModel->selectedRows().count()));
-     if ( bt == QMessageBox::StandardButton::Yes)
-       mGuideLayer->model()->removeGuides(selectionModel->selectedRows());
+    QMessageBox::StandardButton bt = QMessageBox::question( nullptr, tr( "Digitizing Guides" ), tr( "Remove %1 guide(s) ?" ).arg( selectionModel->selectedRows().count() ) );
+    if ( bt == QMessageBox::StandardButton::Yes )
+      mGuideLayer->model()->removeGuides( selectionModel->selectedRows() );
   }
 }

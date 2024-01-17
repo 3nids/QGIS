@@ -15,21 +15,22 @@
 
 #include "qgsdigitizingguidemaptool.h"
 
-#include "qgsdigitizingguidelayer.h"
+#include "qgsannotationlineitem.h"
+#include "qgsannotationmarkeritem.h"
+#include "qgsannotationpointtextitem.h"
 #include "qgscircle.h"
-#include "qgsguiutils.h"
+#include "qgsdigitizingguidelayer.h"
 #include "qgsgeometry.h"
+#include "qgsguiutils.h"
 #include "qgsmapcanvas.h"
 #include "qgsmapmouseevent.h"
 #include "qgsmultipoint.h"
 #include "qgsproject.h"
 #include "qgsrubberband.h"
-#include "qgssettingsregistrycore.h"
 #include "qgssettingsentryimpl.h"
+#include "qgssettingsregistrycore.h"
 #include "qgssnapindicator.h"
-#include "qgsannotationmarkeritem.h"
-#include "qgsannotationlineitem.h"
-#include "qgsannotationpointtextitem.h"
+#include "qgssnappingutils.h"
 
 #include <QInputDialog>
 
@@ -62,7 +63,7 @@ void QgsDigitizingGuideMapTool::restorePreviousMapTool() const
 
 
 QgsDigitizingGuideMapToolDistanceToPoints::QgsDigitizingGuideMapToolDistanceToPoints( QgsMapCanvas *canvas )
-    : QgsDigitizingGuideMapTool( canvas )
+  : QgsDigitizingGuideMapTool( canvas )
 {
   mSnapIndicator.reset( new QgsSnapIndicator( canvas ) );
 }
@@ -70,7 +71,7 @@ QgsDigitizingGuideMapToolDistanceToPoints::QgsDigitizingGuideMapToolDistanceToPo
 
 void QgsDigitizingGuideMapToolDistanceToPoints::deactivate()
 {
-    mDistances.clear();
+  mDistances.clear();
 
   mSnapIndicator->setMatch( QgsPointLocator::Match() );
   mCircleRubberBand->reset( Qgis::GeometryType::Line );
@@ -139,7 +140,7 @@ void QgsDigitizingGuideMapToolDistanceToPoints::canvasMoveEvent( QgsMapMouseEven
 {
   e->snapPoint();
 
-    if ( mDistances.count() < 2 )
+  if ( mDistances.count() < 2 )
   {
     mSnapIndicator->setMatch( e->mapPointMatch() );
   }
@@ -160,10 +161,9 @@ void QgsDigitizingGuideMapToolDistanceToPoints::canvasMoveEvent( QgsMapMouseEven
 
 void QgsDigitizingGuideMapToolDistanceToPoints::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
-  qDebug() << e->button();
   if ( e->button() == Qt::MouseButton::RightButton )
   {
-      mDistances.clear();
+    mDistances.clear();
   }
   else
   {
@@ -172,23 +172,24 @@ void QgsDigitizingGuideMapToolDistanceToPoints::canvasReleaseEvent( QgsMapMouseE
 
     if ( mDistances.count() < 2 )
     {
-      QInputDialog* d = new QInputDialog;
+      QInputDialog *d = new QInputDialog;
       //d->setDialogTitle( tr( "Distance to point" ) );
       d->setLabelText( tr( "Distance to point [m]" ) );
-      d->setInputMode(QInputDialog::DoubleInput);
-      d->setDoubleDecimals(3);
+      d->setInputMode( QInputDialog::DoubleInput );
+      d->setDoubleDecimals( 3 );
 
       QgsPointXY pt = toLayerCoordinates( QgsProject::instance()->digitizingGuideLayer(), e->mapPoint() );
       mDistances.append( std::pair<QgsPointXY, double>( pt, 0 ) );
 
-      connect(d, &QInputDialog::doubleValueChanged, this, [=](double distance){
-          mDistances.last().second = distance;
-          updateRubberband();
-      });
+      connect( d, &QInputDialog::doubleValueChanged, this, [ = ]( double distance )
+      {
+        mDistances.last().second = distance;
+        updateRubberband();
+      } );
 
       if ( !d->exec() )
       {
-          mDistances.removeLast();
+        mDistances.removeLast();
       }
     }
     else
@@ -197,10 +198,10 @@ void QgsDigitizingGuideMapToolDistanceToPoints::canvasReleaseEvent( QgsMapMouseE
       if ( !solution.isEmpty() )
       {
         bool ok = false;
-        QString title = QInputDialog::getText(nullptr, tr("Add Point Giude"), tr("Guide Title"),  QLineEdit::EchoMode::Normal, tr("Distance to 2 points"), &ok);
-        if (ok)
+        QString title = QInputDialog::getText( nullptr, tr( "Add Point Giude" ), tr( "Guide Title" ),  QLineEdit::EchoMode::Normal, tr( "Distance to 2 points" ), &ok );
+        if ( ok )
         {
-          createPointDistanceToPointsGuide( solution, mDistances );
+          createPointDistanceToPointsGuide( solution, mDistances, title );
         }
         mDistances.clear();
         restorePreviousMapTool();
@@ -212,20 +213,128 @@ void QgsDigitizingGuideMapToolDistanceToPoints::canvasReleaseEvent( QgsMapMouseE
   updateRubberband();
 }
 
-void QgsDigitizingGuideMapToolDistanceToPoints::createPointDistanceToPointsGuide( const QgsPoint &guidePoint, const QList<std::pair<QgsPointXY, double> > &distances )
+void QgsDigitizingGuideMapToolDistanceToPoints::createPointDistanceToPointsGuide( const QgsPoint &guidePoint, const QList<std::pair<QgsPointXY, double> > &distances, const QString &title )
 {
-  QgsDigitizingGuideLayer* dl = QgsProject::instance()->digitizingGuideLayer();
+  QgsDigitizingGuideLayer *dl = QgsProject::instance()->digitizingGuideLayer();
 
-    QList<QgsAnnotationItem*> details;
-    for (const auto &distance : distances )
-    {
-        details << dl->createDetailsPoint( QgsPoint( distance.first ) );
+  QList<QgsAnnotationItem *> details;
+  for ( const auto &distance : distances )
+  {
+    details << dl->createDetailsPoint( QgsPoint( distance.first ) );
 
-        QgsLineString *line = new QgsLineString({guidePoint, distance.first});
-        details << dl->createDetailsLine( line );
-        details << dl->createDetailsPointTextGuide( QString::number( distance.second, 'f', 3 ), line->centroid(), guidePoint.azimuth( QgsPoint( distance.first ) ) - 90 );
-    }
+    QgsLineString *line = new QgsLineString( {guidePoint, distance.first} );
+    details << dl->createDetailsLine( line );
+    details << dl->createDetailsPointTextGuide( QString::number( distance.second, 'f', 3 ), line->centroid(), guidePoint.azimuth( QgsPoint( distance.first ) ) - 90 );
+  }
 
-    dl->addPointGuide( guidePoint, tr("Distance to 2 points"), details );
+  dl->addPointGuide( guidePoint, title, details );
 }
 
+
+QgsDigitizingGuideMapToolLineExtension::QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas )
+  : QgsDigitizingGuideMapTool( canvas )
+{
+  mSnapIndicator.reset( new QgsSnapIndicator( canvas ) );
+}
+
+void QgsDigitizingGuideMapToolLineExtension::deactivate()
+{
+  mSnapIndicator->setMatch( QgsPointLocator::Match() );
+  mRubberBand->reset( Qgis::GeometryType::Line );
+
+  QgsDigitizingGuideMapTool::deactivate();
+}
+
+void QgsDigitizingGuideMapToolLineExtension::canvasMoveEvent( QgsMapMouseEvent *e )
+{
+  if ( !mSegment )
+  {
+    EdgesOnlyFilter filter;
+    const QgsPointLocator::Match match = canvas()->snappingUtils()->snapToMap( e->mapPoint(), &filter );
+
+    if ( match.isValid() )
+    {
+      mSnapIndicator->setMatch( match );
+    }
+    else
+    {
+      mSnapIndicator->setMatch( QgsPointLocator::Match() );
+    }
+  }
+  else
+  {
+    if ( !mRubberBand )
+    {
+      mRubberBand.reset( new QgsRubberBand( mCanvas, Qgis::GeometryType::Line ) );
+      QColor color = QgsSettingsRegistryCore::settingsDigitizingLineColor->value();
+      mRubberBand->setLineStyle( Qt::DotLine );
+      mRubberBand->setStrokeColor( color );
+    }
+    else
+    {
+      mRubberBand->reset( Qgis::GeometryType::Line );
+    }
+
+    QgsLineString *line = createLine( e->mapPoint() );
+    mRubberBand->addGeometry( QgsGeometry( line ), QgsProject::instance()->digitizingGuideLayer()->crs() );
+  }
+}
+
+void QgsDigitizingGuideMapToolLineExtension::canvasReleaseEvent( QgsMapMouseEvent *e )
+{
+  if ( e->button() == Qt::MouseButton::RightButton )
+  {
+    mSegment.reset();
+  }
+  else
+  {
+    if ( !mSegment )
+    {
+      EdgesOnlyFilter filter;
+      const QgsPointLocator::Match match = canvas()->snappingUtils()->snapToMap( e->mapPoint(), &filter );
+
+      if ( match.isValid() )
+      {
+        QgsPointXY p1, p2;
+        match.edgePoints( p1, p2 );
+        mSegment = {p1, p2};
+      }
+    }
+    else
+    {
+      QgsLineString *line = createLine( e->mapPoint() );
+      bool ok = false;
+      if ( line )
+      {
+        QString title = QInputDialog::getText( nullptr, tr( "Add Point Giude" ), tr( "Guide Title" ),  QLineEdit::EchoMode::Normal, tr( "Line Extension" ), &ok );
+        if ( ok )
+        {
+          QgsDigitizingGuideLayer *dl = QgsProject::instance()->digitizingGuideLayer();
+          dl->addLineGuide( line, title );
+        }
+        else
+        {
+          delete line;
+        }
+      }
+      restorePreviousMapTool();
+      return;
+    }
+  }
+  mSnapIndicator->setMatch( QgsPointLocator::Match() );
+}
+
+QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPointXY &point )
+{
+  if ( !mSegment )
+    return nullptr;
+
+  double d1 = mSegment->first.sqrDist( point );
+  double d2 = mSegment->second.sqrDist( point );
+
+  const QgsPointXY &startPoint = d1 < d2 ? mSegment->first : mSegment->second;
+
+  const QgsPointXY endPoint = QgsGeometryUtils::perpendicularSegment( QgsPoint( point ), QgsPoint( mSegment->first ), QgsPoint( mSegment->second ) ).endPoint();
+
+  return new QgsLineString( {startPoint, endPoint} );
+}

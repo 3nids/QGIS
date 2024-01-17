@@ -18,6 +18,8 @@
 
 #include "qgsmaptool.h"
 #include "qobjectuniqueptr.h"
+#include "qgspointlocator.h"
+
 
 class QgsSnapIndicator;
 class QgsRubberBand;
@@ -34,7 +36,7 @@ class GUI_EXPORT QgsDigitizingGuideMapTool : public QgsMapTool
     Q_OBJECT
   public:
     //! Constructor
-      QgsDigitizingGuideMapTool( QgsMapCanvas *canvas );
+    QgsDigitizingGuideMapTool( QgsMapCanvas *canvas );
 
     Flags flags() const override {return AllowZoomRect;}
     void keyPressEvent( QKeyEvent *e ) override;
@@ -58,14 +60,14 @@ class GUI_EXPORT QgsDigitizingGuideMapToolDistanceToPoints : public QgsDigitizin
     Q_OBJECT
   public:
     //! Constructor
-  QgsDigitizingGuideMapToolDistanceToPoints( QgsMapCanvas *canvas );
+    QgsDigitizingGuideMapToolDistanceToPoints( QgsMapCanvas *canvas );
 
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void deactivate() override;
 
   private:
-    void createPointDistanceToPointsGuide( const QgsPoint &guidePoint, const QList<std::pair<QgsPointXY, double>> &distances );
+    void createPointDistanceToPointsGuide( const QgsPoint &guidePoint, const QList<std::pair<QgsPointXY, double>> &distances, const QString &title );
     void updateRubberband();
     QgsPoint intersectionSolution( const QgsMapMouseEvent *e ) const;
 
@@ -76,6 +78,36 @@ class GUI_EXPORT QgsDigitizingGuideMapToolDistanceToPoints : public QgsDigitizin
 
 };
 
+/**
+ * \ingroup gui
+ * @brief The QgsDigitizingGuideMapToolDistanceToPoints is a map tool to place a point guide at a given distance to 2 points
+ * \since QGIS 3.34
+ */
+class GUI_EXPORT QgsDigitizingGuideMapToolLineExtension : public QgsDigitizingGuideMapTool
+{
+    Q_OBJECT
+  public:
+    //! Constructor
+    QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas );
+
+    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
+    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+    void deactivate() override;
+
+  private:
+
+    struct EdgesOnlyFilter : public QgsPointLocator::MatchFilter
+    {
+      bool acceptMatch( const QgsPointLocator::Match &m ) override { return m.hasEdge(); }
+    };
+
+    QgsLineString *createLine( const QgsPointXY &point );
+
+    std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
+    std::optional<std::pair<QgsPointXY, QgsPointXY>> mSegment;
+    QObjectUniquePtr<QgsRubberBand> mRubberBand;
+
+};
 
 
 #endif // QGSDIGITIZINGGUIDESMAPTOOL_H
