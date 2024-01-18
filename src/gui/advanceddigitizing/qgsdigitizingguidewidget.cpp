@@ -46,7 +46,7 @@ QgsDigitizingGuideWidget::QgsDigitizingGuideWidget( QgsMapCanvas *canvas, QWidge
   mGuidesMapTools.insert( mDistanceToPointsButton, new QgsDigitizingGuideMapToolDistanceToPoints( canvas ) );
   mGuidesMapTools.insert( mLineExtensionButton, new QgsDigitizingGuideMapToolLineExtension( canvas ) );
   mGuidesMapTools.insert( mLineParallelButton, new QgsDigitizingGuideMapToolLineParallel( canvas ) );
-  //mGuidesMapTools.insert( mLinePerpendicularButton, new QgsDigitizingGuideMapToolPerpendicular( canvas ) );
+  mGuidesMapTools.insert( mLinePerpendicularButton, new QgsDigitizingGuideMapToolLinePerpendicular( canvas ) );
 
   for ( auto it = mGuidesMapTools.constBegin(); it != mGuidesMapTools.constEnd(); it++ )
   {

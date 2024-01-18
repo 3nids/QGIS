@@ -189,6 +189,21 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineParallel : public QgsDigitizingGui
   private:
     QgsLineString *createLine( const QgsPointXY &point, double offset = 0 ) override;
 };
+/**
+ * \ingroup gui
+ * @brief The QgsDigitizingGuideMapToolLinePerpendicular is a map tool to place a line guide as a perpendicular to a segment
+ * \since QGIS 3.34
+ */
+class GUI_EXPORT QgsDigitizingGuideMapToolLinePerpendicular : public QgsDigitizingGuideMapToolLineAbstract
+{
+    Q_OBJECT
+  public:
+    //! Constructor
+    QgsDigitizingGuideMapToolLinePerpendicular( QgsMapCanvas *canvas );
+
+  private:
+    QgsLineString *createLine( const QgsPointXY &point, double offset = 0 ) override;
+};
 
 
 #endif // QGSDIGITIZINGGUIDESMAPTOOL_H

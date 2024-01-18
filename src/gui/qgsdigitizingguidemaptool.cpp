@@ -484,6 +484,23 @@ QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPoint
   return new QgsLineString( {newLine.first(), newLine.last()} );
 }
 
+QgsDigitizingGuideMapToolLinePerpendicular::QgsDigitizingGuideMapToolLinePerpendicular( QgsMapCanvas *canvas )
+  : QgsDigitizingGuideMapToolLineAbstract( tr( "Perpendicular" ), canvas )
+{
+}
+
+QgsLineString *QgsDigitizingGuideMapToolLinePerpendicular::createLine( const QgsPointXY &point, double offset )
+{
+  Q_UNUSED( offset )
+
+  if ( !mSegment )
+    return nullptr;
+
+  QgsLineString *line = new QgsLineString(QgsGeometryUtils::perpendicularSegment( QgsPoint( point ), QgsPoint( mSegment->first ), QgsPoint( mSegment->second ) ) );
+
+  return line;
+}
+
 ///@cond PRIVATE
 
 QgsDigitizingGuideToolUserInputWidget::QgsDigitizingGuideToolUserInputWidget( const QString &title, bool offset, QWidget *parent )
