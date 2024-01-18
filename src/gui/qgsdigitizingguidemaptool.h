@@ -19,12 +19,48 @@
 #include "qgsmaptool.h"
 #include "qobjectuniqueptr.h"
 #include "qgspointlocator.h"
+#include "ui_qgsdigitizingguidetooluserinputwidget.h"
 
+#include <QWidget>
 
 class QgsSnapIndicator;
 class QgsRubberBand;
 
+class QDoubleSpinBox;
+
 #define SIP_NO_FILE
+
+#ifndef SIP_RUN
+///@cond PRIVATE
+
+class GUI_EXPORT QgsDigitizingGuideToolUserInputWidget : public QWidget, private Ui::QgsDigitizingGuideToolUserInputWidget
+{
+    Q_OBJECT
+
+  public:
+
+  explicit QgsDigitizingGuideToolUserInputWidget( const QString &title, bool offset = false, QWidget *parent = nullptr );
+
+    QString title() const;
+    double offset() const;
+
+
+  signals:
+    void offsetChanged( double offset );
+    void offsetEditingFinished( double offset, const Qt::KeyboardModifiers &modifiers );
+    void offsetEditingCanceled();
+
+  protected:
+    bool eventFilter( QObject *obj, QEvent *ev ) override;
+
+private:
+    QDoubleSpinBox *mOffsetSpinBox = nullptr;
+
+};
+
+///@endcond
+#endif
+
 
 /**
  * \ingroup gui
@@ -93,7 +129,7 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineAbstract : public QgsDigitizingGui
     Q_OBJECT
   public:
     //! Constructor
-    QgsDigitizingGuideMapToolLineAbstract( QgsMapCanvas *canvas );
+    QgsDigitizingGuideMapToolLineAbstract( const QString &defaultTitle, QgsMapCanvas *canvas );
 
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
@@ -103,12 +139,14 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineAbstract : public QgsDigitizingGui
     std::optional<std::pair<QgsPointXY, QgsPointXY>> mSegment;
 
   private:
+    void createUserInputWidget();
 
     virtual QgsLineString *createLine( const QgsPointXY &point ) = 0;
 
     std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
     QObjectUniquePtr<QgsRubberBand> mRubberBand;
-
+    QString mDefaultTitle;
+    QgsDigitizingGuideToolUserInputWidget *mUserInputWidget = nullptr;
 };
 
 /**
