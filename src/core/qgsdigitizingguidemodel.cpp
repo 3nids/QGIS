@@ -17,6 +17,8 @@
 
 #include "qgsdigitizingguidelayer.h"
 #include "qgsannotationitem.h"
+#include "qgsannotationpointtextitem.h"
+#include "qgsannotationlinetextitem.h"
 
 #include <QItemSelection>
 #include <QModelIndexList>
@@ -136,21 +138,49 @@ Qt::ItemFlags QgsDigitizingGuideModel::flags( const QModelIndex &index ) const
     return Qt::ItemFlags();
 
   if ( index.column() == 0 )
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-bool QgsDigitizingGuideModel::setData( const QModelIndex &index,
-                                       const QVariant &value, int role )
+bool QgsDigitizingGuideModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
   if ( !index.isValid() )
     return false;
 
+  if ( index.column() == 0 && role == static_cast<int>( Qt::EditRole ) )
+  {
+    mGuides[index.row()].mTitle = value.toString();
+    QgsAnnotationItem *titleItem = mGuideLayer->item( mGuides[index.row()].mTitleItemId );
+
+    if ( mGuides[index.row()].mType == QStringLiteral( "point-guide" ) )
+    {
+      QgsAnnotationPointTextItem *pointTextItem = dynamic_cast<QgsAnnotationPointTextItem *>( titleItem );
+      if ( pointTextItem )
+      {
+        pointTextItem->setText( value.toString() );
+        mGuideLayer->triggerRepaint();
+        emit dataChanged( index, index );
+        return true;
+      }
+    }
+    else if ( mGuides[index.row()].mType == QStringLiteral( "line-guide" ) )
+    {
+      QgsAnnotationLineTextItem *lineTextItem = dynamic_cast<QgsAnnotationLineTextItem *>( titleItem );
+      if ( lineTextItem )
+      {
+        lineTextItem->setText( value.toString() );
+        mGuideLayer->triggerRepaint();
+        emit dataChanged( index, index );
+        return true;
+      }
+    }
+  }
+
   if ( index.column() == 0 && role == static_cast<int>( Qt::CheckStateRole ) )
   {
     bool enabled = value == Qt::Checked ? true : false;
-    QgsAnnotationItem *item = mGuideLayer->item( mGuides[index.row()].mGuideItemId )->clone();
+    QgsAnnotationItem *item = mGuideLayer->item( mGuides[index.row()].mGuideItemId );
     if ( item )
     {
       item->setEnabled( enabled );
