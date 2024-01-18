@@ -45,6 +45,11 @@ class GUI_EXPORT QgsDigitizingGuideMapTool : public QgsMapTool
     //! Restores the previous map tool on the map canvas
     void restorePreviousMapTool() const;
 
+    struct EdgesOnlyFilter : public QgsPointLocator::MatchFilter
+    {
+      bool acceptMatch( const QgsPointLocator::Match &m ) override { return m.hasEdge(); }
+    };
+
   private:
     QPointer< QgsMapTool > mPreviousTool;
 };
@@ -80,33 +85,62 @@ class GUI_EXPORT QgsDigitizingGuideMapToolDistanceToPoints : public QgsDigitizin
 
 /**
  * \ingroup gui
- * @brief The QgsDigitizingGuideMapToolDistanceToPoints is a map tool to place a point guide at a given distance to 2 points
+ * @brief The QgsDigitizingGuideMapToolLineAbstract is an absctract class for line extension/parallel/perpendicular implementations
  * \since QGIS 3.34
  */
-class GUI_EXPORT QgsDigitizingGuideMapToolLineExtension : public QgsDigitizingGuideMapTool
+class GUI_EXPORT QgsDigitizingGuideMapToolLineAbstract : public QgsDigitizingGuideMapTool
+{
+    Q_OBJECT
+  public:
+    //! Constructor
+    QgsDigitizingGuideMapToolLineAbstract( QgsMapCanvas *canvas );
+
+    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
+    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+    void deactivate() override;
+
+  protected:
+    std::optional<std::pair<QgsPointXY, QgsPointXY>> mSegment;
+
+  private:
+
+    virtual QgsLineString *createLine( const QgsPointXY &point ) = 0;
+
+    std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
+    QObjectUniquePtr<QgsRubberBand> mRubberBand;
+
+};
+
+/**
+ * \ingroup gui
+ * @brief The QgsDigitizingGuideMapToolLineExtension is a map tool to place a line guide as an extension of a segment
+ * \since QGIS 3.34
+ */
+class GUI_EXPORT QgsDigitizingGuideMapToolLineExtension : public QgsDigitizingGuideMapToolLineAbstract
 {
     Q_OBJECT
   public:
     //! Constructor
     QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas );
 
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-    void deactivate() override;
+  private:
+    QgsLineString *createLine( const QgsPointXY &point ) override;
+};
+
+/**
+ * \ingroup gui
+ * @brief The QgsDigitizingGuideMapToolLineParallel is a map tool to place a line guide as a parallel to a segment
+ * \since QGIS 3.34
+ */
+class GUI_EXPORT QgsDigitizingGuideMapToolLineParallel : public QgsDigitizingGuideMapToolLineAbstract
+{
+    Q_OBJECT
+  public:
+    //! Constructor
+    QgsDigitizingGuideMapToolLineParallel( QgsMapCanvas *canvas );
 
   private:
-
-    struct EdgesOnlyFilter : public QgsPointLocator::MatchFilter
-    {
-      bool acceptMatch( const QgsPointLocator::Match &m ) override { return m.hasEdge(); }
-    };
-
-    QgsLineString *createLine( const QgsPointXY &point );
-
-    std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
-    std::optional<std::pair<QgsPointXY, QgsPointXY>> mSegment;
-    QObjectUniquePtr<QgsRubberBand> mRubberBand;
-
+    QgsLineString *createLine( const QgsPointXY &point ) override;
 };
 
 

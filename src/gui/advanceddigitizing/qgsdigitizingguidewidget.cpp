@@ -43,11 +43,15 @@ QgsDigitizingGuideWidget::QgsDigitizingGuideWidget( QgsMapCanvas *canvas, QWidge
 
   connect( mGuidesTable->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QgsDigitizingGuideWidget::guideSelectionChanged );
 
-  connect( mDistanceToPointsButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::enableGuideMapTool );
   mGuidesMapTools.insert( mDistanceToPointsButton, new QgsDigitizingGuideMapToolDistanceToPoints( canvas ) );
-
-  connect( mLineExtensionButton, &QToolButton::clicked, this, &QgsDigitizingGuideWidget::enableGuideMapTool );
   mGuidesMapTools.insert( mLineExtensionButton, new QgsDigitizingGuideMapToolLineExtension( canvas ) );
+  mGuidesMapTools.insert( mLineParallelButton, new QgsDigitizingGuideMapToolLineParallel( canvas ) );
+  //mGuidesMapTools.insert( mLinePerpendicularButton, new QgsDigitizingGuideMapToolPerpendicular( canvas ) );
+
+  for ( auto it = mGuidesMapTools.constBegin(); it != mGuidesMapTools.constEnd(); it++ )
+  {
+    connect( it.key(), &QToolButton::clicked, this, &QgsDigitizingGuideWidget::enableGuideMapTool );
+  }
 
 }
 

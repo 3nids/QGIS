@@ -231,13 +231,13 @@ void QgsDigitizingGuideMapToolDistanceToPoints::createPointDistanceToPointsGuide
 }
 
 
-QgsDigitizingGuideMapToolLineExtension::QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas )
+QgsDigitizingGuideMapToolLineAbstract::QgsDigitizingGuideMapToolLineAbstract( QgsMapCanvas *canvas )
   : QgsDigitizingGuideMapTool( canvas )
 {
   mSnapIndicator.reset( new QgsSnapIndicator( canvas ) );
 }
 
-void QgsDigitizingGuideMapToolLineExtension::deactivate()
+void QgsDigitizingGuideMapToolLineAbstract::deactivate()
 {
   mSnapIndicator->setMatch( QgsPointLocator::Match() );
   mRubberBand->reset( Qgis::GeometryType::Line );
@@ -245,7 +245,7 @@ void QgsDigitizingGuideMapToolLineExtension::deactivate()
   QgsDigitizingGuideMapTool::deactivate();
 }
 
-void QgsDigitizingGuideMapToolLineExtension::canvasMoveEvent( QgsMapMouseEvent *e )
+void QgsDigitizingGuideMapToolLineAbstract::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( !mSegment )
   {
@@ -280,7 +280,7 @@ void QgsDigitizingGuideMapToolLineExtension::canvasMoveEvent( QgsMapMouseEvent *
   }
 }
 
-void QgsDigitizingGuideMapToolLineExtension::canvasReleaseEvent( QgsMapMouseEvent *e )
+void QgsDigitizingGuideMapToolLineAbstract::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
   if ( e->button() == Qt::MouseButton::RightButton )
   {
@@ -324,6 +324,12 @@ void QgsDigitizingGuideMapToolLineExtension::canvasReleaseEvent( QgsMapMouseEven
   mSnapIndicator->setMatch( QgsPointLocator::Match() );
 }
 
+
+QgsDigitizingGuideMapToolLineExtension::QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas )
+  : QgsDigitizingGuideMapToolLineAbstract( canvas )
+{
+}
+
 QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPointXY &point )
 {
   if ( !mSegment )
@@ -337,4 +343,50 @@ QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPoin
   const QgsPointXY endPoint = QgsGeometryUtils::perpendicularSegment( QgsPoint( point ), QgsPoint( mSegment->first ), QgsPoint( mSegment->second ) ).endPoint();
 
   return new QgsLineString( {startPoint, endPoint} );
+}
+
+
+QgsDigitizingGuideMapToolLineParallel::QgsDigitizingGuideMapToolLineParallel( QgsMapCanvas *canvas )
+  : QgsDigitizingGuideMapToolLineAbstract( canvas )
+{
+}
+
+QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPointXY &point )
+{
+  if ( !mSegment )
+    return nullptr;
+
+  const QgsPointXY &s1 = mSegment->first;
+  const QgsPointXY &s2 = mSegment->second;
+
+  const double nx = s2.y() - s1.y();
+  const double ny = -( s2.x() - s1.x() );
+  const double t = ( point.x() * ny - point.y() * nx - s1.x() * ny + s1.y() * nx ) / ( ( s2.x() - s1.x() ) * ny - ( s2.y() - s1.y() ) * nx );
+
+  QgsPoint p1;
+  QgsPoint p2;
+
+  if ( t > 1 )
+  {
+    p1 = QgsPoint( s1 );
+    p2 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+  }
+  else if ( t < 0 )
+  {
+    p1 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+    p2 = QgsPoint( s2 );
+  }
+  else
+  {
+    p1 = QgsPoint( s1 );
+    p2 = QgsPoint( s2 );
+  }
+
+  const QgsPoint pointPoint = QgsPoint( point );
+
+  double distance = QgsGeometryUtils::leftOfLine( pointPoint, p2, p1 ) * QgsGeometryUtils::distToInfiniteLine( pointPoint, p1, p2 );
+
+  QgsPolylineXY newLine = QgsGeometry::fromPolylineXY( {p1, p2} ).offsetCurve( distance, 8, Qgis::JoinStyle::Miter, 2 ).asPolyline();
+
+  return new QgsLineString( {newLine.first(), newLine.last()} );
 }

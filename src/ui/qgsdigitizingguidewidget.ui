@@ -31,7 +31,7 @@
      <item>
       <widget class="QToolButton" name="mDistanceToPointsButton">
        <property name="toolTip">
-        <string>Create point guide from distance to 2 points</string>
+        <string>Creates point guide from distance to 2 points</string>
        </property>
        <property name="text">
         <string>...</string>
@@ -45,11 +45,33 @@
      <item>
       <widget class="QToolButton" name="mLineExtensionButton">
        <property name="text">
-        <string>...</string>
+        <string>Creates line guide as an extension of a segment</string>
        </property>
        <property name="icon">
         <iconset resource="../../images/images.qrc">
          <normaloff>:/images/themes/default/mActionGuideLineProlongation.svg</normaloff>:/images/themes/default/mActionGuideLineProlongation.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="mLineParallelButton">
+       <property name="text">
+        <string>Creates line guide as a parallel line to a segment</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../images/images.qrc">
+         <normaloff>:/images/themes/default/mActionGuideLineParallel.svg</normaloff>:/images/themes/default/mActionGuideLineParallel.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="mLinePerpendicularButton">
+       <property name="text">
+        <string>Creates line guide as a perpendicular line to a segment</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../images/images.qrc">
+         <normaloff>:/images/themes/default/mActionGuideLinePerpendicular.svg</normaloff>:/images/themes/default/mActionGuideLinePerpendicular.svg</iconset>
        </property>
       </widget>
      </item>
