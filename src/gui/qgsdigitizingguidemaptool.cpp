@@ -31,8 +31,7 @@
 #include "qgssettingsregistrycore.h"
 #include "qgssnapindicator.h"
 #include "qgssnappingutils.h"
-#include "qgsapplication.h"
-
+#include "qgsfloatingwidget.h"
 
 #include <QInputDialog>
 
@@ -233,7 +232,7 @@ void QgsDigitizingGuideMapToolDistanceToPoints::createPointDistanceToPointsGuide
 }
 
 
-QgsDigitizingGuideMapToolLineAbstract::QgsDigitizingGuideMapToolLineAbstract(const QString &defaultTitle, QgsMapCanvas *canvas )
+QgsDigitizingGuideMapToolLineAbstract::QgsDigitizingGuideMapToolLineAbstract( const QString &defaultTitle, QgsMapCanvas *canvas )
   : QgsDigitizingGuideMapTool( canvas )
   , mDefaultTitle( defaultTitle )
 {
@@ -242,6 +241,9 @@ QgsDigitizingGuideMapToolLineAbstract::QgsDigitizingGuideMapToolLineAbstract(con
 
 void QgsDigitizingGuideMapToolLineAbstract::deactivate()
 {
+  deleteUserInputWidget();
+
+  mSegment.reset();
   mSnapIndicator->setMatch( QgsPointLocator::Match() );
   mRubberBand->reset( Qgis::GeometryType::Line );
 
@@ -266,21 +268,25 @@ void QgsDigitizingGuideMapToolLineAbstract::canvasMoveEvent( QgsMapMouseEvent *e
   }
   else
   {
-    if ( !mRubberBand )
-    {
-      mRubberBand.reset( new QgsRubberBand( mCanvas, Qgis::GeometryType::Line ) );
-      QColor color = QgsSettingsRegistryCore::settingsDigitizingLineColor->value();
-      mRubberBand->setLineStyle( Qt::DotLine );
-      mRubberBand->setStrokeColor( color );
-    }
-    else
-    {
-      mRubberBand->reset( Qgis::GeometryType::Line );
-    }
-
     QgsLineString *line = createLine( e->mapPoint() );
-    mRubberBand->addGeometry( QgsGeometry( line ), QgsProject::instance()->digitizingGuideLayer()->crs() );
+    updateRubberBand( line );
   }
+}
+
+void QgsDigitizingGuideMapToolLineAbstract::updateRubberBand( QgsLineString *line )
+{
+  if ( !mRubberBand )
+  {
+    mRubberBand.reset( new QgsRubberBand( mCanvas, Qgis::GeometryType::Line ) );
+    QColor color = QgsSettingsRegistryCore::settingsDigitizingLineColor->value();
+    mRubberBand->setLineStyle( Qt::DotLine );
+    mRubberBand->setStrokeColor( color );
+  }
+  else
+  {
+    mRubberBand->reset( Qgis::GeometryType::Line );
+  }
+  mRubberBand->addGeometry( QgsGeometry( line ), QgsProject::instance()->digitizingGuideLayer()->crs() );
 }
 
 void QgsDigitizingGuideMapToolLineAbstract::canvasReleaseEvent( QgsMapMouseEvent *e )
@@ -306,12 +312,12 @@ void QgsDigitizingGuideMapToolLineAbstract::canvasReleaseEvent( QgsMapMouseEvent
   }
   else
   {
+
     QgsLineString *line = createLine( e->mapPoint() );
     if ( line )
-     {
-        QgsDigitizingGuideLayer *dl = QgsProject::instance()->digitizingGuideLayer();
-        dl->addLineGuide( line, mUserInputWidget->title() );
-     }
+    {
+      QgsDigitizingGuideLayer *dl = QgsProject::instance()->digitizingGuideLayer();
+      dl->addLineGuide( line, mUserInputWidget->title() );
     }
     restorePreviousMapTool();
     return;
@@ -322,17 +328,60 @@ void QgsDigitizingGuideMapToolLineAbstract::canvasReleaseEvent( QgsMapMouseEvent
 
 void QgsDigitizingGuideMapToolLineAbstract::createUserInputWidget()
 {
-  //deleteUserInputWidget();
+  deleteUserInputWidget();
 
-  mUserInputWidget = new QgsDigitizingGuideToolUserInputWidget(mDefaultTitle);
-  QgisApp::instance()->addUserInputWidget( mUserInputWidget );
+  mFloatingWidget = new QgsFloatingWidget( mCanvas->window() );
+  mFloatingWidget->setAnchorWidget( mCanvas );
+  mFloatingWidget->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::TopRight );
+  mFloatingWidget->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopRight );
+
+  mUserInputWidget = new QgsDigitizingGuideToolUserInputWidget( mDefaultTitle, mHasOffset, mFloatingWidget );
   mUserInputWidget->setFocus( Qt::TabFocusReason );
 
-  connect( mUserInputWidget, &QgsOffsetUserWidget::offsetChanged, this, &QgsMapToolOffsetCurve::updateGeometryAndRubberBand );
-  connect( mUserInputWidget, &QgsOffsetUserWidget::offsetEditingFinished, this, &QgsMapToolOffsetCurve::applyOffsetFromWidget );
-  connect( mUserInputWidget, &QgsOffsetUserWidget::offsetEditingCanceled, this, &QgsMapToolOffsetCurve::cancel );
+  QHBoxLayout *containerLayout = new QHBoxLayout();
+  containerLayout->setContentsMargins( 0, 0, 0, 0 );
+  containerLayout->addWidget( mUserInputWidget );
+  mFloatingWidget->setLayout( containerLayout );
 
-  connect( mUserInputWidget, &QgsOffsetUserWidget::offsetConfigChanged, this, [ = ] {updateGeometryAndRubberBand( mUserInputWidget->offset() );} );
+  mFloatingWidget->show();
+
+  connect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::offsetChanged, this, &QgsDigitizingGuideMapToolLineAbstract::offsetChanged );
+  connect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::editingFinished, this, &QgsDigitizingGuideMapToolLineAbstract::validateFromUserWidget );
+  connect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::editingCanceled, this, &QgsDigitizingGuideMapToolLineAbstract::restorePreviousMapTool );
+}
+
+void QgsDigitizingGuideMapToolLineAbstract::deleteUserInputWidget()
+{
+  if ( mUserInputWidget )
+  {
+    disconnect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::offsetChanged, this, &QgsDigitizingGuideMapToolLineAbstract::offsetChanged );
+    disconnect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::editingFinished, this, &QgsDigitizingGuideMapToolLineAbstract::validateFromUserWidget );
+    disconnect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::editingCanceled, this, &QgsDigitizingGuideMapToolLineAbstract::restorePreviousMapTool );
+    mUserInputWidget->releaseKeyboard();
+  }
+  mUserInputWidget = nullptr;
+  if ( mFloatingWidget )
+  {
+    mFloatingWidget->deleteLater();
+    mFloatingWidget = nullptr;
+  }
+}
+
+void QgsDigitizingGuideMapToolLineAbstract::offsetChanged( double offset )
+{
+  QgsLineString *line = createLine( QgsPoint(), offset );
+  updateRubberBand( line );
+}
+
+void QgsDigitizingGuideMapToolLineAbstract::validateFromUserWidget( double offset )
+{
+  QgsLineString *line = createLine( QgsPoint(), offset );
+  if ( line )
+  {
+    QgsDigitizingGuideLayer *dl = QgsProject::instance()->digitizingGuideLayer();
+    dl->addLineGuide( line, mUserInputWidget->title() );
+  }
+  restorePreviousMapTool();
 }
 
 QgsDigitizingGuideMapToolLineExtension::QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas )
@@ -340,8 +389,10 @@ QgsDigitizingGuideMapToolLineExtension::QgsDigitizingGuideMapToolLineExtension( 
 {
 }
 
-QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPointXY &point )
+QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPointXY &point, double offset )
 {
+  Q_UNUSED( offset )
+
   if ( !mSegment )
     return nullptr;
 
@@ -359,9 +410,10 @@ QgsLineString *QgsDigitizingGuideMapToolLineExtension::createLine( const QgsPoin
 QgsDigitizingGuideMapToolLineParallel::QgsDigitizingGuideMapToolLineParallel( QgsMapCanvas *canvas )
   : QgsDigitizingGuideMapToolLineAbstract( tr( "Parallel" ), canvas )
 {
+  mHasOffset = true;
 }
 
-QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPointXY &point )
+QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPointXY &point, double offset )
 {
   if ( !mSegment )
     return nullptr;
@@ -376,15 +428,26 @@ QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPoint
   QgsPoint p1;
   QgsPoint p2;
 
-  if ( t > 1 )
+  if ( offset == 0 )
   {
-    p1 = QgsPoint( s1 );
-    p2 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
-  }
-  else if ( t < 0 )
-  {
-    p1 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
-    p2 = QgsPoint( s2 );
+    if ( t > 1 )
+    {
+      p1 = QgsPoint( s1 );
+      p2 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+    }
+    else if ( t < 0 )
+    {
+      p1 = QgsPoint( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+      p2 = QgsPoint( s2 );
+    }
+    else
+    {
+      p1 = QgsPoint( s1 );
+      p2 = QgsPoint( s2 );
+    }
+    const QgsPoint pointPoint = QgsPoint( point );
+
+    offset = QgsGeometryUtils::leftOfLine( pointPoint, p2, p1 ) * QgsGeometryUtils::distToInfiniteLine( pointPoint, p1, p2 );
   }
   else
   {
@@ -392,24 +455,28 @@ QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPoint
     p2 = QgsPoint( s2 );
   }
 
-  const QgsPoint pointPoint = QgsPoint( point );
+  QgsPolylineXY newLine = QgsGeometry::fromPolylineXY( {p1, p2} ).offsetCurve( offset, 8, Qgis::JoinStyle::Miter, 2 ).asPolyline();
 
-  double distance = QgsGeometryUtils::leftOfLine( pointPoint, p2, p1 ) * QgsGeometryUtils::distToInfiniteLine( pointPoint, p1, p2 );
-
-  QgsPolylineXY newLine = QgsGeometry::fromPolylineXY( {p1, p2} ).offsetCurve( distance, 8, Qgis::JoinStyle::Miter, 2 ).asPolyline();
+  if ( mUserInputWidget && offset == 0 )
+  {
+    mUserInputWidget->setOffset( offset );
+  }
 
   return new QgsLineString( {newLine.first(), newLine.last()} );
 }
 
 ///@cond PRIVATE
 
-QgsDigitizingGuideToolUserInputWidget::QgsDigitizingGuideToolUserInputWidget(const QString &title, bool offset, QWidget *parent)
+QgsDigitizingGuideToolUserInputWidget::QgsDigitizingGuideToolUserInputWidget( const QString &title, bool offset, QWidget *parent )
+  : QWidget( parent )
 {
-  mTitleLineEdit->setText(title);
-  mOffsetLabel->setVisible(offset);
-  mOffsetSpinBox->setVisible(offset);
+  setupUi( this );
 
-  if(offset)
+  mTitleLineEdit->setText( title );
+  mOffsetLabel->setVisible( offset );
+  mOffsetSpinBox->setVisible( offset );
+
+  if ( offset )
   {
     mOffsetSpinBox->setDecimals( 6 );
     mOffsetSpinBox->installEventFilter( this );
@@ -423,6 +490,11 @@ QString QgsDigitizingGuideToolUserInputWidget::title() const
   return mTitleLineEdit->text();
 }
 
+void QgsDigitizingGuideToolUserInputWidget::setOffset( double offset )
+{
+  whileBlocking( mOffsetSpinBox )->setValue( offset );
+}
+
 double QgsDigitizingGuideToolUserInputWidget::offset() const
 {
   return mOffsetSpinBox->value();
@@ -430,17 +502,17 @@ double QgsDigitizingGuideToolUserInputWidget::offset() const
 
 bool QgsDigitizingGuideToolUserInputWidget::eventFilter( QObject *obj, QEvent *ev )
 {
-  if ( obj == mOffsetSpinBox && ev->type() == QEvent::KeyPress )
+  if ( ( obj == mOffsetSpinBox || obj == mTitleLineEdit ) && ev->type() == QEvent::KeyPress )
   {
     QKeyEvent *event = static_cast<QKeyEvent *>( ev );
     if ( event->key() == Qt::Key_Escape )
     {
-      emit offsetEditingCanceled();
+      emit editingCanceled();
       return true;
     }
-    if ( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return )
+    if ( obj == mOffsetSpinBox && ( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return ) )
     {
-      emit offsetEditingFinished( offset(), event->modifiers() );
+      emit editingFinished( offset() );
       return true;
     }
   }

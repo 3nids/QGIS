@@ -25,6 +25,7 @@
 
 class QgsSnapIndicator;
 class QgsRubberBand;
+class QgsFloatingWidget;
 
 class QDoubleSpinBox;
 
@@ -39,23 +40,20 @@ class GUI_EXPORT QgsDigitizingGuideToolUserInputWidget : public QWidget, private
 
   public:
 
-  explicit QgsDigitizingGuideToolUserInputWidget( const QString &title, bool offset = false, QWidget *parent = nullptr );
+    explicit QgsDigitizingGuideToolUserInputWidget( const QString &title, bool offset = false, QWidget *parent = nullptr );
 
     QString title() const;
-    double offset() const;
 
+    void setOffset( double offset );
+    double offset() const;
 
   signals:
     void offsetChanged( double offset );
-    void offsetEditingFinished( double offset, const Qt::KeyboardModifiers &modifiers );
-    void offsetEditingCanceled();
+    void editingFinished( double offset );
+    void editingCanceled();
 
   protected:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
-
-private:
-    QDoubleSpinBox *mOffsetSpinBox = nullptr;
-
 };
 
 ///@endcond
@@ -127,6 +125,7 @@ class GUI_EXPORT QgsDigitizingGuideMapToolDistanceToPoints : public QgsDigitizin
 class GUI_EXPORT QgsDigitizingGuideMapToolLineAbstract : public QgsDigitizingGuideMapTool
 {
     Q_OBJECT
+
   public:
     //! Constructor
     QgsDigitizingGuideMapToolLineAbstract( const QString &defaultTitle, QgsMapCanvas *canvas );
@@ -136,17 +135,27 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineAbstract : public QgsDigitizingGui
     void deactivate() override;
 
   protected:
+    void updateRubberBand( QgsLineString *line );
+
+    bool mHasOffset = false;
     std::optional<std::pair<QgsPointXY, QgsPointXY>> mSegment;
+    QgsDigitizingGuideToolUserInputWidget *mUserInputWidget = nullptr;
+
+  private slots:
+    void offsetChanged( double offset );
+    void validateFromUserWidget( double offset );
+
 
   private:
     void createUserInputWidget();
+    void deleteUserInputWidget();
 
-    virtual QgsLineString *createLine( const QgsPointXY &point ) = 0;
+    virtual QgsLineString *createLine( const QgsPointXY &point, double offset = 0 ) = 0;
 
     std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
     QObjectUniquePtr<QgsRubberBand> mRubberBand;
     QString mDefaultTitle;
-    QgsDigitizingGuideToolUserInputWidget *mUserInputWidget = nullptr;
+    QgsFloatingWidget *mFloatingWidget = nullptr;
 };
 
 /**
@@ -162,7 +171,7 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineExtension : public QgsDigitizingGu
     QgsDigitizingGuideMapToolLineExtension( QgsMapCanvas *canvas );
 
   private:
-    QgsLineString *createLine( const QgsPointXY &point ) override;
+    QgsLineString *createLine( const QgsPointXY &point, double offset = 0 ) override;
 };
 
 /**
@@ -178,7 +187,7 @@ class GUI_EXPORT QgsDigitizingGuideMapToolLineParallel : public QgsDigitizingGui
     QgsDigitizingGuideMapToolLineParallel( QgsMapCanvas *canvas );
 
   private:
-    QgsLineString *createLine( const QgsPointXY &point ) override;
+    QgsLineString *createLine( const QgsPointXY &point, double offset = 0 ) override;
 };
 
 
