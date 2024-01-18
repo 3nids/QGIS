@@ -252,10 +252,12 @@ void QgsDigitizingGuideMapToolLineAbstract::deactivate()
 
 void QgsDigitizingGuideMapToolLineAbstract::canvasMoveEvent( QgsMapMouseEvent *e )
 {
+  e->snapPoint();
+
   if ( !mSegment )
   {
     EdgesOnlyFilter filter;
-    const QgsPointLocator::Match match = canvas()->snappingUtils()->snapToMap( e->mapPoint(), &filter );
+    const QgsPointLocator::Match match = canvas()->snappingUtils()->snapToMap( e->snapPoint(), &filter );
 
     if ( match.isValid() )
     {
@@ -268,7 +270,7 @@ void QgsDigitizingGuideMapToolLineAbstract::canvasMoveEvent( QgsMapMouseEvent *e
   }
   else
   {
-    QgsLineString *line = createLine( e->mapPoint() );
+    QgsLineString *line = createLine( e->snapPoint() );
     updateRubberBand( line );
   }
 }
@@ -330,19 +332,36 @@ void QgsDigitizingGuideMapToolLineAbstract::createUserInputWidget()
 {
   deleteUserInputWidget();
 
-  mFloatingWidget = new QgsFloatingWidget( mCanvas->window() );
+  mFloatingWidget = new QgsFloatingWidget( mCanvas );
   mFloatingWidget->setAnchorWidget( mCanvas );
   mFloatingWidget->setAnchorWidgetPoint( QgsFloatingWidget::AnchorPoint::TopRight );
   mFloatingWidget->setAnchorPoint( QgsFloatingWidget::AnchorPoint::TopRight );
+
+  QFrame *f = new QFrame();
+  f->setObjectName( QStringLiteral( "mUserInputContainer" ) );
+
+  QPalette pal = mCanvas->window()->palette();
+  pal.setBrush( mCanvas->window()->backgroundRole(), pal.window() );
+  f->setPalette( pal );
+  f->setAutoFillBackground( true );
+  f->setFrameShape( QFrame::StyledPanel );
+  f->setFrameShadow( QFrame::Plain );
+
+  QBoxLayout *topLayout = new QBoxLayout( QBoxLayout::TopToBottom );
+  topLayout->setContentsMargins( 0, 0, 0, 0 );
+  topLayout->addWidget( f );
+  mFloatingWidget->setLayout( topLayout );
+  topLayout->setSizeConstraint( QLayout::SetFixedSize );
 
   mUserInputWidget = new QgsDigitizingGuideToolUserInputWidget( mDefaultTitle, mHasOffset, mFloatingWidget );
   mUserInputWidget->setFocus( Qt::TabFocusReason );
 
   QHBoxLayout *containerLayout = new QHBoxLayout();
   containerLayout->setContentsMargins( 0, 0, 0, 0 );
+  containerLayout->setSizeConstraint( QLayout::SetFixedSize );
   containerLayout->addWidget( mUserInputWidget );
-  mFloatingWidget->setLayout( containerLayout );
-
+  f->setLayout( containerLayout );
+  mFloatingWidget->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding );
   mFloatingWidget->show();
 
   connect( mUserInputWidget, &QgsDigitizingGuideToolUserInputWidget::offsetChanged, this, &QgsDigitizingGuideMapToolLineAbstract::offsetChanged );
@@ -457,7 +476,7 @@ QgsLineString *QgsDigitizingGuideMapToolLineParallel::createLine( const QgsPoint
 
   QgsPolylineXY newLine = QgsGeometry::fromPolylineXY( {p1, p2} ).offsetCurve( offset, 8, Qgis::JoinStyle::Miter, 2 ).asPolyline();
 
-  if ( mUserInputWidget && offset == 0 )
+  if ( mUserInputWidget && !point.isEmpty() )
   {
     mUserInputWidget->setOffset( offset );
   }
@@ -479,6 +498,8 @@ QgsDigitizingGuideToolUserInputWidget::QgsDigitizingGuideToolUserInputWidget( co
   if ( offset )
   {
     mOffsetSpinBox->setDecimals( 6 );
+    mOffsetSpinBox->setMinimum( -1e8 );
+    mOffsetSpinBox->setMaximum( 1e8 );
     mOffsetSpinBox->installEventFilter( this );
     connect( mOffsetSpinBox, static_cast < void ( QDoubleSpinBox::* )( double ) > ( &QDoubleSpinBox::valueChanged ), this, &QgsDigitizingGuideToolUserInputWidget::offsetChanged );
     setFocusProxy( mOffsetSpinBox );
