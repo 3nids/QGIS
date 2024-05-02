@@ -1238,8 +1238,9 @@ endif()
 #############################################################
 # Enable packaging
 if (WITH_CORE)
-  include(Bundle)
+  #include(Bundle)
   include(VcpkgInstallDeps)
+  include(Package)
 endif()
 
 if (UNIX AND NOT APPLE)

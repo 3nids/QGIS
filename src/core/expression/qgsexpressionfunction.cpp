@@ -81,6 +81,7 @@ Q_GLOBAL_STATIC( ExpressionFunctionList, sFunctions )
 Q_DECLARE_METATYPE( QgsSpatialIndex )
 Q_DECLARE_METATYPE( QgsExpressionContext )
 Q_DECLARE_METATYPE( std::shared_ptr<QgsVectorLayer> )
+Q_DECLARE_METATYPE( std::shared_ptr<QgsVectorLayerFeatureSource> )
 
 const QString QgsExpressionFunction::helpText() const
 {
@@ -260,6 +261,31 @@ bool QgsExpressionFunction::allParamsStatic( const QgsExpressionNodeFunction *no
   }
 
   return true;
+}
+
+/**
+ * Helper function to prepare layer nodes. If the node is static, we obtain a featureSource
+ * for the layer which can then be reused through the evaluation of this expression
+ * without blocking the main thread.
+ */
+bool prepareLayerNode( QgsExpressionNode *layerNode, QgsExpression *parent, const QgsExpressionContext *context )
+{
+  if ( layerNode->isStatic( parent, context ) )
+  {
+    QVariant layer = layerNode->eval( parent, context );
+    bool foundLayer = false;
+
+    QgsVectorLayerFeatureSource *featureSource = QgsExpressionUtils::getFeatureSource( layer, context, parent, foundLayer );
+
+    if ( featureSource )
+    {
+      context->setThreadLocalCachedValue( QStringLiteral( "featuresource/%1" ).arg( featureSource->id() ), QVariant::fromValue( featureSource ) );
+    }
+
+    return featureSource && foundLayer;
+  }
+
+  return false;
 }
 
 static QVariant fcnGenerateSeries( const QVariantList &values, const QgsExpressionContext *, QgsExpression *parent, const QgsExpressionNodeFunction * )
@@ -6489,7 +6515,7 @@ static QVariant fcnTransformGeometry( const QVariantList &values, const QgsExpre
 static QVariant fcnGetFeatureById( const QVariantList &values, const QgsExpressionContext *context, QgsExpression *parent, const QgsExpressionNodeFunction * )
 {
   bool foundLayer = false;
-  std::unique_ptr<QgsVectorLayerFeatureSource> featureSource = QgsExpressionUtils::getFeatureSource( values.at( 0 ), context, parent, foundLayer );
+  QgsVectorLayerFeatureSource *featureSource = QgsExpressionUtils::getFeatureSource( values.at( 0 ), context, parent, foundLayer );
 
   //no layer found
   if ( !featureSource || !foundLayer )
@@ -6519,7 +6545,8 @@ static QVariant fcnGetFeature( const QVariantList &values, const QgsExpressionCo
 {
   //arguments: 1. layer id / name, 2. key attribute, 3. eq value
   bool foundLayer = false;
-  std::unique_ptr<QgsVectorLayerFeatureSource> featureSource = QgsExpressionUtils::getFeatureSource( values.at( 0 ), context, parent, foundLayer );
+
+  QgsVectorLayerFeatureSource *featureSource = QgsExpressionUtils::getFeatureSource( values.at( 0 ), context, parent, foundLayer );
 
   //no layer found
   if ( !featureSource || !foundLayer )
@@ -9194,11 +9221,28 @@ const QList<QgsExpressionFunction *> &QgsExpression::Functions()
     functions << uuidFunc;
 
     functions
-        << new QgsStaticExpressionFunction( QStringLiteral( "feature_id" ), QgsExpressionFunction::ParameterList() << QgsExpressionFunction::Parameter( QStringLiteral( "feature" ) ), fcnGetFeatureId, QStringLiteral( "Record and Attributes" ), QString(), true )
-        << new QgsStaticExpressionFunction( QStringLiteral( "get_feature" ), QgsExpressionFunction::ParameterList() << QgsExpressionFunction::Parameter( QStringLiteral( "layer" ) )
-                                            << QgsExpressionFunction::Parameter( QStringLiteral( "attribute" ) )
-                                            << QgsExpressionFunction::Parameter( QStringLiteral( "value" ), true ),
-                                            fcnGetFeature, QStringLiteral( "Record and Attributes" ), QString(), false, QSet<QString>(), false, QStringList() << QStringLiteral( "QgsExpressionUtils::getFeature" ) )
+        << new QgsStaticExpressionFunction( QStringLiteral( "feature_id" ), QgsExpressionFunction::ParameterList() << QgsExpressionFunction::Parameter( QStringLiteral( "feature" ) ), fcnGetFeatureId, QStringLiteral( "Record and Attributes" ), QString(), true );
+
+    QgsStaticExpressionFunction *getFeatureFunc = new QgsStaticExpressionFunction( QStringLiteral( "get_feature" ), QgsExpressionFunction::ParameterList() << QgsExpressionFunction::Parameter( QStringLiteral( "layer" ) )
+        << QgsExpressionFunction::Parameter( QStringLiteral( "attribute" ) )
+        << QgsExpressionFunction::Parameter( QStringLiteral( "value" ), true ),
+        fcnGetFeature, QStringLiteral( "Record and Attributes" ), QString(), false, QSet<QString>(), false, QStringList() << QStringLiteral( "QgsExpressionUtils::getFeature" ) );
+
+    getFeatureFunc->setPrepareFunction( []( const QgsExpressionNodeFunction * node, QgsExpression * parent, const QgsExpressionContext * context )
+    {
+      Q_UNUSED( context )
+      if ( node->args()->count() > 0 )
+      {
+        prepareLayerNode( node->args()->at( 0 ), parent, context );
+      }
+      return true;
+    }
+                                      );
+
+    functions
+        << getFeatureFunc;
+
+    functions
         << new QgsStaticExpressionFunction( QStringLiteral( "get_feature_by_id" ), QgsExpressionFunction::ParameterList() << QgsExpressionFunction::Parameter( QStringLiteral( "layer" ) )
                                             << QgsExpressionFunction::Parameter( QStringLiteral( "feature_id" ) ),
                                             fcnGetFeatureById, QStringLiteral( "Record and Attributes" ), QString(), false, QSet<QString>(), false );

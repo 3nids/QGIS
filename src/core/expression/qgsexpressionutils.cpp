@@ -22,6 +22,8 @@
 #include "qgsvectorlayerfeatureiterator.h"
 #include "qgssymbollayerutils.h"
 
+Q_DECLARE_METATYPE( std::shared_ptr<QgsVectorLayerFeatureSource> )
+
 ///@cond PRIVATE
 
 QgsExpressionUtils::TVL QgsExpressionUtils::AND[3][3] =
@@ -306,15 +308,21 @@ QVariant QgsExpressionUtils::runMapLayerFunctionThreadSafe( const QVariant &valu
   return res;
 }
 
-std::unique_ptr<QgsVectorLayerFeatureSource> QgsExpressionUtils::getFeatureSource( const QVariant &value, const QgsExpressionContext *context, QgsExpression *e, bool &foundLayer )
+QgsVectorLayerFeatureSource *QgsExpressionUtils::getFeatureSource( const QVariant &value, const QgsExpressionContext *context, QgsExpression *e, bool &foundLayer )
 {
-  std::unique_ptr<QgsVectorLayerFeatureSource> featureSource;
+  QgsVectorLayerFeatureSource *featureSource = value.value<QgsVectorLayerFeatureSource*>();
+
+  if ( featureSource )
+  {
+    foundLayer = true;
+    return featureSource;
+  }
 
   executeLambdaForMapLayer( value, context, e, [&featureSource]( QgsMapLayer * layer )
   {
     if ( QgsVectorLayer *vl = qobject_cast< QgsVectorLayer *>( layer ) )
     {
-      featureSource.reset( new QgsVectorLayerFeatureSource( vl ) );
+      featureSource = new QgsVectorLayerFeatureSource( vl ); // TODO unique_ptr?
     }
   }, foundLayer );
 

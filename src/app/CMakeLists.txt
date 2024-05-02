@@ -447,7 +447,11 @@ set(TEST_RCCS ../../tests/testdata/testdata.qrc)
 
 if (WIN32)
   set (QGIS_APP_SRCS ${QGIS_APP_SRCS} main.cpp ${TEST_RCCS})
-  set (QGIS_APPMAIN_SRCS mainwin.cpp)
+  if(BUILD_WITH_QT6)
+    set (QGIS_APPMAIN_SRCS mainwin.cpp)
+  else()
+    set (QGIS_APPMAIN_SRCS mainwinqt5.cpp)
+  endif()
   if (NOT MSVC)
     enable_language(RC)
     set(CMAKE_RC_COMPILER_INIT ${CMAKE_GENERATOR_RC})
@@ -512,7 +516,10 @@ if (ANDROID)
   # require c++17
   target_compile_features(${QGIS_APP_NAME} PRIVATE cxx_std_17)
 else()
-  add_executable(${QGIS_APP_NAME} MACOSX_BUNDLE WIN32 ${QGIS_APPMAIN_SRCS})
+  add_executable(${QGIS_APP_NAME} WIN32 ${QGIS_APPMAIN_SRCS} main.cpp)
+  set_target_properties(${QGIS_APP_NAME} PROPERTIES
+    MACOSX_BUNDLE TRUE
+  )
 
   if(MSVC AND BUILD_WITH_QT6)
     qt_disable_unicode_defines(${QGIS_APP_NAME})
@@ -657,7 +664,7 @@ if (NOT WIN32)
 target_link_libraries(${QGIS_APP_NAME} QTSignal)
 endif()
 
-if (APPLE)
+if (FALSE)
   set_target_properties(${QGIS_APP_NAME} PROPERTIES
     INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${QGIS_LIB_DIR}
     INSTALL_RPATH_USE_LINK_PATH true
@@ -678,7 +685,7 @@ if (WITH_PDAL)
 endif()
 
 if(MSVC)
-  install(FILES qgis.ico qgis-mime.ico qgis-qgs.ico qgis-qlr.ico qgis-qml.ico qgis-qpt.ico DESTINATION ${CMAKE_INSTALL_PREFIX}/icons)
+  install(FILES qgis.ico qgis-mime.ico qgis-qgs.ico qgis-qlr.ico qgis-qml.ico qgis-qpt.ico DESTINATION icons)
 endif()
 
 install(TARGETS qgis_app

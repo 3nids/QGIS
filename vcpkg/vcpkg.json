@@ -2,9 +2,9 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "reference": "7adc2e4d49e8d0efc07a369079faa6bc3dbb90f3",
-      "baseline": "7adc2e4d49e8d0efc07a369079faa6bc3dbb90f3",
-      "repository": "https://github.com/microsoft/vcpkg"
+      "reference": "217ad4d0533d8249d5d6116bee28854ef69e030c",
+      "baseline": "217ad4d0533d8249d5d6116bee28854ef69e030c",
+      "repository": "https://github.com/3nids/vcpkg"
     },
     "registries": [
       {
@@ -47,6 +47,8 @@
         "poppler"
       ]
     },
+    "tinygltf",
+    "pdal-wrench",
     "geos",
     "gsl",
     "jhasse-poly2tri",
