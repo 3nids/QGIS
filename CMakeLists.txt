@@ -1223,6 +1223,7 @@ endif()
 # Enable packaging
 if (WITH_CORE)
   include(Bundle)
+  include(VcpkgInstallDeps)
 endif()
 
 if (UNIX AND NOT APPLE)
