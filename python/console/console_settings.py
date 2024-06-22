@@ -98,8 +98,14 @@ class ConsoleOptionsWidget(QWidget, Ui_SettingsDialogPythonConsole):
         self.removeAPIpath.clicked.connect(self.removeAPI)
         self.compileAPIs.clicked.connect(self._prepareAPI)
 
+        self.generateToken.clicked.connect(self.generateGHToken)
         self.formatter.currentTextChanged.connect(self.onFormatterChanged)
         self.onFormatterChanged()
+
+    def generateGHToken(self):
+        description = self.tr("PyQGIS Console")
+        url = 'https://github.com/settings/tokens/new?description={}&scopes=gist'.format(description)
+        QDesktopServices.openUrl(QUrl(url))
 
     def initialCheck(self):
         if self.preloadAPI.isChecked():
@@ -185,6 +191,8 @@ class ConsoleOptionsWidget(QWidget, Ui_SettingsDialogPythonConsole):
         settings = QgsSettings()
         settings.setValue("pythonConsole/preloadAPI", self.preloadAPI.isChecked())
         settings.setValue("pythonConsole/autoSaveScript", self.autoSaveScript.isChecked())
+
+        settings.setValue("pythonConsole/accessTokenGithub", self.tokenGhLineEdit.text())
 
         for i in range(0, self.tableWidget.rowCount()):
             text = self.tableWidget.item(i, 1).text()
