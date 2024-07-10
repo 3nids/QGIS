@@ -68,7 +68,7 @@ class CORE_EXPORT QgsAuthMethodConfig
     //! Gets name of configuration
     const QString name() const { return mName; }
     //! Sets name of configuration
-    void setName( const QString &name ) { mName = name; }
+    void setName( const QString &name ) { mName = name; } SIP_SKIP
 
     //! A URI to auto-select a config when connecting to a resource
     const QString uri() const { return mUri; }
