@@ -1,0 +1,45 @@
+name: Run Bots on PR
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  sipify:
+    if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '@sipify')
+    runs-on: [ubuntu-latest]
+    steps:
+
+      - name: Install Requirements
+        run: |
+          sudo apt install -y \
+              cpanminus \
+              libyaml-tiny-perl \
+              libio-socket-ssl-perl \
+              libhttp-date-perl \
+              libgetopt-long-descriptive-perl \
+              libmoo-perl \
+              libnamespace-clean-perl \
+              libpath-tiny-perl \
+              libpod-constants-perl \
+              libscalar-list-utils-perl \
+              libsort-key-perl \
+              libstrictures-perl \
+              libstring-escape-perl \
+              libtry-tiny-perl
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: run sipify
+        run: ./scripts/sipify_all.sh
+
+      - name: commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "auto sipify 🍺"
+          git push
