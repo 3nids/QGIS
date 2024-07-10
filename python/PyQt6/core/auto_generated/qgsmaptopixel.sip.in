@@ -60,13 +60,6 @@ Returns a new QgsMapToPixel created using a specified ``scale`` and distance uni
 :return: matching QgsMapToPixel
 %End
 
-    bool isValid() const;
-%Docstring
-Returns ``True`` if the object is valid (i.e. it has parameters set), or ``False`` if the object is default constructed
-with no parameters set.
-
-.. versionadded:: 3.22
-%End
 
     QgsPointXY transform( const QgsPointXY &p ) const;
 %Docstring
