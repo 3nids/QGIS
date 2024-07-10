@@ -78,7 +78,7 @@ class CORE_EXPORT QgsMapToPixel
      *
      * \since QGIS 3.22
      */
-    bool isValid() const { return mValid; }
+    bool isValid() const { return mValid; } SIP_SKIP
 
     /**
      * Transforms a point \a p from map (world) coordinates to device coordinates.
