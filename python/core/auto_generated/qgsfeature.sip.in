@@ -602,15 +602,6 @@ Alternatively, in Python it is possible to directly `del` an attribute via its i
     }
 %End
 
-    bool isValid() const /HoldGIL/;
-%Docstring
-Returns the validity of this feature.
-
-This is normally set by the provider to indicate some problem that makes the feature
-invalid or to indicate a null feature.
-
-.. seealso:: :py:func:`setValid`
-%End
 
     void setValid( bool validity ) /HoldGIL/;
 %Docstring
