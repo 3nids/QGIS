@@ -6,9 +6,10 @@ on:
 
 jobs:
   sipify:
-    if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '/@sipify')
+    if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '@sipify')
     runs-on: [ubuntu-latest]
     steps:
+
       - name: Install Requirements
         run: |
           sudo apt install -y \
