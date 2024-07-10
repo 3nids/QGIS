@@ -34,10 +34,6 @@ still be available in the model as NULL value(s).
 .. versionadded:: 3.10
 %End
 
-    void setFeature( const QgsFeatureId &fid );
-%Docstring
-Set the feature to the given feature id
-%End
 
     QgsFeature feature() const;
 %Docstring
