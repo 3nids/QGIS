@@ -11,7 +11,7 @@ jobs:
     steps:
 
       - name: Get PR branch
-        uses: alessbell/pull-request-comment-branch@v2
+        uses: alessbell/pull-request-comment-branch@v2.1.0
         id: comment-branch
 
       - run: |
