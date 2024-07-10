@@ -46,7 +46,7 @@ class CORE_EXPORT QgsFeaturePickerModel : public QgsFeaturePickerModelBase
     void setExtraIdentifierValueToNull() override;
 
     //! Set the feature to the given feature id
-    void setFeature( const QgsFeatureId &fid );
+    void setFeature( const QgsFeatureId &fid ) SIP_SKIP;
 
     /**
      * Returns the current feature
