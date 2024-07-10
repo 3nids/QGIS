@@ -6,20 +6,13 @@ on:
 
 jobs:
   sipify:
-    if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '@sipify')
+    if: contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '/sipify')
     runs-on: [ubuntu-latest]
     steps:
 
       - name: Get PR branch
         uses: alessbell/pull-request-comment-branch@v2.1.0
         id: comment-branch
-
-      - run: |
-          echo "github.event.pull_request.head.repo.base_ref: ${{ github.base_ref }}"
-          echo "github.event.pull_request.head.repo.head_ref: ${{ github.head_ref }}"
-          echo "comment-head_ref: ${{ steps.comment-branch.outputs.head_ref }}"
-          echo "comment-base_ref: ${{ steps.comment-branch.outputs.base_ref }}"
-          echo "repository: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}"
 
       - uses: actions/checkout@v4
         with:
@@ -50,8 +43,8 @@ jobs:
 
       - name: commit
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name qgis-bot
+          git config user.email bot@qgis.org
           git add .
           git commit -m "auto sipify 🍺"
           git push
