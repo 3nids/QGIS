@@ -1,4 +1,4 @@
-name: Run Bots on PR
+name: Run sipify on PR
 
 on:
   issue_comment:
@@ -28,10 +28,13 @@ jobs:
               libstring-escape-perl \
               libtry-tiny-perl
 
+      - name: Get PR branch
+        uses: xt0rted/pull-request-comment-branch@v2
+        id: comment-branch
+
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ steps.comment-branch.outputs.head_ref }}
 
       - name: run sipify
         run: ./scripts/sipify_all.sh
