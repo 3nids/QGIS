@@ -813,7 +813,7 @@ class CORE_EXPORT QgsFeature
      *
      * \see setValid()
      */
-    bool isValid() const SIP_HOLDGIL;
+    bool isValid() const SIP_SKIP;
 
     /**
      * Sets the validity of the feature.
