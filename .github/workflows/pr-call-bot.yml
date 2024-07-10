@@ -11,7 +11,7 @@ jobs:
     steps:
 
       - name: Get PR branch
-        uses: xt0rted/pull-request-comment-branch@v2
+        uses: alessbell/pull-request-comment-branch@v2
         id: comment-branch
 
       - run: |
@@ -19,12 +19,12 @@ jobs:
           echo "github.event.pull_request.head.repo.head_ref: ${{ github.head_ref }}"
           echo "comment-head_ref: ${{ steps.comment-branch.outputs.head_ref }}"
           echo "comment-base_ref: ${{ steps.comment-branch.outputs.base_ref }}"
+          echo "repository: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}"
 
       - uses: actions/checkout@v4
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
-          #ref: ${{ github.event.pull_request.head.repo.base_ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          repository: ${{ steps.comment-branch.outputs.head_owner }}/${{ steps.comment-branch.outputs.head_repo }}
 
       - name: Install Requirements
         run: |
