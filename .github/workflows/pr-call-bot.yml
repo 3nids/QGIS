@@ -10,6 +10,22 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
 
+      - name: Get PR branch
+        uses: xt0rted/pull-request-comment-branch@v2
+        id: comment-branch
+
+      - run: |
+        echo "github.event.pull_request.head.repo.base_ref: ${{ github.event.pull_request.head.repo.base_ref }}"
+        echo "github.event.pull_request.head.repo.head_ref: ${{ github.event.pull_request.head.repo.head_ref }}"
+        echo "comment-head_ref: ${{ steps.comment-branch.outputs.head_ref }}"
+        echo "comment-base_ref: ${{ steps.comment-branch.outputs.base_ref }}"
+
+      - uses: actions/checkout@v4
+        with:
+          #ref: ${{ steps.comment-branch.outputs.head_ref }}
+          ref: ${{ github.event.pull_request.head.repo.base_ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
       - name: Install Requirements
         run: |
           sudo apt install -y \
@@ -27,15 +43,6 @@ jobs:
               libstrictures-perl \
               libstring-escape-perl \
               libtry-tiny-perl
-
-      - name: Get PR branch
-        uses: xt0rted/pull-request-comment-branch@v2
-        id: comment-branch
-
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.comment-branch.outputs.head_ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: run sipify
         run: ./scripts/sipify_all.sh
