@@ -1,12 +1,20 @@
 name: Setup Vcpkg
 description: Initialize vcpkg tool, does not checkout the registry
   # TODO, set VCPKG_BASE_VERSION based on this
-  # inputs:
+inputs:
+  vcpkg-root:
+    required: false
+    description: "Location of VCPKG installation"
+    type: string
   #  vcpkg-version:
   #    description: Enter vcpkg version tag or stable or latest
   #    required: false
   #    default: latest
   #    type: string
+outputs:
+    vcpkg-root:
+      description: "Location of VCPKG installation"
+      value: ${{ steps.set-output.outputs.vcpkg-root }}
 
 runs:
   using: composite
@@ -26,3 +34,8 @@ runs:
         iex (iwr -useb https://aka.ms/vcpkg-init.ps1)
         echo "VCPKG_ROOT=$env:VCPKG_ROOT" >> $env:GITHUB_ENV
         echo "PATH=$env:VCPKG_ROOT;$env:PATH" >> $env:GITHUB_ENV
+
+    - name: set output
+      id: set-output
+      run: echo "vcpkg-root=$(echo $VCPKG_ROOT)" >> $GITHUB_OUTPUT
+      shell: bash
