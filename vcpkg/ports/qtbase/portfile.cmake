@@ -18,7 +18,7 @@ set(${PORT}_PATCHES
         installed_dir.patch
         GLIB2-static.patch # alternative is to force pkg-config
         clang-cl_source_location.patch
-        clang-cl_QGADGET_fix.diff
+        # clang-cl_QGADGET_fix.diff
         fix-host-aliasing.patch
         fix_deploy_windows.patch
         macdeployqt_links.patch
