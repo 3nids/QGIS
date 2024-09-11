@@ -794,7 +794,7 @@ class TestQgsMapBoxGlStyleConverter(QgisTestCase):
             if expected_size:
                 self.assertEqual(labeling.labelSettings().format().buffer().size(), expected_size)
             if expected_data_defined:
-                self.assertEqual(labeling.labelSettings().dataDefinedProperties().property(QgsPalLayerSettings.Property.BufferSize), expected_data_defined)
+                self.assertEqual(labeling.labelSettings().dataDefinedProperties().property(QgsPalLayerSettings.Property.BufferSize).asExpression(), expected_data_defined)
 
     def testFontFamilyReplacement(self):
         context = QgsMapBoxGlStyleConversionContext()
