@@ -78,6 +78,8 @@ set (ENABLE_LOCAL_BUILD_SHORTCUTS FALSE CACHE BOOL "Disables some build steps wh
 
 #############################################################
 if (APPLE)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.14" CACHE STRING "Minimum OS X deployment version")
+
   # QGIS custom dependencies package from qgis/QGIS-Mac-Packager
   # they can be downloaded from https://download.qgis.org/downloads/macos/deps/
   # and extracted to /opt/QGIS/qgis-deps-<deps-version>/stage

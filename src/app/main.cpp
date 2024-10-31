@@ -1316,8 +1316,11 @@ int main( int argc, char *argv[] )
 #endif
 
 #ifdef Q_OS_MAC
+  // The following values are set by default in Qt6
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   // Set hidpi icons; use SVG icons, as PNGs will be relatively too small
   QCoreApplication::setAttribute( Qt::AA_UseHighDpiPixmaps );
+#endif
 
   // Set 1024x1024 icon for dock, app switcher, etc., rendering
   myApp.setWindowIcon( QIcon( QgsApplication::iconsPath() + QStringLiteral( "qgis-icon-macos.png" ) ) );

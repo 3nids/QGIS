@@ -14,7 +14,7 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
 endif()
 
 if(APPLE)
-  set(APPLE_LIB_LIST ApplicationServices CoreFoundation IOKit AppKit)
+  set(APPLE_LIB_LIST ApplicationServices CoreFoundation IOKit AppKit UserNotifications)
   foreach(_lib ${APPLE_LIB_LIST})
     string(TOUPPER ${_lib} _lib_var)
     # prefer /System/Library/Frameworks, in case CMAKE_FIND_FRAMEWORK=LAST, etc.

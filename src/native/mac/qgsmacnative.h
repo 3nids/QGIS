@@ -18,6 +18,7 @@
 #ifndef QGSMACNATIVE_H
 #define QGSMACNATIVE_H
 
+
 #include "qgsnative.h"
 
 class QString;
@@ -37,12 +38,14 @@ class NATIVE_EXPORT QgsMacNative : public QgsNative
     void openFileExplorerAndSelectFile( const QString &path ) override;
     QgsNative::Capabilities capabilities() const override;
     QgsNative::NotificationResult showDesktopNotification( const QString &summary, const QString &body, const NotificationSettings &settings ) override;
+    void doSendNotification( void *voidCenter, NSString *title, NSString *body );
+
 
     bool hasDarkTheme() override;
 
   private:
-    class QgsUserNotificationCenter;
-    QgsUserNotificationCenter *mQgsUserNotificationCenter = nullptr;
+    QString mIconPath;
+
 };
 
 
