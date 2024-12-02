@@ -19,7 +19,6 @@ Represents a matrix in a raster calculator operation.
 #include "qgsrastermatrix.h"
 %End
   public:
-
     enum TwoArgOperator /BaseType=IntEnum/
     {
       opPLUS,
@@ -65,7 +64,14 @@ Returns ``True`` if matrix is 1x1 (=scalar number)
 %End
     double number() const;
 
+    double *data();
+%Docstring
+Returns data array (but not ownership)
 
+.. note::
+
+   not available in Python bindings
+%End
 
     void setData( int cols, int rows, double *data, double nodataValue );
 
