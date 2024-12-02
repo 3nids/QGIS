@@ -32,7 +32,6 @@ class QgsGraph;
 class ANALYSIS_EXPORT QgsGraphAnalyzer
 {
   public:
-
     /**
      * Solve shortest path problem using Dijkstra algorithm
      * \param source source graph
@@ -77,13 +76,14 @@ class ANALYSIS_EXPORT QgsGraphAnalyzer
     // clang-format on
 #endif
 
-    /**
+      /**
      * Returns shortest path tree with root-node in startVertexIdx
      * \param source source graph
      * \param startVertexIdx index of the start vertex
      * \param criterionNum index of the optimization strategy
      */
-    static QgsGraph *shortestTree( const QgsGraph *source, int startVertexIdx, int criterionNum );
+      static QgsGraph *
+      shortestTree( const QgsGraph *source, int startVertexIdx, int criterionNum );
 };
 
 #endif // QGSGRAPHANALYZER_H
