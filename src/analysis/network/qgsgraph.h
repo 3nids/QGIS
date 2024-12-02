@@ -168,6 +168,7 @@ class ANALYSIS_EXPORT QgsGraph
      * \throws IndexError if the vertex is not found.
      */
     QgsGraphVertex vertex( int idx ) const;
+    // clang-format off
     % MethodCode
     if ( sipCpp->hasVertex( a0 ) )
     {
@@ -179,6 +180,7 @@ class ANALYSIS_EXPORT QgsGraph
       sipIsErr = 1;
     }
     % End
+    // clang-format on
 #endif
 
 #ifndef SIP_RUN
@@ -202,6 +204,7 @@ class ANALYSIS_EXPORT QgsGraph
      * \since QGIS 3.24
      */
     void removeVertex( int index );
+    // clang-format off
     % MethodCode
     if ( sipCpp->hasVertex( a0 ) )
     {
@@ -213,6 +216,7 @@ class ANALYSIS_EXPORT QgsGraph
       sipIsErr = 1;
     }
     % End
+    // clang-format on
 #endif
 
     /**
@@ -234,6 +238,7 @@ class ANALYSIS_EXPORT QgsGraph
      * \throws IndexError if the edge is not found.
      */
     QgsGraphEdge edge( int idx ) const;
+    // clang-format off
     % MethodCode
     if ( sipCpp->hasEdge( a0 ) )
     {
@@ -245,6 +250,7 @@ class ANALYSIS_EXPORT QgsGraph
       sipIsErr = 1;
     }
     % End
+    // clang-format on
 #endif
 
 
@@ -271,6 +277,7 @@ class ANALYSIS_EXPORT QgsGraph
      * \since QGIS 3.24
      */
     void removeEdge( int index );
+    // clang-format off
     % MethodCode
     if ( sipCpp->hasEdge( a0 ) )
     {
@@ -282,6 +289,7 @@ class ANALYSIS_EXPORT QgsGraph
       sipIsErr = 1;
     }
     % End
+    // clang-format on
 #endif
 
     /**
@@ -320,6 +328,7 @@ class ANALYSIS_EXPORT QgsGraph
      * \since QGIS 3.24
     */
     int findOppositeEdge( int index ) const;
+    // clang-format off
     % MethodCode
     if ( sipCpp->hasEdge( a0 ) )
     {
@@ -331,6 +340,7 @@ class ANALYSIS_EXPORT QgsGraph
       sipIsErr = 1;
     }
     % End
+    // clang-format on
 #endif
 
     /**
