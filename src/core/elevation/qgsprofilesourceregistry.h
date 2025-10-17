@@ -22,6 +22,7 @@
 class QgsAbstractProfileSource;
 
 #include <QList>
+#include <QObject>
 
 
 /**
