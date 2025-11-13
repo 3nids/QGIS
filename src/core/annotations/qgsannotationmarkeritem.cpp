@@ -27,7 +27,6 @@ QgsAnnotationMarkerItem::QgsAnnotationMarkerItem( const QgsPoint &point )
   , mPoint( point )
   , mSymbol( std::make_unique< QgsMarkerSymbol >() )
 {
-
 }
 
 QgsAnnotationMarkerItem::~QgsAnnotationMarkerItem() = default;

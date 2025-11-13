@@ -20,12 +20,20 @@
 #include "moc_qgsnetworkdiskcache.cpp"
 
 #include <QStorageInfo>
+#include <QNetworkCacheMetaData>
+#include <QDateTime>
+#include <QIODevice>
+#include <QCryptographicHash>
+#include <QUrlQuery>
+#include <algorithm>
+#include <QStringList>
 #include <mutex>
 
 ///@cond PRIVATE
 ExpirableNetworkDiskCache QgsNetworkDiskCache::sDiskCache;
 ///@endcond
 QMutex QgsNetworkDiskCache::sDiskCacheMutex;
+QString QgsNetworkDiskCache::sCurrentAuthorizationCacheKey;
 
 QgsNetworkDiskCache::QgsNetworkDiskCache( QObject *parent )
   : QNetworkDiskCache( parent )
@@ -72,7 +80,7 @@ qint64 QgsNetworkDiskCache::cacheSize() const
 QNetworkCacheMetaData QgsNetworkDiskCache::metaData( const QUrl &url )
 {
   const QMutexLocker lock( &sDiskCacheMutex );
-  return sDiskCache.metaData( url );
+  return sDiskCache.metaData( authorizationVariantUrl( url ) );
 }
 
 void QgsNetworkDiskCache::updateMetaData( const QNetworkCacheMetaData &metaData )
@@ -84,23 +92,38 @@ void QgsNetworkDiskCache::updateMetaData( const QNetworkCacheMetaData &metaData 
 QIODevice *QgsNetworkDiskCache::data( const QUrl &url )
 {
   const QMutexLocker lock( &sDiskCacheMutex );
-  return sDiskCache.data( url );
+  return sDiskCache.data( authorizationVariantUrl( url ) );
 }
 
 bool QgsNetworkDiskCache::remove( const QUrl &url )
 {
   const QMutexLocker lock( &sDiskCacheMutex );
-  return sDiskCache.remove( url );
+  return sDiskCache.remove( authorizationVariantUrl( url ) );
 }
 
 QIODevice *QgsNetworkDiskCache::prepare( const QNetworkCacheMetaData &metaData )
 {
+  // Evaluate HTTP caching headers BEFORE acquiring lock to minimize locked duration
+  if ( !isCacheable( metaData ) )
+  {
+    return nullptr; // skip creating a cache device entirely
+  }
+
+  QNetworkCacheMetaData variantMeta = metaData;
+  variantMeta.setUrl( authorizationVariantUrl( metaData.url() ) );
+
   const QMutexLocker lock( &sDiskCacheMutex );
-  return sDiskCache.prepare( metaData );
+  return sDiskCache.prepare( variantMeta );
 }
 
 void QgsNetworkDiskCache::insert( QIODevice *device )
 {
+  if ( !device )
+    return; // nothing to do
+
+  // We cannot directly access the metadata passed to prepare from here; however
+  // if prepare() returned a device we already evaluated cacheability. So we
+  // just forward the insert.
   const QMutexLocker lock( &sDiskCacheMutex );
   sDiskCache.insert( device );
 }
@@ -195,4 +218,79 @@ qint64 QgsNetworkDiskCache::smartCacheSize( const QString &cacheDir )
   static std::once_flag initialized;
   std::call_once( initialized, determineSmartCacheSize, cacheDir, sCacheSize );
   return sCacheSize;
+}
+
+bool QgsNetworkDiskCache::isCacheable( const QNetworkCacheMetaData &metaData )
+{
+  // Extract headers and evaluate HTTP rules (simplified RFC 7234 compliance)
+  QString cacheControl;
+  QString pragma;
+  QString vary;
+  for ( const auto &raw : metaData.rawHeaders() )
+  {
+    const QString headerName = QString::fromLatin1( raw.first ).toLower();
+    const QString headerValue = QString::fromLatin1( raw.second ).trimmed();
+    if ( headerName == QLatin1String( "cache-control" ) )
+      cacheControl = headerValue.toLower();
+    else if ( headerName == QLatin1String( "pragma" ) )
+      pragma = headerValue.toLower();
+    else if ( headerName == QLatin1String( "vary" ) )
+      vary = headerValue.toLower();
+  }
+
+  auto containsToken = []( const QString &list, const QString &token ) -> bool
+  {
+    // Split on commas and trim
+    const QStringList parts = list.split( ',', Qt::SkipEmptyParts );
+    for ( const QString &p : parts )
+    {
+      if ( p.trimmed() == token )
+        return true;
+    }
+    return false;
+  };
+
+  // Disallow caching for explicit directives
+  if ( cacheControl.contains( "no-store" ) || cacheControl.contains( "no-cache" ) )
+    return false;
+  if ( cacheControl.contains( "max-age=0" ) )
+    return false;
+  if ( pragma.contains( "no-cache" ) )
+    return false;
+
+  // If server signals variation over Authorization: cache only if we have a key set; otherwise skip to prevent leakage
+  if ( containsToken( vary, "authorization" ) && sCurrentAuthorizationCacheKey.isEmpty() )
+    return false;
+
+  // Potential future enhancement: detect 'private' + Authorization and decide
+  // revalidation requirements. Currently treat 'private' as cacheable (local).
+
+  return true;
+}
+
+void QgsNetworkDiskCache::setCurrentAuthorizationCacheKey( const QString &authorizationHeaderValue )
+{
+  const QMutexLocker lock( &sDiskCacheMutex );
+  sCurrentAuthorizationCacheKey = authorizationHeaderValue;
+}
+
+QUrl QgsNetworkDiskCache::authorizationVariantUrl( const QUrl &original )
+{
+  // Only augment when an authorization key is set AND we previously saw a Vary: Authorization (we cannot know that here, so we always augment if key set)
+  if ( sCurrentAuthorizationCacheKey.isEmpty() )
+    return original;
+
+  // Hash the authorization value to avoid exposing secrets in cache file names
+  QByteArray hash = QCryptographicHash::hash( sCurrentAuthorizationCacheKey.toUtf8(), QCryptographicHash::Sha256 ).toHex();
+  QUrl variant = original;
+  QUrlQuery query( variant );
+  // Use a stable parameter name unlikely to clash; if already present with same value keep
+  QString existing = query.queryItemValue( QStringLiteral( "_authv" ) );
+  if ( existing != QString::fromLatin1( hash ) )
+  {
+    query.removeQueryItem( QStringLiteral( "_authv" ) );
+    query.addQueryItem( QStringLiteral( "_authv" ), QString::fromLatin1( hash ) );
+    variant.setQuery( query );
+  }
+  return variant;
 }
