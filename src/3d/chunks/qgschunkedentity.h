@@ -57,7 +57,7 @@ class QgsRayCastContext;
  * \brief Implementation of entity that handles chunks of data organized in quadtree with loading data when necessary
  * based on data error and unloading of data when data are not necessary anymore
  */
-class QgsChunkedEntity : public Qgs3DMapSceneEntity
+class _3D_EXPORT QgsChunkedEntity : public Qgs3DMapSceneEntity
 {
     Q_OBJECT
   public:
