@@ -27,6 +27,7 @@
 // version without notice, or even be removed.
 //
 
+#include "qgis_3d.h"
 #include "qgschunkloader.h"
 #include "qgschunkedentity.h"
 #include "qgs3drendercontext.h"
@@ -53,7 +54,7 @@ namespace Qt3DCore
  *
  * \since QGIS 4.0
  */
-class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
+class _3D_EXPORT QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
 {
     Q_OBJECT
 
@@ -83,7 +84,7 @@ class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactor
  *
  * \since QGIS 4.0
  */
-class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+class _3D_EXPORT QgsAnnotationLayerChunkLoader : public QgsChunkLoader
 {
     Q_OBJECT
 
@@ -126,7 +127,7 @@ class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
  *
  * \since QGIS 4.0
  */
-class QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
+class _3D_EXPORT QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
 {
     Q_OBJECT
   public:
