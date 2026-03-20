@@ -31,6 +31,7 @@
 #include "qgsgui.h"
 #include "qgsiconutils.h"
 #include "qgslogger.h"
+#include "qgsnative.h"
 #include "qgsproject.h"
 #include "qgsprojectionselectiondialog.h"
 #include "qgsprovidermetadata.h"
@@ -271,7 +272,8 @@ void QgsNewSpatialiteLayerDialog::selectionChanged()
 bool QgsNewSpatialiteLayerDialog::createDb()
 {
   QString dbPath
-    = QFileDialog::getSaveFileName( this, tr( "New SpatiaLite Database File" ), QDir::homePath(), tr( "SpatiaLite" ) + " (*.sqlite *.db *.sqlite3 *.db3 *.s3db)", nullptr, QFileDialog::DontConfirmOverwrite );
+    = QgsGui::nativePlatformInterface()
+        ->getSaveFileName( this, tr( "New SpatiaLite Database File" ), QDir::homePath(), tr( "SpatiaLite" ) + " (*.sqlite *.db *.sqlite3 *.db3 *.s3db)", nullptr, QFileDialog::DontConfirmOverwrite );
 
   if ( dbPath.isEmpty() )
     return false;

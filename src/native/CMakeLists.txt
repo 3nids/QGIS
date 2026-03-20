@@ -100,7 +100,11 @@ if(NOT ANDROID)
   )
 endif()
 
-target_link_libraries(qgis_native ${QT_VERSION_BASE}::Core ${QT_VERSION_BASE}::Gui)
+target_link_libraries(qgis_native ${QT_VERSION_BASE}::Core ${QT_VERSION_BASE}::Gui ${QT_VERSION_BASE}::Widgets)
+
+if(APPLE)
+  target_link_libraries(qgis_native "-framework UniformTypeIdentifiers")
+endif()
 
 if (UNIX AND NOT APPLE AND NOT ANDROID)
   target_link_libraries(qgis_native ${QT_VERSION_BASE}::DBus)

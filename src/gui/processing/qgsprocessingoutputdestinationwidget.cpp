@@ -21,6 +21,8 @@
 #include "qgsencodingfiledialog.h"
 #include "qgsfieldmappingwidget.h"
 #include "qgsfileutils.h"
+#include "qgsgui.h"
+#include "qgsnative.h"
 #include "qgsnewdatabasetablenamewidget.h"
 #include "qgsprocessingalgorithm.h"
 #include "qgsprocessingcontext.h"
@@ -465,8 +467,8 @@ void QgsProcessingLayerOutputDestinationWidget::selectFile()
 
   const bool dontConfirmOverwrite = mParameter->metadata().value( u"widget_wrapper"_s ).toMap().value( u"dontconfirmoverwrite"_s, false ).toBool();
 
-  QString filename
-    = QFileDialog::getSaveFileName( this, tr( "Save file" ), path, fileFilter, &lastFilter, dontConfirmOverwrite ? QFileDialog::Options( QFileDialog::DontConfirmOverwrite ) : QFileDialog::Options() );
+  QString filename = QgsGui::nativePlatformInterface()
+                       ->getSaveFileName( this, tr( "Save file" ), path, fileFilter, &lastFilter, dontConfirmOverwrite ? QFileDialog::Options( QFileDialog::DontConfirmOverwrite ) : QFileDialog::Options() );
   if ( !filename.isEmpty() )
   {
     mUseTemporary = false;
@@ -511,7 +513,8 @@ void QgsProcessingLayerOutputDestinationWidget::saveToGeopackage()
   if ( lastPath.isEmpty() )
     lastPath = settings.value( u"/Processing/Configuration/OUTPUTS_FOLDER"_s, QString() ).toString();
 
-  QString filename = QFileDialog::getSaveFileName( this, tr( "Save to GeoPackage" ), lastPath, tr( "GeoPackage files (*.gpkg);;All files (*.*)" ), nullptr, QFileDialog::DontConfirmOverwrite );
+  QString filename
+    = QgsGui::nativePlatformInterface()->getSaveFileName( this, tr( "Save to GeoPackage" ), lastPath, tr( "GeoPackage files (*.gpkg);;All files (*.*)" ), nullptr, QFileDialog::DontConfirmOverwrite );
   // return dialog focus on Mac
   activateWindow();
   raise();

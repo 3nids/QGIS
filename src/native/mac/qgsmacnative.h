@@ -38,6 +38,15 @@ class NATIVE_EXPORT QgsMacNative : public QgsNative
     QgsNative::Capabilities capabilities() const override;
     QgsNative::NotificationResult showDesktopNotification( const QString &summary, const QString &body, const NotificationSettings &settings ) override;
 
+    QString getSaveFileName(
+      QWidget *parent = nullptr,
+      const QString &caption = QString(),
+      const QString &dir = QString(),
+      const QString &filter = QString(),
+      QString *selectedFilter = nullptr,
+      QFileDialog::Options options = QFileDialog::Options()
+    ) override;
+
     bool hasDarkTheme() override;
 
   private:

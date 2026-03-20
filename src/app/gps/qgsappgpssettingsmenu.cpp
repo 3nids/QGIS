@@ -22,6 +22,8 @@
 #include "qgsfieldproxymodel.h"
 #include "qgsfileutils.h"
 #include "qgsgpsmarker.h"
+#include "qgsgui.h"
+#include "qgsnative.h"
 #include "qgsproject.h"
 #include "qgsprojectgpssettings.h"
 #include "qgssettings.h"
@@ -228,8 +230,9 @@ QgsAppGpsSettingsMenu::QgsAppGpsSettingsMenu( QWidget *parent )
       const QString initialPath = lastGpkgLog.isEmpty() ? QDir::homePath() : lastGpkgLog;
 
       QString selectedFilter;
-      QString fileName = QFileDialog::
-        getSaveFileName( this, tr( "GPS Log File" ), initialPath, tr( "GeoPackage" ) + " (*.gpkg *.GPKG);;" + tr( "SpatiaLite" ) + " (*.sqlite *.db *.sqlite3 *.db3 *.s3db);;", &selectedFilter, QFileDialog::Option::DontConfirmOverwrite );
+      QString fileName
+        = QgsGui::nativePlatformInterface()
+            ->getSaveFileName( this, tr( "GPS Log File" ), initialPath, tr( "GeoPackage" ) + " (*.gpkg *.GPKG);;" + tr( "SpatiaLite" ) + " (*.sqlite *.db *.sqlite3 *.db3 *.s3db);;", &selectedFilter, QFileDialog::Option::DontConfirmOverwrite );
       if ( fileName.isEmpty() )
       {
         mActionGpkgLog->setChecked( false );

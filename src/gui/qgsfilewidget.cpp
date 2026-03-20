@@ -20,8 +20,10 @@
 #include "qgsfileutils.h"
 #include "qgsfilterlineedit.h"
 #include "qgsfocuskeeper.h"
+#include "qgsgui.h"
 #include "qgslogger.h"
 #include "qgsmimedatautils.h"
+#include "qgsnative.h"
 #include "qgsproject.h"
 #include "qgssettings.h"
 
@@ -355,7 +357,7 @@ void QgsFileWidget::openFileDialog()
         title = !mDialogTitle.isEmpty() ? mDialogTitle : tr( "Create or select a file" );
         if ( !confirmOverwrite() )
         {
-          fileName = QFileDialog::getSaveFileName( this, title, QFileInfo( oldPath ).absoluteFilePath(), mFilter, &mSelectedFilter, mOptions | QFileDialog::DontConfirmOverwrite );
+          fileName = QgsGui::nativePlatformInterface()->getSaveFileName( this, title, QFileInfo( oldPath ).absoluteFilePath(), mFilter, &mSelectedFilter, mOptions | QFileDialog::DontConfirmOverwrite );
         }
         else
         {

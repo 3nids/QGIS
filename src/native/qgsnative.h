@@ -22,6 +22,7 @@
 
 #include "qgis_native.h"
 
+#include <QFileDialog>
 #include <QImage>
 #include <QObject>
 #include <QVariant>
@@ -242,6 +243,68 @@ class NATIVE_EXPORT QgsNative : public QObject
      * \since QGIS 3.4
      */
     virtual void onRecentProjectsChanged( const std::vector<RecentProjectProperties> &recentProjects );
+
+    /**
+     * Shows a native "Save File" dialog.
+     *
+     * This is a platform-aware wrapper around QFileDialog::getSaveFileName().
+     * On macOS, the QFileDialog::DontConfirmOverwrite option is not honored by
+     * the native file dialog. This method ensures the option is respected by
+     * falling back to a non-native dialog when necessary.
+     *
+     * \since QGIS 3.44
+     */
+    virtual QString getSaveFileName(
+      QWidget *parent = nullptr,
+      const QString &caption = QString(),
+      const QString &dir = QString(),
+      const QString &filter = QString(),
+      QString *selectedFilter = nullptr,
+      QFileDialog::Options options = QFileDialog::Options()
+    );
+
+    /**
+     * Shows a native "Open File" dialog.
+     *
+     * This is a platform-aware wrapper around QFileDialog::getOpenFileName().
+     *
+     * \since QGIS 3.44
+     */
+    virtual QString getOpenFileName(
+      QWidget *parent = nullptr,
+      const QString &caption = QString(),
+      const QString &dir = QString(),
+      const QString &filter = QString(),
+      QString *selectedFilter = nullptr,
+      QFileDialog::Options options = QFileDialog::Options()
+    );
+
+    /**
+     * Shows a native "Open Files" dialog for selecting multiple files.
+     *
+     * This is a platform-aware wrapper around QFileDialog::getOpenFileNames().
+     *
+     * \since QGIS 3.44
+     */
+    virtual QStringList getOpenFileNames(
+      QWidget *parent = nullptr,
+      const QString &caption = QString(),
+      const QString &dir = QString(),
+      const QString &filter = QString(),
+      QString *selectedFilter = nullptr,
+      QFileDialog::Options options = QFileDialog::Options()
+    );
+
+    /**
+     * Shows a native "Select Directory" dialog.
+     *
+     * This is a platform-aware wrapper around QFileDialog::getExistingDirectory().
+     *
+     * \since QGIS 3.44
+     */
+    virtual QString getExistingDirectory(
+      QWidget *parent = nullptr, const QString &caption = QString(), const QString &dir = QString(), QFileDialog::Options options = QFileDialog::Options( QFileDialog::ShowDirsOnly )
+    );
 
   signals:
 
