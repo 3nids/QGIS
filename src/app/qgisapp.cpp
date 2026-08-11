@@ -2511,6 +2511,7 @@ void QgisApp::dropEvent( QDropEvent *event )
     {
       QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionMethod( method );
       mLayerTreeDrop = false;
+      updateNewLayerInsertionPoint();
     }
 
     timer->deleteLater();
@@ -2541,6 +2542,9 @@ void QgisApp::registerCustomDropHandler( QgsCustomDropHandler *handler )
   {
     canvas->setCustomDropHandlers( mCustomDropHandlers );
   }
+
+  if ( mLayerTreeView )
+    mLayerTreeView->setCustomDropHandlers( mCustomDropHandlers );
 }
 
 void QgisApp::unregisterCustomDropHandler( QgsCustomDropHandler *handler )
@@ -2552,6 +2556,9 @@ void QgisApp::unregisterCustomDropHandler( QgsCustomDropHandler *handler )
   {
     canvas->setCustomDropHandlers( mCustomDropHandlers );
   }
+
+  if ( mLayerTreeView )
+    mLayerTreeView->setCustomDropHandlers( mCustomDropHandlers );
 }
 
 void QgisApp::registerCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler )
@@ -4614,6 +4621,17 @@ void QgisApp::setupConnections()
 
   connect( mLayerTreeView, &QgsLayerTreeView::datasetsDropped, this, [this]( QDropEvent *event ) {
     mLayerTreeDrop = true;
+
+    QgsLayerTreeRegistryBridge::InsertionPoint insertionPoint = mLayerTreeView->datasetDropInsertionPoint();
+    if ( insertionPoint.group )
+    {
+      // if the target group is embedded, defer to the first non-embedded parent, at worst the top level item
+      QgsLayerTreeGroup *insertGroup = QgsLayerTreeUtils::firstGroupWithoutCustomProperty( insertionPoint.group, u"embedded"_s );
+      if ( insertGroup != insertionPoint.group )
+        insertionPoint = QgsLayerTreeRegistryBridge::InsertionPoint( insertGroup, 0 );
+      QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( insertionPoint );
+    }
+
     dropEvent( event );
   } );
 
@@ -5054,6 +5072,10 @@ void QgisApp::initLayerTreeView()
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMessageBar( mInfoBar );
 
+  // let the view accept drags which no data provider can load, but which a custom
+  // drop handler will consume (e.g. .qlr, .qpt, .py, style .xml files)
+  mLayerTreeView->setCustomDropHandlers( mCustomDropHandlers );
+
   mLayerTreeView->setMenuProvider( new QgsAppLayerTreeViewMenuProvider( mLayerTreeView, mMapCanvas ) );
   new QgsLayerTreeViewFilterIndicatorProvider( mLayerTreeView );                                                                          // gets parented to the layer view
   new QgsLayerTreeViewEmbeddedIndicatorProvider( mLayerTreeView );                                                                        // gets parented to the layer view
@@ -5194,6 +5216,9 @@ void QgisApp::setupLayerTreeViewFromSettings()
 
 void QgisApp::updateNewLayerInsertionPoint()
 {
+  if ( mLayerTreeDrop )
+    return;
+
   QgsLayerTreeRegistryBridge::InsertionPoint insertionPoint = layerTreeInsertionPoint();
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( insertionPoint );
 }
@@ -7191,7 +7216,7 @@ QList<QgsMapLayer *> QgisApp::openFile( const QString &fileName, const QString &
   }
   else if ( fi.suffix().compare( "qlr"_L1, Qt::CaseInsensitive ) == 0 )
   {
-    QgsLayerTreeRegistryBridge::InsertionPoint p = layerTreeInsertionPoint();
+    QgsLayerTreeRegistryBridge::InsertionPoint p = QgsProject::instance()->layerTreeRegistryBridge()->layerInsertionPoint();
     QgsAppLayerHandling::openLayerDefinition( fileName, &p );
   }
   else if ( fi.suffix().compare( "qpt"_L1, Qt::CaseInsensitive ) == 0 )
