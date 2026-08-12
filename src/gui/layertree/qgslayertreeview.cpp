@@ -868,6 +868,8 @@ void QgsLayerTreeView::dragMoveEvent( QDragMoveEvent *event )
       }
 
       case Qgis::LayerDropPayloadType::Project:
+        // accepted, but replacing the project is not an insertion into this tree and the
+        // feedback for it is shown by the hosting window
         clearDropIndicator();
         event->accept();
         break;
@@ -967,7 +969,10 @@ void QgsLayerTreeView::paintEvent( QPaintEvent *event )
 {
   QTreeView::paintEvent( event );
 
-  if ( mDatasetDragActive && mDragPayloadType != Qgis::LayerDropPayloadType::Layers )
+  // Only payloads whose consequence is confined to this view are given feedback here.
+  // A project replaces the whole session, so its feedback belongs to the hosting window
+  // rather than to one panel of it.
+  if ( mDatasetDragActive && mDragPayloadType == Qgis::LayerDropPayloadType::Invalid )
   {
     QPainter painter( viewport() );
     QgsLayerDropFeedbackOverlay::paintFeedback( &painter, viewport()->rect(), mDragPayloadType, this );
