@@ -2302,7 +2302,10 @@ QgisApp::~QgisApp()
 
 void QgisApp::dragEnterEvent( QDragEnterEvent *event )
 {
-  const Qgis::LayerDropPayloadType payloadType = QgsLayerDropClassifier::classify( event->mimeData(), mCustomDropHandlers );
+  // classify once per drag: the result cannot change while the same data is dragged, and
+  // dragMoveEvent() is called for every mouse move
+  mDragPayloadType = QgsLayerDropClassifier::classify( event->mimeData(), mCustomDropHandlers );
+  mDatasetDragActive = true;
 
   if ( event->mimeData()->hasUrls() || event->mimeData()->hasFormat( u"application/x-vnd.qgis.qgis.uri"_s ) )
   {
@@ -2313,8 +2316,7 @@ void QgisApp::dragEnterEvent( QDragEnterEvent *event )
       event->acceptProposedAction();
   }
 
-  // show the feedback overlay over the map canvas
-  updateCanvasDropFeedback( payloadType, event->position() );
+  updateDropFeedback( mDragPayloadType );
 
   // check if any custom handlers can operate on the data
   const QVector<QPointer<QgsCustomDropHandler>> handlers = mCustomDropHandlers;
@@ -2338,8 +2340,14 @@ void QgisApp::dragMoveEvent( QDragMoveEvent *event )
     return;
   }
 
-  const Qgis::LayerDropPayloadType payloadType = QgsLayerDropClassifier::classify( event->mimeData(), mCustomDropHandlers );
-  updateCanvasDropFeedback( payloadType, event->position() );
+  if ( !mDatasetDragActive )
+  {
+    // defensive: a move without a preceding drag enter
+    mDragPayloadType = QgsLayerDropClassifier::classify( event->mimeData(), mCustomDropHandlers );
+    mDatasetDragActive = true;
+  }
+  const Qgis::LayerDropPayloadType payloadType = mDragPayloadType;
+  updateDropFeedback( payloadType );
 
   // refuse payloads which no data provider can load and no custom handler can consume,
   // so that the drop is rejected, consistently with the layer tree view.
@@ -2360,44 +2368,39 @@ void QgisApp::dragMoveEvent( QDragMoveEvent *event )
 
 void QgisApp::dragLeaveEvent( QDragLeaveEvent *event )
 {
-  if ( mCanvasDropFeedbackOverlay )
-    mCanvasDropFeedbackOverlay->hide();
+  mDatasetDragActive = false;
+  updateDropFeedback( Qgis::LayerDropPayloadType::Invalid );
   QMainWindow::dragLeaveEvent( event );
 }
 
-void QgisApp::updateCanvasDropFeedback( Qgis::LayerDropPayloadType payloadType, const QPointF &pos )
+void QgisApp::updateDropFeedback( Qgis::LayerDropPayloadType payloadType )
 {
-  // Show a canvas overlay for project drags and for payloads which cannot be loaded.
-  // Layer/custom payloads give no canvas overlay and custom handlers manage their own feedback.
-  bool showOverlay = ( payloadType == Qgis::LayerDropPayloadType::Project || payloadType == Qgis::LayerDropPayloadType::Invalid ) && mMapCanvas;
-  if ( showOverlay )
+  // Dropping a project replaces the whole session, not just one panel, so the feedback
+  // covers the entire window wherever the cursor happens to be. The other payload types
+  // are scoped to whichever widget receives them and provide their own (or no) feedback.
+  if ( payloadType != Qgis::LayerDropPayloadType::Project )
   {
-    // only while the drag actually hovers the canvas
-    const QPoint canvasPos = mMapCanvas->viewport()->mapFromGlobal( mapToGlobal( pos.toPoint() ) );
-    showOverlay = mMapCanvas->viewport()->rect().contains( canvasPos );
-  }
-
-  if ( !showOverlay )
-  {
-    if ( mCanvasDropFeedbackOverlay )
-      mCanvasDropFeedbackOverlay->hide();
+    if ( mDropFeedbackOverlay )
+      mDropFeedbackOverlay->hide();
     return;
   }
 
-  if ( !mCanvasDropFeedbackOverlay )
-    mCanvasDropFeedbackOverlay = new QgsLayerDropFeedbackOverlay( mMapCanvas->viewport() );
-  mCanvasDropFeedbackOverlay->setPayloadType( payloadType );
-  mCanvasDropFeedbackOverlay->setGeometry( mMapCanvas->viewport()->rect() );
-  mCanvasDropFeedbackOverlay->raise();
-  mCanvasDropFeedbackOverlay->show();
+  if ( !mDropFeedbackOverlay )
+    mDropFeedbackOverlay = new QgsLayerDropFeedbackOverlay( this );
+  mDropFeedbackOverlay->setPayloadType( payloadType );
+  mDropFeedbackOverlay->setGeometry( rect() );
+  mDropFeedbackOverlay->raise();
+  mDropFeedbackOverlay->show();
 }
 
 void QgisApp::dropEvent( QDropEvent *event )
 {
-  if ( mCanvasDropFeedbackOverlay )
-    mCanvasDropFeedbackOverlay->hide();
+  mDatasetDragActive = false;
+  updateDropFeedback( Qgis::LayerDropPayloadType::Invalid );
 
-  // refuse payloads which nothing can load or handle, mirroring the drag refusal in dragMoveEvent()
+  // refuse payloads which nothing can load or handle, mirroring the drag refusal in dragMoveEvent().
+  // The drop is classified afresh rather than reusing the cached drag classification, since the
+  // layer tree view forwards its own drops here without this window ever seeing the drag.
   const bool datasetDrag = QgsLayerDropClassifier::isDatasetDrag( event->mimeData() );
   if ( datasetDrag && QgsLayerDropClassifier::classify( event->mimeData(), mCustomDropHandlers ) == Qgis::LayerDropPayloadType::Invalid )
   {

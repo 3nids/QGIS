@@ -1062,8 +1062,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     void layerTreeViewDoubleClicked( const QModelIndex &index );
     //! Make sure the insertion point for new layers is up-to-date with the current item in layer tree view
     void updateNewLayerInsertionPoint();
-    //! Shows or hides the map canvas drop feedback overlay for a drag of the given \a payloadType at cursor \a pos
-    void updateCanvasDropFeedback( Qgis::LayerDropPayloadType payloadType, const QPointF &pos );
+    //! Shows or hides the window wide drop feedback overlay for a drag of the given \a payloadType
+    void updateDropFeedback( Qgis::LayerDropPayloadType payloadType );
     //! connected to layer tree registry bridge, selects first of the newly added map layers
     void autoSelectAddedLayer( QList<QgsMapLayer *> layers );
 
@@ -2704,8 +2704,12 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QgsLayerTreeView *mLayerTreeView = nullptr;
     //! Keep track of whether ongoing dataset(s) is/are being dropped through the table of contents
     bool mLayerTreeDrop = false;
-    //! Overlay shown over the map canvas while a project drag hovers it. Lazily created.
-    QgsLayerDropFeedbackOverlay *mCanvasDropFeedbackOverlay = nullptr;
+    //! Overlay shown over the whole window while a project drag hovers it. Lazily created.
+    QgsLayerDropFeedbackOverlay *mDropFeedbackOverlay = nullptr;
+    //! Payload classification of the current drag, cached on drag enter
+    Qgis::LayerDropPayloadType mDragPayloadType = Qgis::LayerDropPayloadType::Invalid;
+    //! TRUE while a dataset drag hovers the window and has been classified
+    bool mDatasetDragActive = false;
 
     bool mInitializationHasCompleted = false;
     QStringList mDeferredFileOpenPaths;
