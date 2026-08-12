@@ -110,6 +110,33 @@ accepted or refused.
 %End
 
 
+    virtual Qgis::LayerDropPayloadType payloadType( const QMimeData *data );
+%Docstring
+Returns the type of payload the handler recognizes in the provided mime
+``data``.
+
+Like :py:func:`~QgsCustomDropHandler.canHandleMimeData`, this is called
+while data is dragged over a widget which accepts map layers, and must
+be lightweight and free of side effects. It refines the answer of
+:py:func:`~QgsCustomDropHandler.canHandleMimeData`: rather than only
+stating that the handler can consume the data, it states what the data
+behaves like, so that the widget can show matching feedback.
+
+The base class implementation reports
+:py:class:`Qgis`.LayerDropPayloadType.CustomHandler when
+:py:func:`~QgsCustomDropHandler.canHandleMimeData` returns ``True``, and
+:py:class:`Qgis`.LayerDropPayloadType.Invalid otherwise.
+
+Reimplement it when the drop is not merely consumed by the handler but
+behaves like something QGIS already knows: return
+:py:class:`Qgis`.LayerDropPayloadType.Layers when the drop inserts
+layers into the layer tree, so that an insertion indicator is shown at
+the drop position, or :py:class:`Qgis`.LayerDropPayloadType.Project when
+it replaces the current project.
+
+.. versionadded:: 4.4
+%End
+
  virtual void handleMimeData( const QMimeData *data ) /Deprecated="Since 3.10. Use handleMimeDataV2() instead."/;
 %Docstring
 Called when the specified mime ``data`` has been dropped onto QGIS.

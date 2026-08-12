@@ -35,6 +35,11 @@ bool QgsCustomDropHandler::canHandleMimeData( const QMimeData * )
   return true;
 }
 
+Qgis::LayerDropPayloadType QgsCustomDropHandler::payloadType( const QMimeData *data )
+{
+  return canHandleMimeData( data ) ? Qgis::LayerDropPayloadType::CustomHandler : Qgis::LayerDropPayloadType::Invalid;
+}
+
 void QgsCustomDropHandler::handleMimeData( const QMimeData *data )
 {
   Q_UNUSED( data )

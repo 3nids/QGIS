@@ -16,6 +16,7 @@
 #ifndef QGSCUSTOMDROPHANDLER_H
 #define QGSCUSTOMDROPHANDLER_H
 
+#include "qgis.h"
 #include "qgis_gui.h"
 #include "qgsmimedatautils.h"
 
@@ -104,6 +105,28 @@ class GUI_EXPORT QgsCustomDropHandler : public QObject
     virtual bool canHandleMimeData( const QMimeData *data );
 
     // TODO QGIS 5.0 - make pure virtual
+
+    /**
+     * Returns the type of payload the handler recognizes in the provided mime \a data.
+     *
+     * Like canHandleMimeData(), this is called while data is dragged over a widget which
+     * accepts map layers, and must be lightweight and free of side effects. It refines the
+     * answer of canHandleMimeData(): rather than only stating that the handler can consume
+     * the data, it states what the data behaves like, so that the widget can show matching
+     * feedback.
+     *
+     * The base class implementation reports Qgis::LayerDropPayloadType::CustomHandler when
+     * canHandleMimeData() returns TRUE, and Qgis::LayerDropPayloadType::Invalid otherwise.
+     *
+     * Reimplement it when the drop is not merely consumed by the handler but behaves like
+     * something QGIS already knows: return Qgis::LayerDropPayloadType::Layers when the drop
+     * inserts layers into the layer tree, so that an insertion indicator is shown at the
+     * drop position, or Qgis::LayerDropPayloadType::Project when it replaces the current
+     * project.
+     *
+     * \since QGIS 4.4
+     */
+    virtual Qgis::LayerDropPayloadType payloadType( const QMimeData *data );
 
     /**
      * Called when the specified mime \a data has been dropped onto QGIS.
