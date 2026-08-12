@@ -31,6 +31,34 @@ Qgis::LayerDropPayloadType QgsLayerDropClassifier::classify( const QMimeData *mi
 {
   bool hasLayer = false;
   bool hasCustomUri = false;
+  bool hasCustomHandler = false;
+
+  // Handlers get the first word, since they know things no provider can tell us: a handler
+  // which reports Project or Layers makes a specific claim about the payload and is
+  // authoritative, while a CustomHandler claim is only a fallback for payloads nothing else
+  // recognizes (the permissive base implementation reports it for any mime data).
+  for ( QgsCustomDropHandler *handler : customHandlers )
+  {
+    if ( !handler )
+      continue;
+
+    switch ( handler->payloadType( mimeData ) )
+    {
+      case Qgis::LayerDropPayloadType::Project:
+        return Qgis::LayerDropPayloadType::Project;
+
+      case Qgis::LayerDropPayloadType::Layers:
+        hasLayer = true;
+        break;
+
+      case Qgis::LayerDropPayloadType::CustomHandler:
+        hasCustomHandler = true;
+        break;
+
+      case Qgis::LayerDropPayloadType::Invalid:
+        break;
+    }
+  }
 
   if ( QgsMimeDataUtils::isUriList( mimeData ) )
   {
@@ -74,13 +102,6 @@ Qgis::LayerDropPayloadType QgsLayerDropClassifier::classify( const QMimeData *mi
     if ( fileName.endsWith( ".qgs"_L1, Qt::CaseInsensitive ) || fileName.endsWith( ".qgz"_L1, Qt::CaseInsensitive ) )
       return Qgis::LayerDropPayloadType::Project;
 
-    if ( fileName.endsWith( ".qlr"_L1, Qt::CaseInsensitive ) )
-    {
-      // QgsLayerDefinition files insert layers into the tree, exactly like datasets
-      hasLayer = true;
-      continue;
-    }
-
     if ( !hasLayer )
     {
       const QFileInfo fileInfo( fileName );
@@ -101,18 +122,11 @@ Qgis::LayerDropPayloadType QgsLayerDropClassifier::classify( const QMimeData *mi
   if ( hasLayer )
     return Qgis::LayerDropPayloadType::Layers;
 
-  // a custom uri is consumed by a matching custom drop handler (loadable layers, if any,
-  // took precedence above and keep the insertion indicator)
-  if ( hasCustomUri )
+  // nothing inserts layers, but a custom drop handler consumes the payload: either a custom
+  // uri matching its provider key, or mime data it claimed above (e.g. .qpt print templates,
+  // .py scripts, style .xml files)
+  if ( hasCustomUri || hasCustomHandler )
     return Qgis::LayerDropPayloadType::CustomHandler;
-
-  // no provider can load the payload, but a custom drop handler may still claim the
-  // mime data (e.g. .qpt print templates, .py scripts, style .xml files)
-  for ( QgsCustomDropHandler *handler : customHandlers )
-  {
-    if ( handler && handler->canHandleMimeData( mimeData ) )
-      return Qgis::LayerDropPayloadType::CustomHandler;
-  }
 
   return Qgis::LayerDropPayloadType::Invalid;
 }

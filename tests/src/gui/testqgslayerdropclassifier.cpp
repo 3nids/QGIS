@@ -53,6 +53,26 @@ class TestDropHandler : public QgsCustomDropHandler
     QString mSuffix;
 };
 
+//! Test drop handler which inserts layers into the tree, like the .qlr handler does
+class LayerInsertingDropHandler : public TestDropHandler
+{
+    Q_OBJECT
+  public:
+    using TestDropHandler::TestDropHandler;
+
+    Qgis::LayerDropPayloadType payloadType( const QMimeData *data ) override { return canHandleMimeData( data ) ? Qgis::LayerDropPayloadType::Layers : Qgis::LayerDropPayloadType::Invalid; }
+};
+
+//! Test drop handler which replaces the current project
+class ProjectDropHandler : public TestDropHandler
+{
+    Q_OBJECT
+  public:
+    using TestDropHandler::TestDropHandler;
+
+    Qgis::LayerDropPayloadType payloadType( const QMimeData *data ) override { return canHandleMimeData( data ) ? Qgis::LayerDropPayloadType::Project : Qgis::LayerDropPayloadType::Invalid; }
+};
+
 //! Test drop handler mimicking a legacy handler which only implements handleFileDrop()
 class LegacyDropHandler : public QgsCustomDropHandler
 {
@@ -179,13 +199,25 @@ void TestQgsLayerDropClassifier::testClassifyDragPayload()
   const std::unique_ptr<QMimeData> layerUriMime( QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << layerUri ) );
   QCOMPARE( QgsLayerDropClassifier::classify( layerUriMime.get(), noHandlers ), PayloadType::Layers );
 
-  // layer definition files insert layers into the tree: they classify as layers
-  // and get the insertion indicator
+  // a handler which inserts layers into the tree (as the .qlr handler does) is authoritative:
+  // no provider recognizes the file, yet it classifies as layers and gets the insertion
+  // indicator rather than the generic custom handler treatment
   QTemporaryFile qlrFile( QDir::tempPath() + u"/XXXXXX.qlr"_s );
   QVERIFY( qlrFile.open() );
   QMimeData qlrFileMime;
   qlrFileMime.setUrls( { QUrl::fromLocalFile( qlrFile.fileName() ) } );
-  QCOMPARE( QgsLayerDropClassifier::classify( &qlrFileMime, noHandlers ), PayloadType::Layers );
+  QCOMPARE( QgsLayerDropClassifier::classify( &qlrFileMime, noHandlers ), PayloadType::Invalid );
+
+  LayerInsertingDropHandler qlrHandler( u"qlr"_s );
+  const QVector<QPointer<QgsCustomDropHandler>> qlrHandlers { QPointer<QgsCustomDropHandler>( &qlrHandler ) };
+  QCOMPARE( QgsLayerDropClassifier::classify( &qlrFileMime, qlrHandlers ), PayloadType::Layers );
+
+  // a handler which replaces the project wins over everything else in the payload
+  ProjectDropHandler mxdHandler( u"mxd"_s );
+  const QVector<QPointer<QgsCustomDropHandler>> mxdHandlers { QPointer<QgsCustomDropHandler>( &mxdHandler ) };
+  QMimeData mxdAndDatasetMime;
+  mxdAndDatasetMime.setUrls( { QUrl::fromLocalFile( pointsPath ), QUrl::fromLocalFile( u"/home/me/map.mxd"_s ) } );
+  QCOMPARE( QgsLayerDropClassifier::classify( &mxdAndDatasetMime, mxdHandlers ), PayloadType::Project );
 
   // payloads no provider can load, but which the application handles through custom
   // drop handlers, classify as CustomHandler instead of Invalid

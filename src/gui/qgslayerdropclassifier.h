@@ -50,9 +50,12 @@ class GUI_EXPORT QgsLayerDropClassifier
     /**
      * Classifies the \a mimeData of a drag or drop event.
      *
-     * If no data provider recognizes the payload, the \a customHandlers are consulted:
-     * when one of them can handle the mime data, the payload classifies as
-     * Qgis::LayerDropPayloadType::CustomHandler, otherwise as Qgis::LayerDropPayloadType::Invalid.
+     * The \a customHandlers are asked first through QgsCustomDropHandler::payloadType(): a
+     * handler reporting a project or layers is authoritative, since it knows about payloads
+     * no data provider can recognize (e.g. layer definition files). Otherwise the payload is
+     * matched against the data providers, and falls back to
+     * Qgis::LayerDropPayloadType::CustomHandler when a handler merely consumes it, or to
+     * Qgis::LayerDropPayloadType::Invalid when nothing claims it at all.
      */
     static Qgis::LayerDropPayloadType classify( const QMimeData *mimeData, const QVector<QPointer<QgsCustomDropHandler>> &customHandlers = QVector<QPointer<QgsCustomDropHandler>>() );
 

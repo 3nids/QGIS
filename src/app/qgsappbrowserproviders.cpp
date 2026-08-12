@@ -175,6 +175,13 @@ bool QgsQlrDropHandler::canHandleMimeData( const QMimeData *data )
   return mimeDataContainsFileWithSuffix( data, u"qlr"_s );
 }
 
+Qgis::LayerDropPayloadType QgsQlrDropHandler::payloadType( const QMimeData *data )
+{
+  // layer definition files insert layers into the tree, exactly like datasets, so they
+  // deserve the insertion indicator rather than the generic custom handler treatment
+  return canHandleMimeData( data ) ? Qgis::LayerDropPayloadType::Layers : Qgis::LayerDropPayloadType::Invalid;
+}
+
 //
 // QgsQptDataItemProvider
 //

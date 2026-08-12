@@ -60,6 +60,7 @@ class QgsQlrDropHandler : public QgsCustomDropHandler
     QString customUriProviderKey() const override;
     void handleCustomUriDrop( const QgsMimeDataUtils::Uri &uri ) const override;
     bool canHandleMimeData( const QMimeData *data ) override;
+    Qgis::LayerDropPayloadType payloadType( const QMimeData *data ) override;
 };
 
 /**
