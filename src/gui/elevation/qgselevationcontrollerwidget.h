@@ -75,6 +75,10 @@ class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction
     bool eventFilter( QObject *watched, QEvent *event ) override;
 
   private:
+    void onHover();
+
+    QMenu *mMenu = nullptr;
+    bool mSuppressRecurse = false;
     QgsDoubleSpinBox *mLowerSpin = nullptr;
     QgsDoubleSpinBox *mUpperSpin = nullptr;
     QToolButton *mLimitsButton = nullptr;
