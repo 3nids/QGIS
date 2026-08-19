@@ -310,9 +310,16 @@ void QgsElevationControllerWidget::setRangeLimits( const QgsDoubleRange &limits 
   mCurrentRange = QgsDoubleRange( newCurrentLower, newCurrentUpper );
   mBlockSliderChanges = false;
   if ( rangeHasChanged )
+  {
     emit rangeChanged( mCurrentRange );
 
+    // the selected range was clipped by the new limits, so the range size shown in the menu is stale
+    if ( !mSettingsAction->lockButton()->isChecked() )
+      whileBlocking( mSettingsAction->sizeSpin() )->setValue( mCurrentRange.upper() - mCurrentRange.lower() );
+  }
+
   mSliderLabels->setLimits( mRangeLimits );
+  mSliderLabels->setRange( mCurrentRange );
 }
 
 void QgsElevationControllerWidget::updateLimitSpins()
