@@ -22,11 +22,15 @@
 #include "qgis_sip.h"
 #include "qgsrange.h"
 
+#include <QPointer>
 #include <QWidget>
 #include <QWidgetAction>
 
+class QgsMapCanvas;
+class QgsMapLayer;
 class QgsRangeSlider;
 class QgsDoubleSpinBox;
+class QCheckBox;
 class QToolButton;
 class QMenu;
 
@@ -60,10 +64,23 @@ class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction
   public:
     QgsElevationControllerSettingsAction( QWidget *parent = nullptr );
 
+    QgsDoubleSpinBox *lowerSpin();
+    QgsDoubleSpinBox *upperSpin();
+    QToolButton *limitsButton();
     QgsDoubleSpinBox *sizeSpin();
+    QToolButton *lockButton();
+    QCheckBox *invertCheckBox();
+
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
 
   private:
+    QgsDoubleSpinBox *mLowerSpin = nullptr;
+    QgsDoubleSpinBox *mUpperSpin = nullptr;
+    QToolButton *mLimitsButton = nullptr;
     QgsDoubleSpinBox *mSizeSpin = nullptr;
+    QToolButton *mLockButton = nullptr;
+    QCheckBox *mInvertCheckBox = nullptr;
 };
 
 
@@ -123,6 +140,14 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
     QMenu *menu();
 
     /**
+     * Returns the map canvas the widget takes its layers from.
+     *
+     * \see setMapCanvas()
+     * \since QGIS 4.4
+     */
+    QgsMapCanvas *mapCanvas() const;
+
+    /**
      * Returns the fixed range size, or -1 if no fixed size is set.
      *
      * A fixed size forces the selected elevation range to have a matching difference between
@@ -172,6 +197,18 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
      */
     void setSignificantElevations( const QList<double> &elevations );
 
+    /**
+     * Sets the map \a canvas the widget takes its layers from.
+     *
+     * The canvas provides the layer used by the "Current Layer" entry of the range limits
+     * button, and its layers give the initial limits when the project defines no elevation
+     * range of its own.
+     *
+     * \see mapCanvas()
+     * \since QGIS 4.4
+     */
+    void setMapCanvas( QgsMapCanvas *canvas );
+
   signals:
 
     /**
@@ -199,13 +236,21 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
 
   private:
     void updateWidgetMask();
+    void updateLimitSpins();
+
+    //! Applies a \a range calculated from layer data to both the limits and the current range
+    void setLimitsFromRange( const QgsDoubleRange &range );
+
+    //! Returns TRUE if \a layer can contribute an elevation range
+    static bool layerHasElevation( QgsMapLayer *layer );
 
     QToolButton *mConfigureButton = nullptr;
     QgsElevationControllerSettingsAction *mSettingsAction = nullptr;
     QMenu *mMenu = nullptr;
-    QAction *mInvertDirectionAction = nullptr;
+    QMenu *mLimitsMenu = nullptr;
     QgsRangeSlider *mSlider = nullptr;
     QgsElevationControllerLabels *mSliderLabels = nullptr;
+    QPointer<QgsMapCanvas> mMapCanvas;
     QgsDoubleRange mRangeLimits;
     QgsDoubleRange mCurrentRange;
     double mFixedRangeSize = -1;
