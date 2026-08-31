@@ -14,6 +14,7 @@
  ***************************************************************************/
 
 #include "qgsapplication.h"
+#include "qgscustomdrophandler.h"
 #include "qgsdroputils.h"
 #include "qgsmimedatautils.h"
 #include "qgstest.h"
@@ -25,6 +26,41 @@
 #include <QUrl>
 
 using namespace Qt::StringLiterals;
+
+//! A handler which predates payloadType() and only says it handles a file when it is dropped
+class LegacyDropHandler : public QgsCustomDropHandler
+{
+    Q_OBJECT
+
+  public:
+    bool handleFileDrop( const QString & ) override { return true; }
+};
+
+//! A handler which consumes .test files
+class TestFileDropHandler : public QgsCustomDropHandler
+{
+    Q_OBJECT
+
+  public:
+    Qgis::DropPayloadType payloadType( const QMimeData *data ) override
+    {
+      return QgsDropUtils::hasFileExtension( data, { u"test"_s } ) ? Qgis::DropPayloadType::CustomHandler : Qgis::DropPayloadType::Unsupported;
+    }
+};
+
+//! A handler which adds layers of its own, from uris carrying its provider key
+class TestLayerDropHandler : public QgsCustomDropHandler
+{
+    Q_OBJECT
+
+  public:
+    QString customUriProviderKey() const override { return u"test_layers"_s; }
+
+    Qgis::DropPayloadType payloadType( const QMimeData *data ) override
+    {
+      return QgsCustomDropHandler::payloadType( data ) == Qgis::DropPayloadType::CustomHandler ? Qgis::DropPayloadType::Layers : Qgis::DropPayloadType::Unsupported;
+    }
+};
 
 class TestQgsDropUtils : public QgsTest
 {
@@ -43,6 +79,11 @@ class TestQgsDropUtils : public QgsTest
     void files();
     void hasCustomUri();
     void hasFileExtension();
+
+    void payloadTypeOfFiles();
+    void payloadTypeOfUris();
+    void payloadTypeOfSeveralItems();
+    void payloadTypeWithHandlers();
 
   private:
     //! Returns mime data carrying \a files as urls, as a file manager would
@@ -153,6 +194,109 @@ void TestQgsDropUtils::hasFileExtension()
   QVERIFY( QgsDropUtils::hasFileExtension( data.get(), { u"qpt"_s, u"model3"_s } ) );
   QVERIFY( !QgsDropUtils::hasFileExtension( data.get(), { u"qpt"_s } ) );
   QVERIFY( !QgsDropUtils::hasFileExtension( data.get(), {} ) );
+}
+
+void TestQgsDropUtils::payloadTypeOfFiles()
+{
+  auto payloadTypeOf = []( const QString &file ) {
+    const std::unique_ptr<QMimeData> data = fileMimeData( { file } );
+    return QgsDropUtils::payloadType( data.get() );
+  };
+
+  QCOMPARE( payloadTypeOf( testDataPath( u"joins.qgs"_s ) ), Qgis::DropPayloadType::Project );
+  QCOMPARE( payloadTypeOf( testDataPath( u"broken_relations2.qgz"_s ) ), Qgis::DropPayloadType::Project );
+  QCOMPARE( payloadTypeOf( testDataPath( u"invalid_source.qlr"_s ) ), Qgis::DropPayloadType::Layers );
+  QCOMPARE( payloadTypeOf( testDataPath( u"points.shp"_s ) ), Qgis::DropPayloadType::Layers );
+  QCOMPARE( payloadTypeOf( testDataPath( u"rgb256x256.png"_s ) ), Qgis::DropPayloadType::Layers );
+
+  // the extension is matched case insensitively, as QgisApp::openFile() does
+  QCOMPARE( payloadTypeOf( touch( u"project.QGZ"_s ) ), Qgis::DropPayloadType::Project );
+
+  // nothing in QGIS reads these
+  QCOMPARE( payloadTypeOf( touch( u"notes.rtf"_s ) ), Qgis::DropPayloadType::Unsupported );
+
+  // an extension is all a drag can afford to look at, so what carries none is left to the drop
+  QCOMPARE( payloadTypeOf( touch( u"README"_s ) ), Qgis::DropPayloadType::Unknown );
+  QCOMPARE( payloadTypeOf( testDataPath( QString() ) ), Qgis::DropPayloadType::Unknown );
+
+  // a widget dragging its own contents carries no dataset at all
+  QMimeData layerTreeDrag;
+  layerTreeDrag.setData( u"application/qgis.layertreemodeldata"_s, QByteArray() );
+  QCOMPARE( QgsDropUtils::payloadType( &layerTreeDrag ), Qgis::DropPayloadType::Unsupported );
+  QCOMPARE( QgsDropUtils::payloadType( nullptr ), Qgis::DropPayloadType::Unsupported );
+}
+
+void TestQgsDropUtils::payloadTypeOfUris()
+{
+  auto payloadTypeOf = []( const QString &layerType, const QString &providerKey ) {
+    QgsMimeDataUtils::Uri uri;
+    uri.layerType = layerType;
+    uri.providerKey = providerKey;
+    uri.uri = u"/some/path"_s;
+    const std::unique_ptr<QMimeData> data( QgsMimeDataUtils::encodeUriList( { uri } ) );
+    return QgsDropUtils::payloadType( data.get() );
+  };
+
+  QCOMPARE( payloadTypeOf( u"vector"_s, u"ogr"_s ), Qgis::DropPayloadType::Layers );
+  QCOMPARE( payloadTypeOf( u"raster"_s, u"gdal"_s ), Qgis::DropPayloadType::Layers );
+  QCOMPARE( payloadTypeOf( u"project"_s, QString() ), Qgis::DropPayloadType::Project );
+
+  // a custom uri is nothing without the handler it was created for, and none was given here
+  QCOMPARE( payloadTypeOf( u"custom"_s, u"processing"_s ), Qgis::DropPayloadType::Unsupported );
+}
+
+void TestQgsDropUtils::payloadTypeOfSeveralItems()
+{
+  auto payloadTypeOf = []( const QStringList &files ) {
+    const std::unique_ptr<QMimeData> data = fileMimeData( files );
+    return QgsDropUtils::payloadType( data.get() );
+  };
+
+  const QString project = testDataPath( u"joins.qgs"_s );
+  const QString layer = testDataPath( u"points.shp"_s );
+  const QString unsupported = touch( u"notes.rtf"_s );
+  const QString unknown = touch( u"README"_s );
+
+  // the item which dominates what the drop does is the one reported
+  QCOMPARE( payloadTypeOf( { layer, project } ), Qgis::DropPayloadType::Project );
+  QCOMPARE( payloadTypeOf( { unsupported, layer } ), Qgis::DropPayloadType::Layers );
+
+  // one item QGIS cannot classify is enough for the drag not to be refused
+  QCOMPARE( payloadTypeOf( { unsupported, unknown } ), Qgis::DropPayloadType::Unknown );
+  QCOMPARE( payloadTypeOf( { unsupported, unsupported } ), Qgis::DropPayloadType::Unsupported );
+}
+
+void TestQgsDropUtils::payloadTypeWithHandlers()
+{
+  TestFileDropHandler fileHandler;
+  TestLayerDropHandler layerHandler;
+  LegacyDropHandler legacyHandler;
+
+  const std::unique_ptr<QMimeData> claimed = fileMimeData( { touch( u"data.test"_s ) } );
+  const std::unique_ptr<QMimeData> unclaimed = fileMimeData( { touch( u"notes.rtf"_s ) } );
+
+  // a handler recognizes payloads no data provider knows about
+  QCOMPARE( QgsDropUtils::payloadType( claimed.get() ), Qgis::DropPayloadType::Unsupported );
+  QCOMPARE( QgsDropUtils::payloadType( claimed.get(), { &fileHandler } ), Qgis::DropPayloadType::CustomHandler );
+  QCOMPARE( QgsDropUtils::payloadType( unclaimed.get(), { &fileHandler } ), Qgis::DropPayloadType::Unsupported );
+
+  // a handler which brings in layers of its own says so
+  QgsMimeDataUtils::Uri uri;
+  uri.layerType = u"custom"_s;
+  uri.providerKey = u"test_layers"_s;
+  const std::unique_ptr<QMimeData> layerUri( QgsMimeDataUtils::encodeUriList( { uri } ) );
+  QCOMPARE( QgsDropUtils::payloadType( layerUri.get(), { &layerHandler } ), Qgis::DropPayloadType::Layers );
+
+  // a handler which predates payloadType() cannot say what it accepts, so nothing is refused
+  // on its behalf
+  QCOMPARE( QgsDropUtils::payloadType( unclaimed.get(), { &legacyHandler } ), Qgis::DropPayloadType::Unknown );
+
+  // ... but it does not hide what the rest of QGIS does know
+  const std::unique_ptr<QMimeData> project = fileMimeData( { testDataPath( u"joins.qgs"_s ) } );
+  QCOMPARE( QgsDropUtils::payloadType( project.get(), { &legacyHandler } ), Qgis::DropPayloadType::Project );
+
+  // a destroyed handler is skipped rather than dereferenced
+  QCOMPARE( QgsDropUtils::payloadType( claimed.get(), { nullptr, &fileHandler } ), Qgis::DropPayloadType::CustomHandler );
 }
 
 QGSTEST_MAIN( TestQgsDropUtils )

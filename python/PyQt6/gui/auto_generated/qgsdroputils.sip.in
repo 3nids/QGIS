@@ -18,6 +18,8 @@ Inspects the mime data of a drag which brings map data into QGIS.
 Any consuming widget (main window, layer tree, map canvas) or any custom
 drop handlers all gets the infos it needs from this helper.
 
+:py:func:`~payloadType` tells the widget what they will receive.
+
 .. versionadded:: 4.4
 %End
 
@@ -62,6 +64,7 @@ insensitively.
 This is a convenience for a :py:class:`QgsCustomDropHandler` which
 accepts a fixed set of file types.
 %End
+
 };
 
 /************************************************************************
