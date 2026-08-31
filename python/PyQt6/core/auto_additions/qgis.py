@@ -8694,6 +8694,33 @@ Qgis.LayerTreeInsertionMethod.__doc__ = """Layer tree insertion methods
 # --
 Qgis.LayerTreeInsertionMethod.baseClass = Qgis
 # monkey patching scoped based enum
+Qgis.DropPayloadType.Unknown.__doc__ = "Cannot be told apart from the mime data alone, e.g. a file without an extension. A drag must never be refused on this basis"
+Qgis.DropPayloadType.Unsupported.__doc__ = "Nothing in QGIS can open or handle the payload"
+Qgis.DropPayloadType.Layers.__doc__ = "Map layers to be added to the current project"
+Qgis.DropPayloadType.Project.__doc__ = "A QGIS project, which replaces the current one"
+Qgis.DropPayloadType.CustomHandler.__doc__ = "Data a QgsCustomDropHandler consumes, e.g. a script or a print template"
+Qgis.DropPayloadType.__doc__ = """What a drag and drop payload holds, from the point of view of a widget which accepts
+map data, such as the main window, the layer tree or the map canvas.
+
+It is determined while the data is still being dragged, so that the widget can refuse
+a payload it has no use for and tell the user what dropping it would do.
+
+.. seealso:: :py:func:`QgsDropUtils.payloadType`
+
+.. seealso:: :py:func:`QgsCustomDropHandler.payloadType`
+
+.. versionadded:: 4.4
+
+* ``Unknown``: Cannot be told apart from the mime data alone, e.g. a file without an extension. A drag must never be refused on this basis
+* ``Unsupported``: Nothing in QGIS can open or handle the payload
+* ``Layers``: Map layers to be added to the current project
+* ``Project``: A QGIS project, which replaces the current one
+* ``CustomHandler``: Data a QgsCustomDropHandler consumes, e.g. a script or a print template
+
+"""
+# --
+Qgis.DropPayloadType.baseClass = Qgis
+# monkey patching scoped based enum
 Qgis.LegendLayerDoubleClickAction.LayerProperties.__doc__ = "Open the layer properties dialog"
 Qgis.LegendLayerDoubleClickAction.AttributeTable.__doc__ = "Open the attribute table"
 Qgis.LegendLayerDoubleClickAction.LayerStyling.__doc__ = "Open the layer styling dock"

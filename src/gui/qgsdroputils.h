@@ -16,11 +16,16 @@
 #ifndef QGSDROPUTILS_H
 #define QGSDROPUTILS_H
 
+#include "qgis.h"
 #include "qgis_gui.h"
+#include "qgis_sip.h"
 
+#include <QPointer>
 #include <QStringList>
+#include <QVector>
 
 class QMimeData;
+class QgsCustomDropHandler;
 
 /**
  * \ingroup gui
@@ -28,6 +33,8 @@ class QMimeData;
  *
  * Any consuming widget (main window, layer tree, map canvas)
  * or any custom drop handlers all gets the infos it needs from this helper.
+ *
+ * payloadType() tells the widget what they will receive.
  *
  * \since QGIS 4.4
  */
@@ -65,6 +72,29 @@ class GUI_EXPORT QgsDropUtils
      * types.
      */
     static bool hasFileExtension( const QMimeData *data, const QStringList &extensions );
+
+    /**
+     * Returns what \a data holds, so that a widget can refuse a payload it has no use
+     * for and tell the user what dropping it would do.
+     *
+     * The \a customHandlers are asked first, through QgsCustomDropHandler::payloadType(),
+     * as they recognize payloads no data provider knows about, and they alone can speak
+     * for the custom uris QGIS created for them. What is left is matched against QGIS' own
+     * document formats and the data providers.
+     *
+     * A drag which carries several items is reported as the most consequential of them:
+     * a project dropped along with a layer replaces the project.
+     *
+     * Because this runs while data is dragged, files are matched by extension only. One
+     * which has no extension, or which is a directory, is reported as
+     * Qgis::DropPayloadType::Unknown and left for the drop itself to resolve.
+     *
+     * Data which no handler claims and which is not a drag of datasets at all is reported
+     * as Qgis::DropPayloadType::Unsupported. A widget which also drags its own contents, as
+     * the layer tree does when its nodes are reordered, therefore has to tell the two apart
+     * with isDatasetDrag() before asking this, or it refuses its own drags.
+     */
+    static Qgis::DropPayloadType payloadType( const QMimeData *data, const QVector<QPointer<QgsCustomDropHandler>> &customHandlers = QVector<QPointer<QgsCustomDropHandler>>() ) SIP_SKIP;
 };
 
 #endif // QGSDROPUTILS_H

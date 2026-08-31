@@ -2770,6 +2770,15 @@ The development version
       OptimalInInsertionGroup,
     };
 
+    enum class DropPayloadType /BaseType=IntEnum/
+    {
+      Unknown,
+      Unsupported,
+      Layers,
+      Project,
+      CustomHandler,
+    };
+
     enum class LegendLayerDoubleClickAction /BaseType=IntEnum/
     {
       LayerProperties,

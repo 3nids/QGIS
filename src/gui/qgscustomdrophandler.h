@@ -16,6 +16,7 @@
 #ifndef QGSCUSTOMDROPHANDLER_H
 #define QGSCUSTOMDROPHANDLER_H
 
+#include "qgis.h"
 #include "qgis_gui.h"
 #include "qgsmimedatautils.h"
 
@@ -41,6 +42,11 @@ class QgsMapCanvas;
  *   explorer to QGIS will lock the explorer window until the drop handling has
  *   been complete). Accordingly handleMimeData() implementations must return
  *   quickly and defer any intensive or slow processing.
+ *
+ * Whichever approach is used, a handler should also reimplement payloadType(). The handle*()
+ * methods do the work once a drop occurs, while payloadType() is consulted earlier, while the
+ * data is still being dragged, to decide whether the drag is accepted at all and what feedback
+ * the user is shown meanwhile.
  *
  */
 class GUI_EXPORT QgsCustomDropHandler : public QObject
@@ -70,15 +76,43 @@ class GUI_EXPORT QgsCustomDropHandler : public QObject
 
     /**
      * Returns TRUE if the handler is capable of handling the provided mime \a data.
-     * The base class implementation returns FALSE regardless of mime data.
      *
-     * This method is called when mime data is dragged over the QGIS window, in order
-     * to determine whether any handlers are capable of handling the data and to
-     * determine whether the drag action should be accepted.
+     * payloadType() answers the same question with the precision needed to tell the user
+     * what dropping the data would do.
+     *
+     * \deprecated QGIS 4.4. Use payloadType() instead.
      *
      * \since QGIS 3.10
      */
-    virtual bool canHandleMimeData( const QMimeData *data );
+    Q_DECL_DEPRECATED virtual bool canHandleMimeData( const QMimeData *data ) SIP_DEPRECATED;
+
+    /**
+     * Returns what the provided mime \a data holds, which decides whether a widget accepting
+     * map data takes the drop and what the user is shown while the data is dragged over it.
+     *
+     * Reimplement it to report precisely what the handler accepts:
+     *
+     * - Qgis::DropPayloadType::CustomHandler for data the handler consumes, such as a print
+     *   template or a script
+     * - Qgis::DropPayloadType::Layers or Qgis::DropPayloadType::Project when the drop adds
+     *   layers to the project or replaces it, so that it is announced as such
+     * - Qgis::DropPayloadType::Unsupported for anything the handler does not recognize
+     *
+     * Because it is called while data is dragged, this must be lightweight and must NOT
+     * perform any action or otherwise have side effects.
+     *
+     * The base class implementation reports Qgis::DropPayloadType::CustomHandler for a
+     * custom uri whose provider key is customUriProviderKey(), and otherwise defers to the
+     * deprecated canHandleMimeData(). When neither claims the data it returns
+     * Qgis::DropPayloadType::Unknown rather than Qgis::DropPayloadType::Unsupported: a
+     * handler which declares no provider key and reimplements neither method cannot say what
+     * it accepts, and its drops must not be refused on that basis.
+     *
+     * \since QGIS 4.4
+     */
+    virtual Qgis::DropPayloadType payloadType( const QMimeData *data );
+
+    // TODO QGIS 5.0 - make pure virtual and remove canHandleMimeData()
 
     // TODO QGIS 5.0 - return bool
 

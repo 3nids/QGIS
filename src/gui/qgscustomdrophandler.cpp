@@ -15,6 +15,8 @@
 
 #include "qgscustomdrophandler.h"
 
+#include "qgsdroputils.h"
+
 #include "moc_qgscustomdrophandler.cpp"
 
 QString QgsCustomDropHandler::customUriProviderKey() const
@@ -30,6 +32,20 @@ void QgsCustomDropHandler::handleCustomUriDrop( const QgsMimeDataUtils::Uri &uri
 bool QgsCustomDropHandler::canHandleMimeData( const QMimeData * )
 {
   return false;
+}
+
+Qgis::DropPayloadType QgsCustomDropHandler::payloadType( const QMimeData *data )
+{
+  // a handler which declares a custom uri provider key has already said it takes those uris
+  if ( QgsDropUtils::hasCustomUri( data, customUriProviderKey() ) )
+    return Qgis::DropPayloadType::CustomHandler;
+
+  Q_NOWARN_DEPRECATED_PUSH
+  if ( canHandleMimeData( data ) )
+    return Qgis::DropPayloadType::CustomHandler;
+  Q_NOWARN_DEPRECATED_POP
+
+  return Qgis::DropPayloadType::Unknown;
 }
 
 void QgsCustomDropHandler::handleMimeData( const QMimeData *data )

@@ -4971,6 +4971,28 @@ int QgisEvent = QEvent::User + 1;
     Q_ENUM( LayerTreeInsertionMethod )
 
     /**
+     * What a drag and drop payload holds, from the point of view of a widget which accepts
+     * map data, such as the main window, the layer tree or the map canvas.
+     *
+     * It is determined while the data is still being dragged, so that the widget can refuse
+     * a payload it has no use for and tell the user what dropping it would do.
+     *
+     * \see QgsDropUtils::payloadType()
+     * \see QgsCustomDropHandler::payloadType()
+     *
+     * \since QGIS 4.4
+     */
+    enum class DropPayloadType : int
+    {
+      Unknown,       //!< Cannot be told apart from the mime data alone, e.g. a file without an extension. A drag must never be refused on this basis
+      Unsupported,   //!< Nothing in QGIS can open or handle the payload
+      Layers,        //!< Map layers to be added to the current project
+      Project,       //!< A QGIS project, which replaces the current one
+      CustomHandler, //!< Data a QgsCustomDropHandler consumes, e.g. a script or a print template
+    };
+    Q_ENUM( DropPayloadType )
+
+    /**
      * Action performed when double-clicking a layer in the legend.
      *
      * \since QGIS 4.0
