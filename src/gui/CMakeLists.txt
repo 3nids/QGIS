@@ -644,6 +644,7 @@ set(QGIS_GUI_SRCS
   qgsdockablewidgethelper.cpp
   qgsdoublevalidator.cpp
   qgsdockwidget.cpp
+  qgsdropfeedbackoverlay.cpp
   qgsdroputils.cpp
   qgsencodingfiledialog.cpp
   qgserrordialog.cpp
@@ -920,6 +921,7 @@ set(QGIS_GUI_HDRS
   qgsdockablewidgethelper.h
   qgsdockwidget.h
   qgsdoublevalidator.h
+  qgsdropfeedbackoverlay.h
   qgsdroputils.h
   qgsencodingfiledialog.h
   qgserrordialog.h

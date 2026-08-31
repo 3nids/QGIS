@@ -60,6 +60,7 @@
 %Include auto_generated/qgsdirectionallightwidget.sip
 %Include auto_generated/qgsdockwidget.sip
 %Include auto_generated/qgsdoublevalidator.sip
+%Include auto_generated/qgsdropfeedbackoverlay.sip
 %Include auto_generated/qgsdroputils.sip
 %Include auto_generated/qgsencodingfiledialog.sip
 %Include auto_generated/qgserrordialog.sip

@@ -1,0 +1,68 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsdropfeedbackoverlay.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class QgsDropFeedbackOverlay : QWidget
+{
+%Docstring(signature="appended")
+Tells the user, over the widget they are dragging data onto, what
+dropping it would do.
+
+Only a payload worth a warning is announced: one which would replace the
+project, and one nothing in QGIS can read. Anything else drops without
+ceremony, and the overlay hides itself.
+
+The overlay covers the widget it is a child of and follows its size, so
+it belongs on the widget whose whole surface the message is about. It is
+hidden until :py:func:`~announce` is called and hides again on
+:py:func:`~clear`.
+
+.. versionadded:: 4.4
+%End
+
+%TypeHeaderCode
+#include "qgsdropfeedbackoverlay.h"
+%End
+  public:
+    explicit QgsDropFeedbackOverlay( QWidget *parent /TransferThis/ );
+%Docstring
+Constructor for QgsDropFeedbackOverlay, covering ``parent``.
+%End
+
+    void announce( Qgis::DropPayloadType payloadType, const QString &name = QString() );
+%Docstring
+Announces that dropping data of the given ``payloadType`` is about to
+happen, naming it ``name`` in the message when one is known, such as the
+file being dragged.
+
+Shows the overlay when the payload is one the user should be warned
+about, and hides it otherwise.
+%End
+
+    void clear();
+%Docstring
+Hides the overlay, once the drag it was announcing is over.
+%End
+
+  protected:
+    virtual void paintEvent( QPaintEvent *event );
+
+    virtual bool eventFilter( QObject *watched, QEvent *event );
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsdropfeedbackoverlay.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
