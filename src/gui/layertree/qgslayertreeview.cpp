@@ -15,6 +15,7 @@
 
 #include "qgslayertreeview.h"
 
+#include "qgsdroputils.h"
 #include "qgsgui.h"
 #include "qgslayertree.h"
 #include "qgslayertreeembeddedwidgetregistry.h"
@@ -838,50 +839,38 @@ void QgsLayerTreeView::keyPressEvent( QKeyEvent *event )
 
 void QgsLayerTreeView::dragEnterEvent( QDragEnterEvent *event )
 {
-  if ( event->mimeData()->hasUrls() || event->mimeData()->hasFormat( u"application/x-vnd.qgis.qgis.uri"_s ) )
+  if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
-    // the mime data are coming from layer tree, so ignore that, do not import those layers again
-    if ( !event->mimeData()->hasFormat( u"application/qgis.layertreemodeldata"_s ) )
-    {
-      event->accept();
-      return;
-    }
+    event->accept();
+    return;
   }
   QTreeView::dragEnterEvent( event );
 }
 
 void QgsLayerTreeView::dragMoveEvent( QDragMoveEvent *event )
 {
-  if ( event->mimeData()->hasUrls() || event->mimeData()->hasFormat( u"application/x-vnd.qgis.qgis.uri"_s ) )
+  if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
-    // the mime data are coming from layer tree, so ignore that, do not import those layers again
-    if ( !event->mimeData()->hasFormat( u"application/qgis.layertreemodeldata"_s ) )
-    {
-      event->accept();
-      return;
-    }
+    event->accept();
+    return;
   }
   QTreeView::dragMoveEvent( event );
 }
 
 void QgsLayerTreeView::dropEvent( QDropEvent *event )
 {
-  if ( event->mimeData()->hasUrls() || event->mimeData()->hasFormat( u"application/x-vnd.qgis.qgis.uri"_s ) )
+  if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
-    // the mime data are coming from layer tree, so ignore that, do not import those layers again
-    if ( !event->mimeData()->hasFormat( u"application/qgis.layertreemodeldata"_s ) )
+    event->accept();
+
+    QModelIndex index = indexAt( event->pos() );
+    if ( index.isValid() )
     {
-      event->accept();
-
-      QModelIndex index = indexAt( event->pos() );
-      if ( index.isValid() )
-      {
-        setCurrentIndex( index );
-      }
-
-      emit datasetsDropped( event );
-      return;
+      setCurrentIndex( index );
     }
+
+    emit datasetsDropped( event );
+    return;
   }
   if ( event->keyboardModifiers() & Qt::AltModifier || event->keyboardModifiers() & Qt::ControlModifier )
   {
