@@ -1,0 +1,73 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsdroputils.h                                               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class QgsDropUtils
+{
+%Docstring(signature="appended")
+Inspects the mime data of a drag which brings map data into QGIS.
+
+Any consuming widget (main window, layer tree, map canvas) or any custom
+drop handlers all gets the infos it needs from this helper.
+
+.. versionadded:: 4.4
+%End
+
+%TypeHeaderCode
+#include "qgsdroputils.h"
+%End
+  public:
+    static bool isDatasetDrag( const QMimeData *data );
+%Docstring
+Returns ``True`` if ``data`` is a drag of datasets into QGIS: local
+files, or uris coming from within QGIS itself such as browser panel
+entries.
+
+Widgets which accept these alongside drags of their own contents, as the
+layer tree does when its nodes are reordered, use this to tell the two
+apart.
+%End
+
+    static QStringList files( const QMimeData *data );
+%Docstring
+Returns the local files carried by ``data``, in the order they were
+dragged.
+%End
+
+    static bool hasCustomUri( const QMimeData *data, const QString &providerKey );
+%Docstring
+Returns ``True`` if ``data`` carries a custom uri whose provider key is
+``providerKey``, that is, one
+:py:func:`QgsCustomDropHandler.handleCustomUriDrop()` would be called
+with.
+
+This is a convenience for a :py:class:`QgsCustomDropHandler` which
+accepts the browser entries it created.
+%End
+
+    static bool hasFileExtension( const QMimeData *data, const QStringList &extensions );
+%Docstring
+Returns ``True`` if ``data`` carries a local file whose complete suffix
+is one of ``extensions``, given without a leading dot and matched case
+insensitively.
+
+This is a convenience for a :py:class:`QgsCustomDropHandler` which
+accepts a fixed set of file types.
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgsdroputils.h                                               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

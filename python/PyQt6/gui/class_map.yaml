@@ -2207,6 +2207,11 @@ QgsDoubleValidator: src/gui/qgsdoublevalidator.h#L44
 QgsDrawSourceWidget.create: src/gui/effects/qgspainteffectwidget.h#L77
 QgsDrawSourceWidget.setPaintEffect: src/gui/effects/qgspainteffectwidget.h#L79
 QgsDrawSourceWidget: src/gui/effects/qgspainteffectwidget.h#L70
+QgsDropUtils.files: src/gui/qgsdroputils.h#L49
+QgsDropUtils.hasCustomUri: src/gui/qgsdroputils.h#L58
+QgsDropUtils.hasFileExtension: src/gui/qgsdroputils.h#L67
+QgsDropUtils.isDatasetDrag: src/gui/qgsdroputils.h#L44
+QgsDropUtils: src/gui/qgsdroputils.h#L34
 QgsDualView.QgsDualView: src/gui/attributetable/qgsdualview.h#L94
 QgsDualView.attributeTableConfig: src/gui/attributetable/qgsdualview.h#L239
 QgsDualView.cancelProgress: src/gui/attributetable/qgsdualview.h#L286
