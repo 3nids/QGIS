@@ -283,6 +283,7 @@ using namespace Qt::StringLiterals;
 #include "qgsdatumtransformdialog.h"
 #include "qgsdoublespinbox.h"
 #include "qgsdockwidget.h"
+#include "qgsdroputils.h"
 #include "qgsdxfexport.h"
 #include "qgsdxfexportdialog.h"
 #include "qgsdwgimportdialog.h"
@@ -2311,23 +2312,15 @@ QgisApp::~QgisApp()
 
 void QgisApp::dragEnterEvent( QDragEnterEvent *event )
 {
-  if ( event->mimeData()->hasUrls() || event->mimeData()->hasFormat( u"application/x-vnd.qgis.qgis.uri"_s ) )
+  if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
-    // the mime data are coming from layer tree, so ignore that, do not import those layers again
-    if ( !event->mimeData()->hasFormat( u"application/qgis.layertreemodeldata"_s ) )
-      event->acceptProposedAction();
+    event->acceptProposedAction();
+    return;
   }
 
-  // check if any custom handlers can operate on the data
-  const QVector<QPointer<QgsCustomDropHandler>> handlers = mCustomDropHandlers;
-  for ( QgsCustomDropHandler *handler : handlers )
-  {
-    if ( handler && handler->canHandleMimeData( event->mimeData() ) )
-    {
-      event->acceptProposedAction();
-      return;
-    }
-  }
+  // a custom drop handler may still take mime data which carries no dataset at all
+  if ( QgsDropUtils::payloadType( event->mimeData(), mCustomDropHandlers ) != Qgis::DropPayloadType::Unsupported )
+    event->acceptProposedAction();
 }
 
 void QgisApp::dropEvent( QDropEvent *event )
@@ -2365,20 +2358,7 @@ void QgisApp::dropEvent( QDropEvent *event )
     }
   }
 
-  // get the file list
-  QList<QUrl>::iterator i;
-  QList<QUrl> urls = event->mimeData()->urls();
-  QStringList files;
-  for ( i = urls.begin(); i != urls.end(); ++i )
-  {
-    QString fileName = i->toLocalFile();
-    // seems that some drag and drop operations include an empty url
-    // so we test for length to make sure we have something
-    if ( !fileName.isEmpty() )
-    {
-      files << fileName;
-    }
-  }
+  const QStringList files = QgsDropUtils::files( event->mimeData() );
 
   QgsMimeDataUtils::UriList lst;
   if ( QgsMimeDataUtils::isUriList( event->mimeData() ) )
