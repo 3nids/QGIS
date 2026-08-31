@@ -24,6 +24,7 @@ import shutil
 from functools import partial
 
 from qgis.core import (
+    Qgis,
     QgsApplication,
     QgsDataItem,
     QgsDataItemProvider,
@@ -37,6 +38,7 @@ from qgis.core import (
 )
 from qgis.gui import (
     QgsCustomDropHandler,
+    QgsDropUtils,
     QgsGui,
     QgsOptionsWidgetFactory,
     QgsProcessingHistoryDialog,
@@ -119,6 +121,13 @@ class ProcessingDropHandler(QgsCustomDropHandler):
     def handleCustomUriDrop(self, uri):
         path = uri.uri
         self.runAlg(path)
+
+    def payloadType(self, data):
+        if QgsDropUtils.hasCustomUri(
+            data, self.customUriProviderKey()
+        ) or QgsDropUtils.hasFileExtension(data, ["model3"]):
+            return Qgis.DropPayloadType.CustomHandler
+        return Qgis.DropPayloadType.Unsupported
 
 
 class ProcessingModelItem(QgsDataItem):

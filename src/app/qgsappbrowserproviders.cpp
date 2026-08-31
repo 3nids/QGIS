@@ -19,6 +19,7 @@
 #include "qgisapp.h"
 #include "qgsapplication.h"
 #include "qgsbookmarkeditordialog.h"
+#include "qgsdroputils.h"
 #include "qgsfileutils.h"
 #include "qgsguiutils.h"
 #include "qgslayertree.h"
@@ -155,6 +156,13 @@ void QgsQlrDropHandler::handleCustomUriDrop( const QgsMimeDataUtils::Uri &uri ) 
   QgsAppLayerHandling::openLayerDefinition( path );
 }
 
+Qgis::DropPayloadType QgsQlrDropHandler::payloadType( const QMimeData *data )
+{
+  // a layer definition brings in the layers it describes. Dropped as a file it is opened
+  // by QgisApp::openFile() rather than here, which QgsDropUtils knows about.
+  return QgsDropUtils::hasCustomUri( data, customUriProviderKey() ) ? Qgis::DropPayloadType::Layers : Qgis::DropPayloadType::Unsupported;
+}
+
 //
 // QgsQptDataItemProvider
 //
@@ -204,6 +212,11 @@ bool QgsQptDropHandler::handleFileDrop( const QString &file )
     return true;
   }
   return false;
+}
+
+Qgis::DropPayloadType QgsQptDropHandler::payloadType( const QMimeData *data )
+{
+  return QgsDropUtils::hasCustomUri( data, customUriProviderKey() ) || QgsDropUtils::hasFileExtension( data, { u"qpt"_s } ) ? Qgis::DropPayloadType::CustomHandler : Qgis::DropPayloadType::Unsupported;
 }
 
 //
@@ -343,6 +356,11 @@ bool QgsPyDropHandler::handleFileDrop( const QString &file )
   return false;
 }
 
+Qgis::DropPayloadType QgsPyDropHandler::payloadType( const QMimeData *data )
+{
+  return QgsDropUtils::hasCustomUri( data, customUriProviderKey() ) || QgsDropUtils::hasFileExtension( data, { u"py"_s } ) ? Qgis::DropPayloadType::CustomHandler : Qgis::DropPayloadType::Unsupported;
+}
+
 
 //
 // QgsStyleXmlDataItem
@@ -460,6 +478,22 @@ bool QgsStyleXmlDropHandler::handleFileDrop( const QString &file )
     return true;
   }
   return false;
+}
+
+Qgis::DropPayloadType QgsStyleXmlDropHandler::payloadType( const QMimeData *data )
+{
+  if ( QgsDropUtils::hasCustomUri( data, customUriProviderKey() ) )
+    return Qgis::DropPayloadType::CustomHandler;
+
+  // an .xml extension is not enough to tell a style library from any other document, so
+  // sniff the files as handleFileDrop() does
+  const QStringList files = QgsDropUtils::files( data );
+  for ( const QString &file : files )
+  {
+    if ( QgsStyle::isXmlStyleFile( file ) )
+      return Qgis::DropPayloadType::CustomHandler;
+  }
+  return Qgis::DropPayloadType::Unsupported;
 }
 
 //
@@ -888,6 +922,13 @@ void QgsBookmarkItem::setBookmark( const QgsBookmark &bookmark )
 QString QgsBookmarkDropHandler::customUriProviderKey() const
 {
   return u"bookmark"_s;
+}
+
+Qgis::DropPayloadType QgsBookmarkDropHandler::payloadType( const QMimeData * )
+{
+  // a bookmark is dropped onto a map canvas and nowhere else, which asks
+  // canHandleCustomUriCanvasDrop() instead of this
+  return Qgis::DropPayloadType::Unsupported;
 }
 
 bool QgsBookmarkDropHandler::canHandleCustomUriCanvasDrop( const QgsMimeDataUtils::Uri &uri, QgsMapCanvas * )
