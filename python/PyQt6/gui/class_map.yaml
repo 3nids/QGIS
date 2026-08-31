@@ -2208,6 +2208,12 @@ QgsDoubleValidator: src/gui/qgsdoublevalidator.h#L44
 QgsDrawSourceWidget.create: src/gui/effects/qgspainteffectwidget.h#L77
 QgsDrawSourceWidget.setPaintEffect: src/gui/effects/qgspainteffectwidget.h#L79
 QgsDrawSourceWidget: src/gui/effects/qgspainteffectwidget.h#L70
+QgsDropFeedbackOverlay.QgsDropFeedbackOverlay: src/gui/qgsdropfeedbackoverlay.h#L48
+QgsDropFeedbackOverlay.announce: src/gui/qgsdropfeedbackoverlay.h#L57
+QgsDropFeedbackOverlay.clear: src/gui/qgsdropfeedbackoverlay.h#L60
+QgsDropFeedbackOverlay.eventFilter: src/gui/qgsdropfeedbackoverlay.h#L64
+QgsDropFeedbackOverlay.paintEvent: src/gui/qgsdropfeedbackoverlay.h#L63
+QgsDropFeedbackOverlay: src/gui/qgsdropfeedbackoverlay.h#L40
 QgsDropUtils.files: src/gui/qgsdroputils.h#L56
 QgsDropUtils.hasCustomUri: src/gui/qgsdroputils.h#L65
 QgsDropUtils.hasFileExtension: src/gui/qgsdroputils.h#L74

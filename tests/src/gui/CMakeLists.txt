@@ -38,6 +38,7 @@ set(TESTS
   testqgsattributesformproperties.cpp
   testqgsdatetimeedit.cpp
   testqgsdockwidget.cpp
+  testqgsdropfeedbackoverlay.cpp
   testqgsdroputils.cpp
   testqgsfieldexpressionwidget.cpp
   testqgsfilewidget.cpp
