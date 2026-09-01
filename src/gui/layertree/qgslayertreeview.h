@@ -598,7 +598,9 @@ class GUI_EXPORT QgsLayerTreeView : public QgsLayerTreeViewBase
 
     void dragEnterEvent( QDragEnterEvent *event ) override;
     void dragMoveEvent( QDragMoveEvent *event ) override;
+    void dragLeaveEvent( QDragLeaveEvent *event ) override;
     void dropEvent( QDropEvent *event ) override;
+    void paintEvent( QPaintEvent *event ) override;
 
     void resizeEvent( QResizeEvent *event ) override;
 
@@ -630,7 +632,25 @@ class GUI_EXPORT QgsLayerTreeView : public QgsLayerTreeViewBase
     int mLayerMarkWidth;
 
   private:
+    /**
+     * Returns the node a dataset dropped at \a pos would be inserted at, which is the one
+     * dropEvent() makes current. A legend node resolves to the layer it belongs to, and an
+     * empty position to the node which is already current.
+     */
+    QModelIndex insertionIndexAt( const QPoint &pos ) const;
+
+    //! Marks where datasets dropped at \a pos would land, for the drag to be told about it
+    void showInsertionIndicator( const QPoint &pos );
+    void clearInsertionIndicator();
+
     QgsLayerTreeProxyModel *mProxyModel = nullptr;
+
+    //! What the drag hovering the view carries, settled once when it enters
+    Qgis::DropPayloadType mDragPayloadType = Qgis::DropPayloadType::Unknown;
+    //! Where the insertion is marked while datasets are dragged over the view, empty otherwise
+    QRect mInsertionIndicatorRect;
+    //! TRUE when the insertion goes inside the group the indicator outlines, rather than above a node
+    bool mInsertionIntoGroup = false;
 
     QgsMessageBar *mMessageBar = nullptr;
 
