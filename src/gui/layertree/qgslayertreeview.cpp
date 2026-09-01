@@ -32,6 +32,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QMimeData>
+#include <QPainter>
 #include <QScrollBar>
 #include <QString>
 
@@ -841,6 +842,9 @@ void QgsLayerTreeView::dragEnterEvent( QDragEnterEvent *event )
 {
   if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
+    // what the data holds cannot change while the same data is dragged, and drag move
+    // events arrive with every mouse move
+    mDragPayloadType = QgsDropUtils::payloadType( event->mimeData() );
     event->accept();
     return;
   }
@@ -851,10 +855,18 @@ void QgsLayerTreeView::dragMoveEvent( QDragMoveEvent *event )
 {
   if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
+    showInsertionIndicator( event->position().toPoint() );
     event->accept();
     return;
   }
   QTreeView::dragMoveEvent( event );
+}
+
+void QgsLayerTreeView::dragLeaveEvent( QDragLeaveEvent *event )
+{
+  clearInsertionIndicator();
+  mDragPayloadType = Qgis::DropPayloadType::Unknown;
+  QTreeView::dragLeaveEvent( event );
 }
 
 void QgsLayerTreeView::dropEvent( QDropEvent *event )
@@ -862,8 +874,10 @@ void QgsLayerTreeView::dropEvent( QDropEvent *event )
   if ( QgsDropUtils::isDatasetDrag( event->mimeData() ) )
   {
     event->accept();
+    clearInsertionIndicator();
+    mDragPayloadType = Qgis::DropPayloadType::Unknown;
 
-    QModelIndex index = indexAt( event->pos() );
+    const QModelIndex index = insertionIndexAt( event->position().toPoint() );
     if ( index.isValid() )
     {
       setCurrentIndex( index );
@@ -877,6 +891,81 @@ void QgsLayerTreeView::dropEvent( QDropEvent *event )
     event->accept();
   }
   QTreeView::dropEvent( event );
+}
+
+QModelIndex QgsLayerTreeView::insertionIndexAt( const QPoint &pos ) const
+{
+  QModelIndex index = indexAt( pos );
+
+  // a legend node is not somewhere layers can be inserted, its layer is
+  while ( index.isValid() && !index2node( index ) )
+    index = index.parent();
+
+  // past the last row nothing is pointed at, and the insertion follows the current node
+  return index.isValid() ? index : currentIndex();
+}
+
+void QgsLayerTreeView::showInsertionIndicator( const QPoint &pos )
+{
+  // a project replaces the tree rather than being inserted into it, and what only a drop
+  // handler understands never reaches the tree at all
+  if ( mDragPayloadType != Qgis::DropPayloadType::Layers && mDragPayloadType != Qgis::DropPayloadType::Unknown )
+  {
+    clearInsertionIndicator();
+    return;
+  }
+
+  const QModelIndex index = insertionIndexAt( pos );
+  QgsLayerTreeNode *node = index2node( index );
+  const QRect row = visualRect( index );
+  if ( !node || row.isNull() )
+  {
+    clearInsertionIndicator();
+    return;
+  }
+
+  // a group takes the layers inside itself, anything else has them inserted above it
+  const bool intoGroup = QgsLayerTree::isGroup( node );
+  // the line is stroked around its position, so the topmost row needs it nudged inwards
+  const int lineY = std::max( row.top(), 1 );
+  const QRect rect = intoGroup ? QRect( row.left(), row.top(), viewport()->width() - row.left(), row.height() ) : QRect( row.left(), lineY, viewport()->width() - row.left(), 0 );
+
+  if ( rect == mInsertionIndicatorRect && intoGroup == mInsertionIntoGroup )
+    return;
+
+  mInsertionIndicatorRect = rect;
+  mInsertionIntoGroup = intoGroup;
+  viewport()->update();
+}
+
+void QgsLayerTreeView::clearInsertionIndicator()
+{
+  if ( mInsertionIndicatorRect.isNull() )
+    return;
+
+  mInsertionIndicatorRect = QRect();
+  mInsertionIntoGroup = false;
+  viewport()->update();
+}
+
+void QgsLayerTreeView::paintEvent( QPaintEvent *event )
+{
+  QgsLayerTreeViewBase::paintEvent( event );
+
+  if ( mInsertionIndicatorRect.isNull() )
+    return;
+
+  QPainter painter( viewport() );
+  painter.setPen( QPen( palette().color( QPalette::Highlight ), 2 ) );
+  if ( mInsertionIntoGroup )
+  {
+    painter.setBrush( Qt::NoBrush );
+    painter.drawRect( mInsertionIndicatorRect.adjusted( 1, 1, -1, -1 ) );
+  }
+  else
+  {
+    painter.drawLine( mInsertionIndicatorRect.topLeft(), mInsertionIndicatorRect.topRight() );
+  }
 }
 
 void QgsLayerTreeView::resizeEvent( QResizeEvent *event )
