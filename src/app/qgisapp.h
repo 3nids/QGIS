@@ -167,21 +167,30 @@ class QgsAppGpsSettingsMenu;
 class Qgs3DMapScene;
 class Qgs3DMapCanvas;
 class QgsAppCanvasFiltering;
-class QgsCustomization;
 class QgsCustomizationDialog;
+class QgsTopocentricWidget;
+class QgsProcessingWidgetContextGenerator;
 
 #include "qgsconfig.h"
 #include "ui_qgisapp.h"
 
 #include "qgis.h"
 #include "qgis_app.h"
+#include "qgsannotation.h"
+#include "qgsappdbutils.h"
 #include "qgsappdevtoolutils.h"
 #include "qgsattributetablefiltermodel.h"
 #include "qgsauthmanager.h"
+#include "qgsbrowserdockwidget.h"
+#include "qgscoordinatereferencesystem.h"
+#include "qgscustomization.h"
 #include "qgslayertreeregistrybridge.h"
+#include "qgslayoutdesignerinterface.h"
 #include "qgsmaplayeractionregistry.h"
 #include "qgsmaptoolselect.h"
 #include "qgsmasterlayoutinterface.h"
+#include "qgsmessagebar.h"
+#include "qgsmessagelogviewer.h"
 #include "qgsmimedatautils.h"
 #include "qgsoptionsutils.h"
 #include "qgsoptionswidgetfactory.h"
@@ -232,11 +241,11 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
      */
     enum class AppOption : int
     {
-      NoOption = 0,              //! No Option
-      RestorePlugins = 1 << 0,   //! Automatically restore and load previously enabled plugins.
-      SkipBadLayers = 1 << 1,    //! Skip loading layers that are detected as problematic.
-      SkipVersionCheck = 1 << 2, //! Bypass the version compatibility check during startup.
-      EnablePython = 1 << 3      //! Enable the Python interface for scripting and plugins.
+      NoOption = 0,              //!< No Option
+      RestorePlugins = 1 << 0,   //!< Automatically restore and load previously enabled plugins.
+      SkipBadLayers = 1 << 1,    //!< Skip loading layers that are detected as problematic.
+      SkipVersionCheck = 1 << 2, //!< Bypass the version compatibility check during startup.
+      EnablePython = 1 << 3      //!< Enable the Python interface for scripting and plugins.
     };
     Q_DECLARE_FLAGS( AppOptions, AppOption )
     static const AppOptions DEFAULT_OPTIONS;
@@ -264,7 +273,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
       const QString &rootProfileLocation = QString(),
       const QString &activeProfile = QString(),
       QWidget *parent = nullptr,
-      Qt::WindowFlags fl = Qt::Window
+      Qt::WindowFlags fl = Qt::Window,
+      std::unique_ptr<QgsCustomization> customization = nullptr
     );
     //! Constructor for unit tests
     QgisApp();
@@ -940,12 +950,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QgsMapLayer *activeLayer();
 
     /**
-     * Returns the toolbar icon size. If \a dockedToolbar is TRUE, the icon size
-     * for toolbars contained within docks is returned.
-     */
-    QSize iconSize( bool dockedToolbar = false ) const;
-
-    /**
       * Checks available datum transforms and ask user if several are available and none
       * is chosen. Dialog is shown only if global option is set accordingly.
       * \returns TRUE if a datum transform has been specifically chosen by user or only one is available.
@@ -1213,9 +1217,6 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
 
     //! project was read
     void readProject( const QDomDocument & );
-
-    //! Sets app stylesheet from settings
-    void setAppStyleSheet( const QString &stylesheet );
 
     //! request credentials for network manager
     void namProxyAuthenticationRequired( const QNetworkProxy &proxy, QAuthenticator *auth );
@@ -1545,7 +1546,7 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     void openURL( QString url, bool useQgisDocDirectory = true );
 
     //! Opens the plugin manager (since QGIS 4.0)
-    void showPluginManager( int tabIndex = -1 );
+    void showPluginManager( int tabIndex = -1, const QString &searchTerm = QString() );
 
   protected:
     void showEvent( QShowEvent *event ) override;
@@ -2386,6 +2387,9 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     //! Deletes all the layout designer windows
     void deleteLayoutDesigners();
 
+    //! Returns the OpenGL version and GL renderer string if available
+    static QString openGlReportString();
+
     void setupLayoutManagerConnections();
 
     void setupAtlasMapLayerAction( QgsPrintLayout *layout, bool enableAction );
@@ -2664,6 +2668,10 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QLabel *mOnTheFlyProjectionStatusLabel = nullptr;
     //! Widget in status bar used to show status of on the fly projection
     QToolButton *mOnTheFlyProjectionStatusButton = nullptr;
+    //! Popup menu shown on the CRS button when the project uses a topocentric CRS
+    QMenu *mTopocentricMenu = nullptr;
+    //! Widget embedded in mTopocentricMenu to display the topocentric origin
+    QgsTopocentricWidget *mTopocentricWidget = nullptr;
     QToolButton *mMessageButton = nullptr;
     //! Menu that contains the list of actions of the selected vector layer
     QMenu *mFeatureActionMenu = nullptr;
@@ -2929,6 +2937,8 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QgsAbout *mAboutDialog = nullptr;
     std::unique_ptr<QgsCustomization> mCustomization;
     QObjectUniquePtr<QgsCustomizationDialog> mCustomizationDialog;
+
+    std::unique_ptr< QgsProcessingWidgetContextGenerator > mProcessingWidgetContextGenerator;
 
     friend class QgsCanvasRefreshBlocker;
     friend class QgsMapToolsDigitizingTechniqueManager;

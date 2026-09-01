@@ -1457,6 +1457,7 @@ namespace QgsWms
     mapSettings.setDestinationCrs( outputCRS );
 
     mapSettings.setTransformContext( mProject->transformContext() );
+    mapSettings.setEllipsoid( mProject->ellipsoid() );
 
     // Change x- and y- of BBOX for WMS 1.3.0 if axis inverted
     if ( mWmsParameters.versionAsNumber() >= QgsProjectVersion( 1, 3, 0 ) && outputCRS.hasAxisInverted() )
@@ -3159,7 +3160,13 @@ namespace QgsWms
         exporter.setAttributeDisplayName( true );
         exporter.setAttributes( attributes );
         exporter.setIncludeGeometry( withGeometry );
+        // Always add CRS information so that the export knows if it needs to transform geometries
+        // to CRS84 in case the requested profile needs it, the feature geometries are already
+        // in the CRS of the request, so no transformation is needed
         exporter.setTransformGeometries( false );
+        exporter.setDestinationCrs( destCRS );
+        // This is the CRS of the features that the exporter receives
+        exporter.setSourceCrs( destCRS );
 
         QgsJsonUtils::addCrsInfo( jsonCollection, destCRS );
 
@@ -3411,13 +3418,22 @@ namespace QgsWms
       }
 
       QDomElement fieldElem = doc.createElement( "qgs:" + attributeName.replace( ' ', '_' ) );
-      QString fieldTextString = featureAttributes.at( i ).toString();
-      if ( layer )
+
+      // For GML: skip formatter and return null value if the attribute value is null
+      if ( mWmsParameters.infoFormat() == QgsWmsParameters::Format::GML && QgsVariantUtils::isNull( featureAttributes.at( i ) ) )
       {
-        fieldTextString = QgsExpression::replaceExpressionText( replaceValueMapAndRelation( layer, i, fieldTextString ), &expressionContext );
+        fieldElem.setAttribute( "xsi:nil"_L1, "true"_L1 );
       }
-      QDomText fieldText = doc.createTextNode( fieldTextString );
-      fieldElem.appendChild( fieldText );
+      else
+      {
+        QString fieldTextString = featureAttributes.at( i ).toString();
+        if ( layer )
+        {
+          fieldTextString = QgsExpression::replaceExpressionText( replaceValueMapAndRelation( layer, i, fieldTextString ), &expressionContext );
+        }
+        QDomText fieldText = doc.createTextNode( fieldTextString );
+        fieldElem.appendChild( fieldText );
+      }
       typeNameElement.appendChild( fieldElem );
     }
 
@@ -3656,6 +3672,18 @@ namespace QgsWms
         {
           bufferSettings.setEnabled( true );
           bufferSettings.setSize( static_cast<double>( param.mBufferSize ) );
+        }
+
+        if ( param.mFrameSize > 0 )
+        {
+          QgsTextBackgroundSettings background;
+          background.setEnabled( true );
+          background.setSize( QSize( param.mFrameSize, param.mFrameSize ) );
+          background.setType( QgsTextBackgroundSettings::ShapeRectangle );
+          background.setStrokeColor( param.mFrameOutlineColor );
+          background.setStrokeWidth( param.mFrameOutlineWidth );
+          background.setFillColor( param.mFrameBackgroundColor );
+          textFormat.setBackground( background );
         }
 
         textFormat.setBuffer( bufferSettings );
@@ -3904,11 +3932,11 @@ namespace QgsWms
       {
         // Default value based on type configured by user
         QVariant defValue;
-        if ( dim.defaultDisplayType == QgsMapLayerServerProperties::WmsDimensionInfo::AllValues )
+        if ( dim.defaultDisplayType == Qgis::WmsDimensionDefaultDisplay::AllValues )
         {
           continue; // no filter by default for this dimension
         }
-        else if ( dim.defaultDisplayType == QgsMapLayerServerProperties::WmsDimensionInfo::ReferenceValue )
+        else if ( dim.defaultDisplayType == Qgis::WmsDimensionDefaultDisplay::ReferenceValue )
         {
           defValue = dim.referenceValue;
         }
@@ -3923,11 +3951,11 @@ namespace QgsWms
           // sort unique values
           QList<QVariant> values = qgis::setToList( uniqueValues );
           std::sort( values.begin(), values.end() );
-          if ( dim.defaultDisplayType == QgsMapLayerServerProperties::WmsDimensionInfo::MinValue )
+          if ( dim.defaultDisplayType == Qgis::WmsDimensionDefaultDisplay::MinValue )
           {
             defValue = values.first();
           }
-          else if ( dim.defaultDisplayType == QgsMapLayerServerProperties::WmsDimensionInfo::MaxValue )
+          else if ( dim.defaultDisplayType == Qgis::WmsDimensionDefaultDisplay::MaxValue )
           {
             defValue = values.last();
           }

@@ -10,6 +10,7 @@
 
 
 
+
 class QgsPhongMaterialSettings : QgsAbstractMaterialSettings
 {
 %Docstring(signature="appended")
@@ -45,6 +46,8 @@ Returns a new instance of QgsPhongMaterialSettings.
     virtual QgsPhongMaterialSettings *clone() const /Factory/;
 
     virtual bool equals( const QgsAbstractMaterialSettings *other ) const;
+
+    virtual QSet< QgsAbstractMaterialSettings::Property > supportedProperties() const;
 
 
     QColor ambient() const;

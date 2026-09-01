@@ -1202,7 +1202,7 @@ void QgsApplication::setUITheme( const QString &themeName )
   {
     // apply OS-specific UI scale factor to stylesheet's em values
     int index = 0;
-    const static QRegularExpression regex( u"(?<=[\\s:])([0-9\\.]+)(?=em)"_s );
+    const thread_local QRegularExpression regex( u"(?<=[\\s:])([0-9\\.]+)(?=em)"_s );
     QRegularExpressionMatch match = regex.match( styledata, index );
     while ( match.hasMatch() )
     {
@@ -1310,11 +1310,11 @@ QString QgsApplication::srsDatabaseFilePath()
 {
   if ( ABISYM( mRunningFromBuildDir ) )
   {
-    QString tempCopy = QDir::tempPath() + "/srs6.db";
+    QString tempCopy = QDir::tempPath() + "/srs.db";
 
     if ( !QFile( tempCopy ).exists() )
     {
-      QFile f( buildSourcePath() + "/resources/srs6.db" );
+      QFile f( buildSourcePath() + "/resources/srs.db" );
       if ( !f.copy( tempCopy ) )
       {
         qFatal( "Could not create temporary copy" );

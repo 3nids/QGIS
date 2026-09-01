@@ -18,6 +18,7 @@
 
 #include "qgis.h"
 #include "qgsabstractgeometry.h"
+#include "qgscurvepolygon.h"
 #include "qgsfeatureiterator.h"
 #include "qgsgeometryoptions.h"
 #include "qgslinestring.h"
@@ -113,28 +114,32 @@ bool QgsVectorLayerEditUtils::moveVertex( const QgsPoint &p, QgsFeatureId atFeat
 
 Qgis::VectorEditResult QgsVectorLayerEditUtils::deleteVertex( QgsFeatureId featureId, int vertex )
 {
+  return deleteVertices( featureId, { vertex } );
+}
+
+Qgis::VectorEditResult QgsVectorLayerEditUtils::deleteVertices( QgsFeatureId featureId, const QSet<int> &vertices )
+{
   if ( !mLayer->isSpatial() )
     return Qgis::VectorEditResult::InvalidLayer;
 
   QgsFeature f;
   if ( !mLayer->getFeatures( QgsFeatureRequest().setFilterFid( featureId ).setNoAttributes() ).nextFeature( f ) || !f.hasGeometry() )
-    return Qgis::VectorEditResult::FetchFeatureFailed; // geometry not found
+    return Qgis::VectorEditResult::FetchFeatureFailed;
 
   QgsGeometry geometry = f.geometry();
 
-  if ( !geometry.deleteVertex( vertex ) )
+  if ( !geometry.deleteVertices( vertices ) )
     return Qgis::VectorEditResult::EditFailed;
 
   if ( geometry.constGet() && geometry.constGet()->nCoordinates() == 0 )
   {
-    //last vertex deleted, set geometry to null
+    // Last vertex deleted, set geometry to null
     geometry.set( nullptr );
   }
 
   mLayer->changeGeometry( featureId, geometry );
   return !geometry.isNull() ? Qgis::VectorEditResult::Success : Qgis::VectorEditResult::EmptyGeometry;
 }
-
 
 static Qgis::GeometryOperationResult staticAddRing( QgsVectorLayer *layer, std::unique_ptr< QgsCurve > &ring, const QgsFeatureIds &targetFeatureIds, QgsFeatureIds *modifiedFeatureIds, bool firstOne = true )
 {
@@ -383,6 +388,8 @@ Qgis::GeometryOperationResult QgsVectorLayerEditUtils::addPart( const QgsPointSe
 
 Qgis::GeometryOperationResult QgsVectorLayerEditUtils::addPart( QgsCurve *ring, QgsFeatureId featureId )
 {
+  std::unique_ptr<QgsCurve> uniquePtrRing( ring );
+
   if ( !mLayer->isSpatial() )
     return Qgis::GeometryOperationResult::AddPartSelectedGeometryNotFound;
 
@@ -400,12 +407,62 @@ Qgis::GeometryOperationResult QgsVectorLayerEditUtils::addPart( QgsCurve *ring, 
   else
   {
     geometry = f.geometry();
-    if ( mLayer->geometryType() == Qgis::GeometryType::Polygon && ring->orientation() != geometry.polygonOrientation() )
+    if ( mLayer->geometryType() == Qgis::GeometryType::Polygon && uniquePtrRing->orientation() != geometry.polygonOrientation() )
     {
-      ring = ring->reversed();
+      uniquePtrRing.reset( uniquePtrRing->reversed() );
     }
   }
-  Qgis::GeometryOperationResult errorCode = geometry.addPartV2( ring, mLayer->wkbType() );
+  Qgis::GeometryOperationResult errorCode = geometry.addPartV2( uniquePtrRing.release(), mLayer->wkbType() );
+
+  if ( errorCode == Qgis::GeometryOperationResult::Success )
+  {
+    if ( firstPart && QgsWkbTypes::isSingleType( mLayer->wkbType() ) && mLayer->dataProvider()->doesStrictFeatureTypeCheck() )
+    {
+      //convert back to single part if required by layer
+      geometry.convertToSingleType();
+    }
+    mLayer->changeGeometry( featureId, geometry );
+  }
+  return errorCode;
+}
+
+Qgis::GeometryOperationResult QgsVectorLayerEditUtils::addPart( QgsCurvePolygon *polygon, QgsFeatureId featureId )
+{
+  std::unique_ptr<QgsCurvePolygon> uniquePtrPoly( polygon );
+
+  if ( !mLayer->isSpatial() )
+    return Qgis::GeometryOperationResult::AddPartSelectedGeometryNotFound;
+
+  if ( mLayer->geometryType() != Qgis::GeometryType::Polygon )
+    return Qgis::GeometryOperationResult::InvalidInputGeometryType;
+
+  QgsGeometry geometry;
+  bool firstPart = false;
+  QgsFeature f;
+  if ( !mLayer->getFeatures( QgsFeatureRequest().setFilterFid( featureId ).setNoAttributes() ).nextFeature( f ) )
+    return Qgis::GeometryOperationResult::AddPartSelectedGeometryNotFound;
+
+  if ( !f.hasGeometry() )
+  {
+    //no existing geometry, so adding first part to null geometry
+    firstPart = true;
+  }
+  else
+  {
+    geometry = f.geometry();
+    switch ( geometry.polygonOrientation() )
+    {
+      case Qgis::AngularDirection::Clockwise:
+        polygon->forceClockwise();
+        break;
+      case Qgis::AngularDirection::CounterClockwise:
+        polygon->forceCounterClockwise();
+        break;
+      case Qgis::AngularDirection::NoOrientation:
+        break;
+    }
+  }
+  Qgis::GeometryOperationResult errorCode = geometry.addPartV2( uniquePtrPoly.release(), mLayer->wkbType() );
 
   if ( errorCode == Qgis::GeometryOperationResult::Success )
   {

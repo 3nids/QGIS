@@ -290,12 +290,17 @@ set(QGIS_CORE_SRCS
   processing/qgsprocessingparameteraggregate.cpp
   processing/qgsprocessingparameterdxflayers.cpp
   processing/qgsprocessingparameterfieldmap.cpp
+  processing/qgsprocessingparameterheatmappixelsize.cpp
+  processing/qgsprocessingparameterinterpolationpixelsize.cpp
+  processing/qgsprocessingparameterinterpolationsource.cpp
   processing/qgsprocessingparametermeshdataset.cpp
   processing/qgsprocessingparameters.cpp
+  processing/qgsprocessingparameterreliefcolors.cpp
   processing/qgsprocessingparametertininputlayers.cpp
   processing/qgsprocessingparametertype.cpp
   processing/qgsprocessingparametervectortilewriterlayers.cpp
   processing/qgsprocessingparameteralignrasterlayers.cpp
+  processing/qgsprocessingprojectmodelprovider.cpp
   processing/qgsprocessingprovider.cpp
   processing/qgsprocessingregistry.cpp
   processing/qgsprocessingutils.cpp
@@ -435,6 +440,7 @@ set(QGIS_CORE_SRCS
   qgis.cpp
   qgsabstractcontentcache.cpp
   qgsabstractgeopdfexporter.cpp
+  qgsacademicreference.cpp
   qgsapplication.cpp
   qgsapplicationthemeregistry.cpp
   qgsaggregatecalculator.cpp
@@ -971,6 +977,7 @@ set(QGIS_CORE_SRCS
   geometry/qgsrectangle.cpp
   geometry/qgsreferencedgeometry.cpp
   geometry/qgsregularpolygon.cpp
+  geometry/qgssimplecurve.cpp
   geometry/qgssphere.cpp
   geometry/qgssurface.cpp
   geometry/qgstriangle.cpp
@@ -993,6 +1000,7 @@ set(QGIS_CORE_SRCS
   3d/materials/qgsphongmaterialsettings.cpp
   3d/materials/qgsphongtexturedmaterialsettings.cpp
   3d/materials/qgssimplelinematerialsettings.cpp
+  3d/materials/qgsunlitmaterialsettings.cpp
 
   fieldformatter/qgscheckboxfieldformatter.cpp
   fieldformatter/qgsrangefieldformatter.cpp
@@ -1166,6 +1174,7 @@ set(QGIS_CORE_HDRS
   qgis_sip.h
   qgsabstractcontentcache.h
   qgsabstractgeopdfexporter.h
+  qgsacademicreference.h
   qgsaggregatecalculator.h
   qgsalignrasterdata.h
   qgsanimatedicon.h
@@ -1265,6 +1274,7 @@ set(QGIS_CORE_HDRS
   qgsinterval.h
   qgsjsonutils.h
   qgslayerdefinition.h
+  qgslayerrenderingsettings.h
   qgslayernotesutils.h
   qgslegendrenderer.h
   qgslegendsettings.h
@@ -1433,6 +1443,7 @@ set(QGIS_CORE_HDRS
   3d/materials/qgsphongmaterialsettings.h
   3d/materials/qgsphongtexturedmaterialsettings.h
   3d/materials/qgssimplelinematerialsettings.h
+  3d/materials/qgsunlitmaterialsettings.h
 
   actions/qgsaction.h
   actions/qgsactionmanager.h
@@ -1604,6 +1615,7 @@ set(QGIS_CORE_HDRS
   geometry/qgsrectangle.h
   geometry/qgsreferencedgeometry.h
   geometry/qgsregularpolygon.h
+  geometry/qgssimplecurve.h
   geometry/qgssphere.h
   geometry/qgssurface.h
   geometry/qgstriangle.h
@@ -1908,13 +1920,18 @@ set(QGIS_CORE_HDRS
   processing/qgsprocessingparameteraggregate.h
   processing/qgsprocessingparameterdxflayers.h
   processing/qgsprocessingparameterfieldmap.h
+  processing/qgsprocessingparameterheatmappixelsize.h
+  processing/qgsprocessingparameterinterpolationpixelsize.h
+  processing/qgsprocessingparameterinterpolationsource.h
   processing/qgsprocessingparametermeshdataset.h
+  processing/qgsprocessingparameterreliefcolors.h
   processing/qgsprocessingparameters.h
   processing/qgsprocessingparametertininputlayers.h
   processing/qgsprocessingparametertype.h
   processing/qgsprocessingparametertypeimpl.h
   processing/qgsprocessingparametervectortilewriterlayers.h
   processing/qgsprocessingparameteralignrasterlayers.h
+  processing/qgsprocessingprojectmodelprovider.h
   processing/qgsprocessingprovider.h
   processing/qgsprocessingregistry.h
   processing/qgsprocessingutils.h
@@ -2305,7 +2322,6 @@ set(QGIS_CORE_PRIVATE_HDRS
   proj/qgscoordinatereferencesystem_p.h
   proj/qgscoordinatetransformcontext_p.h
   proj/qgscoordinatetransform_p.h
-  proj/qgscoordinatereferencesystem_legacy_p.h
 
   providers/ogr/qgscplerrorhandler_p.h
 
@@ -2340,7 +2356,9 @@ if(MSVC)
       expression/qgsexpressionfunction.cpp
       proj/qgscoordinatereferencesystem.cpp
       textrenderer/qgsfontmanager.cpp
+      vector/qgsvectorlayer.cpp
       qgsapplication.cpp
+      qgis.cpp
       PROPERTIES COMPILE_FLAGS "/bigobj"
   )
 elseif(EMSCRIPTEN)
@@ -2358,8 +2376,15 @@ elseif(EMSCRIPTEN)
     SKIP_PRECOMPILE_HEADERS ON
   )
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND (CMAKE_BUILD_TYPE MATCHES Release OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo))
-  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/qgsexpression_texts.cpp PROPERTIES COMPILE_FLAGS "-O1")
+  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/qgsexpression_texts.cpp PROPERTIES
+    COMPILE_FLAGS "-O1"
+    SKIP_PRECOMPILE_HEADERS ON
+  )
   set_source_files_properties(proj/qgscoordinatereferencesystem.cpp PROPERTIES COMPILE_FLAGS "-mllvm -inline-threshold=128")
+  set_source_files_properties(textrenderer/qgsfontmanager.cpp PROPERTIES
+    COMPILE_FLAGS "-O0"
+    SKIP_PRECOMPILE_HEADERS ON
+  )
 endif()
 
 # Generate cpp+header file from .proto file using "protoc" tool (to support MVT encoding of vector tiles)
@@ -2872,6 +2897,10 @@ endif()
 
 if (WITH_DRACO)
   target_link_libraries(qgis_core ${DRACO_LIBRARY})
+endif()
+
+if (WITH_TRACY)
+  target_link_libraries(qgis_core Tracy::TracyClient)
 endif()
 
 if (WITH_SPATIALITE)

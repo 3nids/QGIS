@@ -283,12 +283,14 @@ class AlgorithmsTest:
                 return self.filepath_from_param(param)
             elif param["type"] == "interpolation":
                 prefix = processingTestDataPath()
-                tmp = ""
+                tmp = []
                 for r in param["name"].split("::|::"):
                     v = r.split("::~::")
-                    tmp += f"{os.path.join(prefix, v[0])}::~::{v[1]}::~::{v[2]}::~::{v[3]}::|::"
-                # trim final separator ::|::
-                return tmp[:-5]
+                    tmp.append(
+                        f"{os.path.join(prefix, v[0])}::~::{v[1]}::~::{v[2]}::~::{v[3]}"
+                    )
+                tmp = "::|::".join(tmp)
+                return tmp
             elif param["type"] == "property":
                 if param.get("expression"):
                     return QgsProperty.fromExpression(param["expression"])
@@ -570,13 +572,10 @@ class GenericAlgorithmsTest(QgisTestCase):
                 "qgis:advancedpythonfieldcalculator",
                 "qgis:barplot",
                 "qgis:boxplot",
-                "qgis:distancematrix",
                 "qgis:distancetonearesthublinetohub",
                 "qgis:distancetonearesthubpoints",
                 "qgis:eliminateselectedpolygons",
-                "qgis:executesql",
                 "qgis:generatepointspixelcentroidsalongline",
-                "qgis:idwinterpolation",
                 "qgis:knearestconcavehull",
                 "qgis:meanandstandarddeviationplot",
                 "qgis:pointsdisplacement",
@@ -595,7 +594,6 @@ class GenericAlgorithmsTest(QgisTestCase):
                 "qgis:setstyleforrasterlayer",
                 "qgis:setstyleforvectorlayer",
                 "qgis:texttofloat",
-                "qgis:tininterpolation",
                 "qgis:variabledistancebuffer",
                 "qgis:vectorlayerhistogram",
                 "qgis:vectorlayerscatterplot",
@@ -633,11 +631,9 @@ class GenericAlgorithmsTest(QgisTestCase):
                 "pdal:tile",
                 "pdal:virtualpointcloud",
                 "qgis:advancedpythonfieldcalculator",
-                "qgis:distancematrix",
                 "qgis:distancetonearesthublinetohub",
                 "qgis:distancetonearesthubpoints",
                 "qgis:eliminateselectedpolygons",
-                "qgis:executesql",
                 "qgis:generatepointspixelcentroidsalongline",
                 "qgis:linestopolygons",
                 "qgis:pointsdisplacement",

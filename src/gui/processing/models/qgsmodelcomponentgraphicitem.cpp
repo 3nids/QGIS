@@ -17,6 +17,7 @@
 
 #include "qgsapplication.h"
 #include "qgsmessagelog.h"
+#include "qgsmodelchildalgorithmwidgets.h"
 #include "qgsmodelgraphicitem.h"
 #include "qgsmodelgraphicsscene.h"
 #include "qgsmodelgraphicsview.h"
@@ -30,6 +31,7 @@
 #include "qgsprocessingmodeloutput.h"
 #include "qgsprocessingmodelparameter.h"
 #include "qgsprocessingparameters.h"
+#include "qgsprocessingwidgetwrapper.h"
 
 #include <QApplication>
 #include <QGraphicsSceneHoverEvent>
@@ -854,6 +856,20 @@ QList<QgsModelArrowItem *> QgsModelComponentGraphicItem::outgoingArrows()
   return arrows;
 }
 
+void QgsModelComponentGraphicItem::registerWidgetContextGenerator( QgsProcessingWidgetContextGenerator *generator )
+{
+  mWidgetContextGenerator = generator;
+}
+
+QgsProcessingParameterWidgetContext QgsModelComponentGraphicItem::createWidgetContext()
+{
+  if ( mWidgetContextGenerator )
+  {
+    return mWidgetContextGenerator->createWidgetContext();
+  }
+  return QgsProcessingParameterWidgetContext();
+}
+
 QgsModelParameterGraphicItem::QgsModelParameterGraphicItem( QgsProcessingModelParameter *parameter, QgsProcessingModelAlgorithm *model, QGraphicsItem *parent )
   : QgsModelComponentGraphicItem( parameter, model, parent )
 {
@@ -1357,7 +1373,9 @@ QString QgsModelChildAlgorithmGraphicItem::linkPointText( Qt::Edge edge, int ind
               break;
 
             case Qgis::ProcessingModelChildParameterSource::ExpressionText:
+              Q_NOWARN_DEPRECATED_PUSH
               parameterValueAsString = u": %1"_s.arg( firstParameterSource.expressionText() );
+              Q_NOWARN_DEPRECATED_POP
               break;
 
             case Qgis::ProcessingModelChildParameterSource::ModelOutput:
@@ -1537,6 +1555,38 @@ int QgsModelChildAlgorithmGraphicItem::indexForOutput( const QString &output ) c
   return -1;
 }
 
+void QgsModelChildAlgorithmGraphicItem::editComponent()
+{
+  edit( false );
+}
+
+void QgsModelChildAlgorithmGraphicItem::editComment()
+{
+  edit( true );
+}
+
+void QgsModelChildAlgorithmGraphicItem::applyEdit( const QgsProcessingModelChildAlgorithm &algorithm )
+{
+  const QgsProcessingModelChildAlgorithm *child = dynamic_cast< const QgsProcessingModelChildAlgorithm * >( component() );
+  if ( !child )
+    return;
+
+  QgsProcessingModelChildAlgorithm newAlgorithm = algorithm;
+  newAlgorithm.setChildId( child->childId() );
+  newAlgorithm.copyNonDefinitionPropertiesFromModel( model() );
+  if ( newAlgorithm.toVariant() == child->toVariant() )
+  {
+    // nothing changed, treat as cancel was pressed
+    return;
+  }
+
+  const QString undoCommandId = u"alg:%1"_s.arg( child->childId() );
+  emit aboutToChange( tr( "Edit %1" ).arg( newAlgorithm.description() ), undoCommandId );
+  model()->setChildAlgorithm( newAlgorithm );
+  emit requestModelRepaint();
+  emit changed();
+}
+
 void QgsModelChildAlgorithmGraphicItem::paintBackground( QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget )
 {
   if ( mProgress < 0 )
@@ -1651,6 +1701,38 @@ void QgsModelChildAlgorithmGraphicItem::activateAlgorithm()
           "Activate them them before trying to activate it.."
         )
       );
+    }
+  }
+}
+
+void QgsModelChildAlgorithmGraphicItem::edit( bool editComment )
+{
+  const QgsProcessingModelChildAlgorithm *child = dynamic_cast< const QgsProcessingModelChildAlgorithm * >( component() );
+  if ( !child )
+    return;
+
+  QgsProcessingParameterWidgetContext widgetContext = createWidgetContext();
+  widgetContext.setModelChildAlgorithmId( child->childId() );
+  QgsProcessingContext *context = widgetContext.processingContextGenerator()->processingContext();
+
+  const QgsProcessingAlgorithm *algorithm = child->algorithm();
+  QgsProcessingModelerParametersDialog dlg( algorithm, model(), *context, child->childId(), child->configuration(), this->scene()->views().at( 0 ) );
+  dlg.setModal( true );
+  dlg.setComments( child->comment()->description() );
+  dlg.setCommentColor( child->comment()->color() );
+  dlg.setWidgetContext( widgetContext );
+  if ( editComment )
+  {
+    dlg.switchToCommentTab();
+  }
+
+  if ( dlg.exec() )
+  {
+    std::unique_ptr< QgsProcessingModelChildAlgorithm > alg = dlg.createAlgorithm();
+    if ( alg )
+    {
+      applyEdit( *alg );
+      emit rebuildConfigurationDockWidget();
     }
   }
 }
@@ -1833,9 +1915,22 @@ bool QgsModelGroupBoxGraphicItem::canDeleteComponent()
 
 void QgsModelGroupBoxGraphicItem::applyEdit( const QgsProcessingModelGroupBox &groupBox )
 {
-  const QString commandId = u"groupbox:%1"_s.arg( groupBox.uuid() );
+  QgsProcessingModelGroupBox newGroupBox = groupBox;
+  const QList<QgsProcessingModelGroupBox> existingGroupBoxes = model()->groupBoxes();
+  for ( const QgsProcessingModelGroupBox &existingGroupBox : existingGroupBoxes )
+  {
+    if ( existingGroupBox.uuid() == newGroupBox.uuid() )
+    {
+      // copy position and size from existing group box
+      newGroupBox.setPosition( existingGroupBox.position() );
+      newGroupBox.setSize( existingGroupBox.size() );
+    }
+  }
+
+  const QString commandId = u"groupbox:%1"_s.arg( newGroupBox.uuid() );
   emit aboutToChange( tr( "Edit Group Box" ), commandId );
-  model()->addGroupBox( groupBox );
+
+  model()->addGroupBox( newGroupBox );
   emit changed();
   emit requestModelRepaint();
 }

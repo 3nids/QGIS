@@ -1,6 +1,7 @@
 // Include auto-generated SIP files
 %Include auto_generated/qgis.sip
 %Include auto_generated/qgsabstractcontentcache.sip
+%Include auto_generated/qgsacademicreference.sip
 %Include auto_generated/qgsaggregatecalculator.sip
 %Include auto_generated/qgsalignrasterdata.sip
 %Include auto_generated/qgsanimatedicon.sip
@@ -92,6 +93,7 @@
 %Include auto_generated/qgsinterval.sip
 %Include auto_generated/qgsjsonutils.sip
 %Include auto_generated/qgslayerdefinition.sip
+%Include auto_generated/qgslayerrenderingsettings.sip
 %Include auto_generated/qgslayernotesutils.sip
 %Include auto_generated/qgslegendrenderer.sip
 %Include auto_generated/qgslegendsettings.sip
@@ -240,6 +242,7 @@
 %Include auto_generated/./3d/materials/qgsphongmaterialsettings.sip
 %Include auto_generated/./3d/materials/qgsphongtexturedmaterialsettings.sip
 %Include auto_generated/./3d/materials/qgssimplelinematerialsettings.sip
+%Include auto_generated/./3d/materials/qgsunlitmaterialsettings.sip
 %Include auto_generated/actions/qgsaction.sip
 %Include auto_generated/actions/qgsactionmanager.sip
 %Include auto_generated/actions/qgsactionscope.sip
@@ -384,6 +387,7 @@
 %Include auto_generated/geometry/qgsrectangle.sip
 %Include auto_generated/geometry/qgsreferencedgeometry.sip
 %Include auto_generated/geometry/qgsregularpolygon.sip
+%Include auto_generated/geometry/qgssimplecurve.sip
 %Include auto_generated/geometry/qgssphere.sip
 %Include auto_generated/geometry/qgssurface.sip
 %Include auto_generated/geometry/qgstriangle.sip
@@ -617,12 +621,17 @@
 %Include auto_generated/processing/qgsprocessingparameteraggregate.sip
 %Include auto_generated/processing/qgsprocessingparameterdxflayers.sip
 %Include auto_generated/processing/qgsprocessingparameterfieldmap.sip
+%Include auto_generated/processing/qgsprocessingparameterheatmappixelsize.sip
+%Include auto_generated/processing/qgsprocessingparameterinterpolationpixelsize.sip
+%Include auto_generated/processing/qgsprocessingparameterinterpolationsource.sip
 %Include auto_generated/processing/qgsprocessingparametermeshdataset.sip
+%Include auto_generated/processing/qgsprocessingparameterreliefcolors.sip
 %Include auto_generated/processing/qgsprocessingparameters.sip
 %Include auto_generated/processing/qgsprocessingparametertininputlayers.sip
 %Include auto_generated/processing/qgsprocessingparametertype.sip
 %Include auto_generated/processing/qgsprocessingparametervectortilewriterlayers.sip
 %Include auto_generated/processing/qgsprocessingparameteralignrasterlayers.sip
+%Include auto_generated/processing/qgsprocessingprojectmodelprovider.sip
 %Include auto_generated/processing/qgsprocessingprovider.sip
 %Include auto_generated/processing/qgsprocessingregistry.sip
 %Include auto_generated/processing/qgsprocessingutils.sip

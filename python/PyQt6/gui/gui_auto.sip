@@ -92,6 +92,7 @@
 %Include auto_generated/qgsfloatingwidget.sip
 %Include auto_generated/qgsfocuswatcher.sip
 %Include auto_generated/qgsfontbutton.sip
+%Include auto_generated/qgsfontcombobox.sip
 %Include auto_generated/qgsformannotation.sip
 %Include auto_generated/qgsgeocoderlocatorfilter.sip
 %Include auto_generated/qgsgeometryrubberband.sip
@@ -453,6 +454,7 @@
 %Include auto_generated/processing/qgsprocessingrecentalgorithmlog.sip
 %Include auto_generated/processing/qgsprocessingtoolboxmodel.sip
 %Include auto_generated/processing/qgsprocessingtoolboxtreeview.sip
+%Include auto_generated/processing/qgsprocessingwidgetcontext.sip
 %Include auto_generated/processing/qgsprocessingwidgetwrapper.sip
 %Include auto_generated/processing/models/qgsmodelarrowitem.sip
 %Include auto_generated/processing/models/qgsmodelcomponentgraphicitem.sip

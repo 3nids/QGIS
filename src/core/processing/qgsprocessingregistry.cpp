@@ -21,7 +21,11 @@
 #include "qgsprocessingparameteralignrasterlayers.h"
 #include "qgsprocessingparameterdxflayers.h"
 #include "qgsprocessingparameterfieldmap.h"
+#include "qgsprocessingparameterheatmappixelsize.h"
+#include "qgsprocessingparameterinterpolationpixelsize.h"
+#include "qgsprocessingparameterinterpolationsource.h"
 #include "qgsprocessingparametermeshdataset.h"
+#include "qgsprocessingparameterreliefcolors.h"
 #include "qgsprocessingparametertininputlayers.h"
 #include "qgsprocessingparametertypeimpl.h"
 #include "qgsprocessingparametervectortilewriterlayers.h"
@@ -89,6 +93,10 @@ QgsProcessingRegistry::QgsProcessingRegistry( QObject *parent SIP_TRANSFERTHIS )
   addParameterType( new QgsProcessingParameterTypePointCloudAttribute() );
   addParameterType( new QgsProcessingParameterTypeVectorTileDestination() );
   addParameterType( new QgsProcessingParameterTypeAlignRasterLayers() );
+  addParameterType( new QgsProcessingParameterTypeHeatmapPixelSize() );
+  addParameterType( new QgsProcessingParameterTypeReliefColors() );
+  addParameterType( new QgsProcessingParameterTypeInterpolationSource() );
+  addParameterType( new QgsProcessingParameterTypeInterpolationPixelSize() );
 }
 
 QgsProcessingRegistry::~QgsProcessingRegistry()

@@ -77,6 +77,11 @@ QgsPluginManagerInterface *QgisAppInterface::pluginManagerInterface()
   return &pluginManagerIface;
 }
 
+void QgisAppInterface::showPluginManager( int tabIndex, const QString &searchTerm )
+{
+  qgis->showPluginManager( tabIndex, searchTerm );
+}
+
 QgsLayerTreeView *QgisAppInterface::layerTreeView()
 {
   return qgis->layerTreeView();
@@ -413,7 +418,7 @@ void QgisAppInterface::closeMapCanvas3D( const QString &name )
 
 QSize QgisAppInterface::iconSize( bool dockedToolbar ) const
 {
-  return qgis->iconSize( dockedToolbar );
+  return QgsGui::iconSize( dockedToolbar ? Qgis::UserInterfaceIconType::DockedToolbar : Qgis::UserInterfaceIconType::MainWindowToolbar );
 }
 
 QgsLayerTreeMapCanvasBridge *QgisAppInterface::layerTreeCanvasBridge()

@@ -35,6 +35,7 @@
 #include "qgspanelwidget.h"
 #include "qgsprocessingalgorithm.h"
 #include "qgsprocessingalgorithmwidgetbase.h"
+#include "qgsprocessingguiregistry.h"
 #include "qgsprocessinghelpeditorwidget.h"
 #include "qgsprocessingmodelalgorithm.h"
 #include "qgsprocessingmodelfeedback.h"
@@ -57,6 +58,7 @@
 #include <QString>
 #include <QSvgGenerator>
 #include <QTextStream>
+#include <QTimer>
 #include <QToolButton>
 #include <QUndoView>
 #include <QUrl>
@@ -335,7 +337,7 @@ QgsModelDesignerDialog::QgsModelDesignerDialog( QWidget *parent, Qt::WindowFlags
 
   // We use a QObjectUniquePtr here because we want to delete QgsModelViewToolSelect
   // mouse handles before everything else and don't want to wait for QObject destructor to destroy it
-  mSelectTool.reset( new QgsModelViewToolSelect( mView ) );
+  mSelectTool = make_qobject_unique<QgsModelViewToolSelect>( mView );
   mSelectTool->setAction( mActionSelectMoveItem );
 
   mToolsActionGroup->addAction( mActionSelectMoveItem );
@@ -491,7 +493,7 @@ void QgsModelDesignerDialog::setModel( QgsProcessingModelAlgorithm *model )
 
   // Delay zoom to the full model to ensure the scene has been properly set
   // and that the itemsBoundingRect returns the correct value.
-  QMetaObject::invokeMethod( this, &QgsModelDesignerDialog::zoomFull, Qt::QueuedConnection );
+  QTimer::singleShot( 100, this, [this] { zoomFull(); } );
 }
 
 void QgsModelDesignerDialog::loadModel( const QString &path )
@@ -526,6 +528,7 @@ void QgsModelDesignerDialog::setModelScene( QgsModelGraphicsScene *scene )
   mScene->setLastRunResult( mLastResult, mLayerStore );
   mScene->setModel( mModel.get() );
   mScene->setMessageBar( mMessageBar );
+  mScene->registerWidgetContextGenerator( this );
 
   QgsSettings settings;
   const bool showFeatureCount = settings.value( u"/Processing/Modeler/ShowFeatureCount"_s, true ).toBool();
@@ -567,7 +570,17 @@ QgsProcessingFeedback *QgsModelDesignerDialog::createFeedback()
   connect( result.get(), &QgsProcessingModelFeedback::childResultReported, this, [this]( const QString &childId, const QgsProcessingModelChildAlgorithmResult & ) {
     mOutdatedChildResults.remove( childId );
   } );
+
   return result.release();
+}
+
+QgsProcessingParameterWidgetContext QgsModelDesignerDialog::createWidgetContext()
+{
+  QgsProcessingParameterWidgetContext context = QgsGui::processingGuiRegistry()->createWidgetContext();
+  context.setModel( model() );
+  context.setModelDesignerDialog( this );
+  context.registerProcessingContextGenerator( this );
+  return context;
 }
 
 void QgsModelDesignerDialog::activate()
@@ -581,6 +594,15 @@ void QgsModelDesignerDialog::activate()
 void QgsModelDesignerDialog::registerProcessingContextGenerator( QgsProcessingContextGenerator *generator )
 {
   mProcessingContextGenerator = generator;
+}
+
+QgsProcessingContext *QgsModelDesignerDialog::processingContext() const
+{
+  if ( mProcessingContextGenerator )
+  {
+    return mProcessingContextGenerator->processingContext();
+  }
+  return nullptr;
 }
 
 void QgsModelDesignerDialog::updateVariablesGui()
@@ -1576,9 +1598,14 @@ QgsModelChildDependenciesWidget::QgsModelChildDependenciesWidget( QWidget *paren
 
 void QgsModelChildDependenciesWidget::setValue( const QList<QgsProcessingModelChildDependency> &value )
 {
+  const bool hasChanged = value != mValue;
   mValue = value;
 
   updateSummaryText();
+  if ( hasChanged )
+  {
+    emit changed();
+  }
 }
 
 void QgsModelChildDependenciesWidget::showDialog()

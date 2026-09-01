@@ -26,6 +26,7 @@ from qgis.core import (
     QgsCompoundCurve,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsCoverageCleanParameters,
     QgsCurvePolygon,
     QgsFeature,
     QgsGeometry,
@@ -11112,6 +11113,13 @@ class TestQgsGeometry(QgisTestCase):
             f"Extend multiline: bbox Expected:\n{expbb.toString()}\nGot:\n{bb.toString()}\n",
         )
 
+        # with deflection angle
+        line = QgsGeometry(QgsLineString([QgsPoint(0, 0), QgsPoint(10, 0)]))
+        res = line.extendLine(5.0, 10.0, -10.0, 45.0)
+        self.assertEqual(
+            res.asWkt(5), "LineString (-4.92404 -0.86824, 0 0, 10 0, 17.07107 -7.07107)"
+        )
+
     def testRemoveRings(self):
         empty = QgsGeometry()
         self.assertFalse(empty.removeInteriorRings())
@@ -12760,13 +12768,14 @@ class TestQgsGeometry(QgisTestCase):
 
     def testValidateGeometry(self):
         tests = [
-            ["", [], [], []],
-            ["Point (100 100)", [], [], []],
-            ["MultiPoint (100 100, 100 200)", [], [], []],
-            ["LINESTRING (0 0, 0 100, 100 100)", [], [], []],
-            ["POLYGON((-1 -1, 4 0, 4 2, 0 2, -1 -1))", [], [], []],
+            ["", [], [], [], []],
+            ["Point (100 100)", [], [], [], []],
+            ["MultiPoint (100 100, 100 200)", [], [], [], []],
+            ["LINESTRING (0 0, 0 100, 100 100)", [], [], [], []],
+            ["POLYGON((-1 -1, 4 0, 4 2, 0 2, -1 -1))", [], [], [], []],
             [
                 "MULTIPOLYGON(Polygon((-1 -1, 4 0, 4 2, 0 2, -1 -1)),Polygon((100 100, 200 100, 200 200, 100 200, 100 100)))",
+                [],
                 [],
                 [],
                 [],
@@ -12776,6 +12785,7 @@ class TestQgsGeometry(QgisTestCase):
                 [QgsGeometry.Error("Ring self-intersection", QgsPointXY(300, 200))],
                 [],
                 [],
+                [QgsGeometry.Error("ring 0 self intersects")],
             ],
             [
                 "MultiPolygon (((159865.14786298031685874 6768656.31838363595306873, 159858.97975336571107619 6769211.44824895076453686, 160486.07089751763851382 6769211.44824895076453686, 160481.95882444124436006 6768658.37442017439752817, 160163.27316101978067309 6768658.37442017439752817, 160222.89822062765597366 6769116.87056819349527359, 160132.43261294672265649 6769120.98264127038419247, 160163.27316101978067309 6768658.37442017439752817, 159865.14786298031685874 6768656.31838363595306873)))",
@@ -12787,6 +12797,7 @@ class TestQgsGeometry(QgisTestCase):
                 ],
                 [],
                 [],
+                [QgsGeometry.Error("Polygon 0 is invalid: ring 0 self intersects")],
             ],
             [
                 "Polygon((0 3, 3 0, 3 3, 0 0, 0 3))",
@@ -12798,9 +12809,18 @@ class TestQgsGeometry(QgisTestCase):
                         QgsPointXY(1.5, 1.5),
                     )
                 ],
+                [QgsGeometry.Error("ring 0 self intersects")],
+            ],
+            [
+                "POLYGON Z ((0 0 0, 1 0 0, 1 1 0.001, 0 1 0, 0 0 0))",
+                [],
+                [],
+                [],
+                [QgsGeometry.Error("points don't lie in the same plane")],
             ],
         ]
         for t in tests:
+            # Geos
             g1 = QgsGeometry.fromWkt(t[0])
             res = g1.validateGeometry(QgsGeometry.ValidationMethod.ValidatorGeos)
             self.assertEqual(
@@ -12810,6 +12830,8 @@ class TestQgsGeometry(QgisTestCase):
                     t[0], t[1], res[0].where() if res else ""
                 ),
             )
+
+            # Geos - allows self touching holes
             res = g1.validateGeometry(
                 QgsGeometry.ValidationMethod.ValidatorGeos,
                 QgsGeometry.ValidityFlag.FlagAllowSelfTouchingHoles,
@@ -12821,6 +12843,8 @@ class TestQgsGeometry(QgisTestCase):
                     t[0], t[2], res[0].where() if res else ""
                 ),
             )
+
+            # QGIS
             res = g1.validateGeometry(
                 QgsGeometry.ValidationMethod.ValidatorQgisInternal
             )
@@ -12831,6 +12855,17 @@ class TestQgsGeometry(QgisTestCase):
                     t[0], t[3], res[0].where() if res else ""
                 ),
             )
+
+            # SFCGAL
+            if Qgis.hasSfcgal():
+                res = g1.validateGeometry(QgsGeometry.ValidationMethod.Sfcgal)
+                self.assertEqual(
+                    res,
+                    t[4],
+                    "mismatch for {}, expected:\n{}\nGot:\n{}\n".format(
+                        t[0], t[4], res[0].where() if res else ""
+                    ),
+                )
 
     def testCollectDuplicateNodes(self):
         g = QgsGeometry.fromWkt(
@@ -14982,6 +15017,61 @@ class TestQgsGeometry(QgisTestCase):
         self.assertEqual(
             res.asWkt(0),
             "GeometryCollection (Polygon ((10 0, 10 10, 0 10, 0 0, 10 0)),Polygon ((10 0, 20 0, 20 10, 10 10, 10 0)))",
+        )
+
+    @unittest.skipIf(Qgis.geosVersionInt() < 31400, "GEOS 3.14 required")
+    def testCoverageClean(self):
+        """
+        Test QgsGeometry.cleanCoverage
+        """
+        g1 = QgsGeometry()
+        params = QgsCoverageCleanParameters()
+        params.setSnappingDistance(0)
+        params.setMaximumGapWidth(0)
+        params.setOverlapMergeStrategy(
+            Qgis.CoverageCleanOverlapMergeStrategy.LongestBorder
+        )
+
+        res = g1.cleanCoverage(params)
+        self.assertTrue(res.isNull())
+
+        g1 = QgsGeometry.fromWkt("Point(1 2)")
+        res = g1.cleanCoverage(params)
+        self.assertTrue(res.isNull())
+
+        # overlap
+        g1 = QgsGeometry.fromWkt(
+            "GeometryCollection (Polygon ((0, 10, 10 10, 10 0, 0 0, 0 10)), Polygon ((9 10, 19 10, 19 0, 9 0, 9 10)))"
+        )
+        res = g1.cleanCoverage(params)
+        res.normalize()
+        self.assertEqual(
+            res.asWkt(0),
+            "GeometryCollection (Polygon ((0 0, 0 10, 9 10, 10 10, 10 0, 9 0, 0 0)),Polygon ((10 0, 10 10, 19 10, 19 0, 10 0)))",
+        )
+
+        # close gap
+        params.setMaximumGapWidth(1)
+        g1 = QgsGeometry.fromWkt(
+            "GeometryCollection (Polygon ((0 11, 10 11, 10 -1, 0 -1, 0 11)), Polygon ((10 10, 10 13, 20 13, 20 -2, 10 -2, 10 0, 10.5 1, 10.5 8.5, 10 10)))"
+        )
+        res = g1.cleanCoverage(params)
+        res.normalize()
+        self.assertEqual(
+            res.asWkt(0),
+            "GeometryCollection (Polygon ((10 -2, 10 -1, 10 0, 10 10, 10 11, 10 13, 20 13, 20 -2, 10 -2)),Polygon ((0 -1, 0 11, 10 11, 10 10, 10 0, 10 -1, 0 -1)))",
+        )
+
+        # GEOS test case
+        params.setMaximumGapWidth(2)
+        g1 = QgsGeometry.fromWkt(
+            "GEOMETRYCOLLECTION (POLYGON ((1 3, 9 3, 9 1, 1 1, 1 3)), POLYGON ((1 3, 1 9, 4 9, 4 3, 3 4, 1 3)), POLYGON ((4 9, 7 9, 7 3, 6 5, 5 5, 4 3, 4 9)), POLYGON ((7 9, 9 9, 9 3, 8 3.1, 7 3, 7 9)))"
+        )
+        res = g1.cleanCoverage(params)
+        res.normalize()
+        self.assertEqual(
+            res.asWkt(1),
+            "GeometryCollection (Polygon ((1 1, 1 3, 4 3, 7 3, 9 3, 9 1, 1 1)),Polygon ((7 3, 7 9, 9 9, 9 3, 7 3)),Polygon ((4 3, 4 9, 7 9, 7 3, 4 3)),Polygon ((1 3, 1 9, 4 9, 4 3, 1 3)))",
         )
 
     def testPolygonOrientation(self):

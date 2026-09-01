@@ -1539,6 +1539,10 @@ class TestQgsExpression : public QObject
       QTest::newRow( "extend null" ) << "extend(NULL, 1, 2)" << false << QVariant();
       QTest::newRow( "extend point" ) << "extend(geom_from_wkt('POINT(1 2)'),1,2)" << false << QVariant();
       QTest::newRow( "extend line" ) << "geom_to_wkt(extend(geom_from_wkt('LineString(0 0, 1 0, 1 1)'),1,2))" << false << QVariant( "LineString (-1 0, 1 0, 1 3)" );
+      QTest::newRow( "extend line with deflection" )
+        << "geom_to_wkt(extend(geom_from_wkt('LineString(0 0, 1 0, 1 1)'),1,2, 45, -45), 3)"
+        << false
+        << QVariant( "LineString (-0.707 0.707, 0 0, 1 0, 1 1, -0.414 2.414)" );
       QTest::newRow( "start_point point" ) << "geom_to_wkt(start_point(geom_from_wkt('POINT(2 0)')))" << false << QVariant( "Point (2 0)" );
       QTest::newRow( "start_point multipoint" ) << "geom_to_wkt(start_point(geom_from_wkt('MULTIPOINT((3 3), (1 1), (2 2))')))" << false << QVariant( "Point (3 3)" );
       QTest::newRow( "start_point line" ) << "geom_to_wkt(start_point(geom_from_wkt('LINESTRING(4 1, 1 1, 2 2)')))" << false << QVariant( "Point (4 1)" );
@@ -2254,8 +2258,12 @@ class TestQgsExpression : public QObject
       QTest::newRow( "right" ) << "right('Hello World', 5)" << false << QVariant( "World" );
       QTest::newRow( "rpad" ) << "rpad('Hello', 10, 'x')" << false << QVariant( "Helloxxxxx" );
       QTest::newRow( "rpad truncate" ) << "rpad('Hello', 4, 'x')" << false << QVariant( "Hell" );
+      QTest::newRow( "rpad no fill parameter" ) << "rpad('Hello', 10)" << false << QVariant( "Hello     " );
+      QTest::newRow( "rpad empty fill character" ) << "rpad('Hello', 10, '')" << false << QVariant( "Hello     " );
       QTest::newRow( "lpad" ) << "lpad('Hello', 10, 'x')" << false << QVariant( "xxxxxHello" );
       QTest::newRow( "lpad truncate" ) << "lpad('Hello', 4, 'x')" << false << QVariant( "Hell" );
+      QTest::newRow( "lpad no fill parameter" ) << "lpad('Hello', 10)" << false << QVariant( "     Hello" );
+      QTest::newRow( "lpad empty fill character" ) << "lpad('Hello', 10, '')" << false << QVariant( "     Hello" );
       QTest::newRow( "title" ) << "title(' HeLlO   WORLD ')" << false << QVariant( " Hello   World " );
       QTest::newRow( "trim" ) << "trim('   Test String ')" << false << QVariant( "Test String" );
       QTest::newRow( "trim empty string" ) << "trim('')" << false << QVariant( "" );
@@ -2289,6 +2297,8 @@ class TestQgsExpression : public QObject
       QTest::newRow( "concat" ) << "concat('a', 'b', 'c', 'd')" << false << QVariant( "abcd" );
       QTest::newRow( "concat function single" ) << "concat('a')" << false << QVariant( "a" );
       QTest::newRow( "concat function with NULL" ) << "concat(NULL,'a','b')" << false << QVariant( "ab" );
+      QTest::newRow( "concat function with only NULL" ) << "concat(NULL)" << false << QVariant( "" );
+      QTest::newRow( "concat function with multi NULL" ) << "concat(NULL, NULL)" << false << QVariant( "" );
       QTest::newRow( "concat_ws no args" ) << "concat_ws()" << true << QVariant();
       QTest::newRow( "concat_ws one arg" ) << "concat_ws(' ')" << true << QVariant();
       QTest::newRow( "concat_ws comma" ) << "concat_ws(',', 'b', NULL, 'd')" << false << QVariant( "b,d" );
@@ -2973,6 +2983,11 @@ class TestQgsExpression : public QObject
         << u"regexp_match( uuid('invalid-format'), '({[a-zA-Z\\\\d]{8}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{12}})')"_s
         << false
         << QVariant( 1 );
+      QTest::newRow( "uuid version unsupported" ) << u"uuid(version:=1)"_s << true << QVariant();
+      QTest::newRow( "uuid v4" ) << u"regexp_match( uuid(version:=4), '({[a-zA-Z\\\\d]{8}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{12}})')"_s << false << QVariant( 1 );
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 9, 0 )
+      QTest::newRow( "uuid v7" ) << u"regexp_match( uuid(version:=7), '({[a-zA-Z\\\\d]{8}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{4}\\\\-[a-zA-Z\\\\d]{12}})')"_s << false << QVariant( 1 );
+#endif
 
       //exif functions
       QString testDataDir = QStringLiteral( TEST_DATA_DIR ) + '/';
@@ -3181,6 +3196,51 @@ class TestQgsExpression : public QObject
       run_evaluation_test( exp3, evalError, result );
       QgsExpression exp4( exp );
       run_evaluation_test( exp4, evalError, result );
+    }
+
+    void layer_property_type_i18n_data()
+    {
+      QTest::addColumn<QString>( "string" );
+      QTest::addColumn<QLocale::Language>( "language" );
+      QTest::addColumn<QVariant>( "expected" );
+
+      QTest::newRow( "layer_property type English" ) << u"layer_property('%1','type')"_s.arg( mPointsLayer->name() ) << QLocale::English << QVariant( "Vector" );
+      QTest::newRow( "layer_property type French" ) << u"layer_property('%1','type')"_s.arg( mPointsLayer->name() ) << QLocale::French << QVariant( "Vecteur" );
+      QTest::newRow( "layer_property type explicit translation English" ) << u"layer_property('%1','type', true)"_s.arg( mPointsLayer->name() ) << QLocale::English << QVariant( "Vector" );
+      QTest::newRow( "layer_property type explicit translation French" ) << u"layer_property('%1','type', true)"_s.arg( mPointsLayer->name() ) << QLocale::French << QVariant( "Vecteur" );
+      QTest::newRow( "layer_property type no translation English" ) << u"layer_property('%1','type', false)"_s.arg( mPointsLayer->name() ) << QLocale::English << QVariant( "Vector" );
+      QTest::newRow( "layer_property type no translation French" ) << u"layer_property('%1','type', false)"_s.arg( mPointsLayer->name() ) << QLocale::French << QVariant( "Vector" );
+    }
+
+    void layer_property_type_i18n()
+    {
+      QFETCH( QString, string );
+      QFETCH( QLocale::Language, language );
+      QFETCH( QVariant, expected );
+
+      QgsExpression exp( string );
+
+      QLocale::setDefault( language );
+      QTranslator translator;
+      const bool ok = translator.load( "qgis_" + QLocale().name(), QgsApplication::i18nPath() );
+      QVERIFY( ok );
+      QCoreApplication::installTranslator( &translator );
+
+      if ( exp.hasParserError() )
+      {
+        qDebug() << exp.parserErrorString();
+      }
+      QCOMPARE( exp.hasParserError(), false );
+
+      QVariant result = exp.evaluate();
+      if ( exp.hasEvalError() )
+      {
+        qDebug() << exp.evalErrorString();
+      }
+
+      QCOMPARE( result, expected );
+
+      QLocale::setDefault( QLocale::English );
     }
 
     void eval_columns()
@@ -4108,7 +4168,7 @@ class TestQgsExpression : public QObject
       QCOMPARE( functionNodes.size(), 5 );
       QgsExpressionFunction *fd;
       QSet<QString> actualFunctions;
-      for ( const auto &f : functionNodes )
+      for ( const QgsExpressionNodeFunction *f : std::as_const( functionNodes ) )
       {
         QCOMPARE( f->nodeType(), QgsExpressionNode::NodeType::ntFunction );
         fd = QgsExpression::QgsExpression::Functions()[f->fnIndex()];
@@ -4122,12 +4182,25 @@ class TestQgsExpression : public QObject
       QList<const QgsExpressionNodeBinaryOperator *> binaryOpsNodes( exp.findNodes<QgsExpressionNodeBinaryOperator>() );
       QCOMPARE( binaryOpsNodes.size(), 2 );
       QSet<QgsExpressionNodeBinaryOperator::BinaryOperator> actualBinaryOps;
-      for ( const auto &f : binaryOpsNodes )
+      for ( const QgsExpressionNodeBinaryOperator *f : std::as_const( binaryOpsNodes ) )
       {
         QCOMPARE( f->nodeType(), QgsExpressionNode::NodeType::ntBinaryOperator );
         actualBinaryOps << f->op();
       }
       QCOMPARE( actualBinaryOps, expectedBinaryOps );
+
+      exp.setExpression( R"(if(current_value('a') in (1, 2), 'yes', 'no'))"_L1 );
+      functionNodes = exp.findNodes<QgsExpressionNodeFunction>();
+      actualFunctions.clear();
+      for ( const QgsExpressionNodeFunction *f : std::as_const( functionNodes ) )
+      {
+        QCOMPARE( f->nodeType(), QgsExpressionNode::NodeType::ntFunction );
+        fd = QgsExpression::QgsExpression::Functions()[f->fnIndex()];
+        actualFunctions << fd->name();
+      }
+      expectedFunctions.clear();
+      expectedFunctions << u"if"_s << u"current_value"_s;
+      QCOMPARE( actualFunctions, expectedFunctions );
     }
 
     void referenced_columns_all_attributes()

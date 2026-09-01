@@ -40,7 +40,7 @@ class QgsGeometry;
 class QgsAbstract3DEngine;
 class QgsPoint;
 class QgsPhongMaterialSettings;
-class QgsMaterial;
+class QgsUnlitMaterial;
 class QgsTessellatedPolygonGeometry;
 class QgsLineMaterial;
 class Qgs3DMapSettings;
@@ -91,7 +91,7 @@ class _3D_EXPORT QgsRubberBand3D
       Circle
     };
 
-    QgsRubberBand3D( Qgs3DMapSettings &map, QgsAbstract3DEngine *engine, Qt3DCore::QEntity *parentEntity, Qgis::GeometryType geometryType = Qgis::GeometryType::Line );
+    QgsRubberBand3D( Qgs3DMapSettings &map, QgsAbstract3DEngine *engine, Qgis::GeometryType geometryType = Qgis::GeometryType::Line );
     ~QgsRubberBand3D();
 
     //! Returns the rubber band width in pixels
@@ -241,7 +241,7 @@ class _3D_EXPORT QgsRubberBand3D
 
     // all these are owned by mPolygonEntity
     QgsTessellatedPolygonGeometry *mPolygonGeometry = nullptr;
-    QgsMaterial *mPolygonMaterial = nullptr;
+    QgsUnlitMaterial *mPolygonMaterial = nullptr;
 
     // all these are owned by mLineEntity
     Qt3DRender::QGeometryRenderer *mLineGeometryRenderer = nullptr;

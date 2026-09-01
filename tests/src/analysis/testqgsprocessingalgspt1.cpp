@@ -28,6 +28,7 @@
 #include "qgsfillsymbol.h"
 #include "qgsfontutils.h"
 #include "qgsgdalutils.h"
+#include "qgsgeometryfactory.h"
 #include "qgslayoutitemmap.h"
 #include "qgslayoutitemscalebar.h"
 #include "qgslayoutmanager.h"
@@ -88,6 +89,7 @@ class TestQgsProcessingAlgsPt1 : public QgsTest
     void saveFeaturesAlg();
     void packageAlg();
     void rasterLayerProperties();
+    void modelerRasterCalculatorCreationOptions();
     void exportToSpreadsheetXlsx();
     void exportToSpreadsheetOds();
     void exportToSpreadsheetOptions();
@@ -523,6 +525,37 @@ void TestQgsProcessingAlgsPt1::rasterLayerProperties()
   QCOMPARE( results.value( u"BAND_COUNT"_s ).toInt(), 1 );
   QCOMPARE( results.value( u"HAS_NODATA_VALUE"_s ).toInt(), 1 );
   QCOMPARE( results.value( u"NODATA_VALUE"_s ).toInt(), -9999 );
+}
+
+void TestQgsProcessingAlgsPt1::modelerRasterCalculatorCreationOptions()
+{
+  std::unique_ptr<QgsProcessingAlgorithm> alg( QgsApplication::processingRegistry()->createAlgorithmById( u"native:modelerrastercalc"_s ) );
+  QVERIFY( alg );
+
+  const QString inputFilename = QStringLiteral( TEST_DATA_DIR ) + u"/raster/band1_int16_noct_epsg4326.tif"_s;
+  const QTemporaryDir tempDir;
+  const QString outputFilename = tempDir.filePath( u"modeler_raster_calculator.tif"_s );
+
+  QVariantMap parameters;
+  parameters.insert( u"LAYERS"_s, QStringList( { inputFilename } ) );
+  parameters.insert( u"EXPRESSION"_s, u"\"A@1\""_s );
+  parameters.insert( u"CREATION_OPTIONS"_s, u"TILED=YES|BLOCKXSIZE=16|BLOCKYSIZE=16"_s );
+  parameters.insert( u"OUTPUT"_s, outputFilename );
+
+  QgsProcessingContext context;
+  QgsProcessingFeedback feedback;
+  bool ok = false;
+  alg->run( parameters, context, &feedback, &ok );
+  QVERIFY( ok );
+
+  gdal::dataset_unique_ptr dataset( GDALOpen( outputFilename.toUtf8().constData(), GA_ReadOnly ) );
+  QVERIFY( dataset );
+
+  int blockWidth = 0;
+  int blockHeight = 0;
+  GDALGetBlockSize( GDALGetRasterBand( dataset.get(), 1 ), &blockWidth, &blockHeight );
+  QCOMPARE( blockWidth, 16 );
+  QCOMPARE( blockHeight, 16 );
 }
 
 void TestQgsProcessingAlgsPt1::exportToSpreadsheetXlsx()
@@ -5009,6 +5042,40 @@ void TestQgsProcessingAlgsPt1::compareDatasets()
   QCOMPARE( results.value( u"UNCHANGED_COUNT"_s ).toLongLong(), 4LL );
   QCOMPARE( results.value( u"ADDED_COUNT"_s ).toLongLong(), 2LL );
   QCOMPARE( results.value( u"DELETED_COUNT"_s ).toLongLong(), 1LL );
+
+  // empty geometry comparisons
+  auto emptyGeom = QgsGeometryFactory::geomFromWkbType( originalLayer->wkbType() );
+  f.setAttributes( QgsAttributes() << 7 << u"g1"_s << u"a1"_s );
+  f.setGeometry( std::move( emptyGeom ) );
+  originalLayer->dataProvider()->addFeature( f );
+  results = alg->run( parameters, *context, &feedback, &ok );
+  QVERIFY( ok );
+  QCOMPARE( results.value( u"UNCHANGED_COUNT"_s ).toLongLong(), 4LL );
+  QCOMPARE( results.value( u"ADDED_COUNT"_s ).toLongLong(), 2LL );
+  QCOMPARE( results.value( u"DELETED_COUNT"_s ).toLongLong(), 2LL );
+
+  f.setAttributes( QgsAttributes() << 7 << u"g1"_s << u"c1"_s );
+  originalLayer->dataProvider()->addFeature( f );
+  results = alg->run( parameters, *context, &feedback, &ok );
+  QVERIFY( ok );
+  QCOMPARE( results.value( u"UNCHANGED_COUNT"_s ).toLongLong(), 4LL );
+  QCOMPARE( results.value( u"ADDED_COUNT"_s ).toLongLong(), 2LL );
+  QCOMPARE( results.value( u"DELETED_COUNT"_s ).toLongLong(), 3LL );
+
+  f.setAttributes( QgsAttributes() << 7 << u"g1"_s << u"a1"_s );
+  revisedLayer->dataProvider()->addFeature( f );
+  results = alg->run( parameters, *context, &feedback, &ok );
+  QVERIFY( ok );
+  QCOMPARE( results.value( u"UNCHANGED_COUNT"_s ).toLongLong(), 5LL );
+  QCOMPARE( results.value( u"ADDED_COUNT"_s ).toLongLong(), 2LL );
+  QCOMPARE( results.value( u"DELETED_COUNT"_s ).toLongLong(), 2LL );
+
+  // check EMPTY geometry in output layer
+  QgsFeatureIterator featIt = qobject_cast<QgsVectorLayer *>( context->getMapLayer( results.value( u"UNCHANGED"_s ).toString() ) )->getFeatures( u"pk = 7"_s );
+  QgsFeature outputFeat;
+  QVERIFY( featIt.nextFeature( outputFeat ) );
+  QVERIFY( outputFeat.isValid() );
+  QVERIFY( outputFeat.geometry().isEmpty() && !outputFeat.geometry().isNull() );
 }
 
 void TestQgsProcessingAlgsPt1::shapefileEncoding()

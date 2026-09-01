@@ -35,12 +35,12 @@ jobs:
 
     steps:
       - name: 🐣 Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: 🐩 Install CMake and Ninja
-        uses: lukka/get-cmake@7bfc9baacbbdcb5e37957ad05c3546b3e222be3c # latest
+        uses: lukka/get-cmake@e6906078ebd1ccb8ce51ab4626ac46a1b5a517e3 # latest
         with:
           # Pin to specific version to avoid rebuilding too often
           # Also helps to avoid spurious build failures like https://github.com/qgis/QGIS/pull/47098
@@ -81,7 +81,7 @@ jobs:
           sudo mkdir -p /usr/local/gfortran
           sudo ln -sf /usr/local/Cellar/gcc@${GCC_VERSION}/*/lib/gcc/${GCC_VERSION} /usr/local/gfortran/lib
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
 
@@ -130,7 +130,9 @@ jobs:
                 -D ENABLE_UNITY_BUILDS=ON \
                 -D "NUGET_USERNAME=${GITHUB_ACTOR}" \
                 -D NUGET_SOURCE="https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
-                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+                -D WITH_HANA=ON \
+                || true
 
                 fdupes -q -r -1 build/vcpkg_installed/${{ matrix.triplet }}/lib | grep -E '\.(so|dylib)' | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
 
@@ -194,7 +196,7 @@ jobs:
     needs: build
     steps:
       - name: 🐣 Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -252,7 +254,7 @@ jobs:
             *.dmg
 
       - name: Upload release assets
-        uses: AButler/upload-release-assets@45be2facf3acc71812c1c17b4cefef5f6e8cac8a  # v3.0.1
+        uses: AButler/upload-release-assets@34491005a5d7ec239a784e460807ce844fde7962  # v4.0.0
         if: ${{ github.event_name == 'release' }}
         with:
           files: '*.dmg'

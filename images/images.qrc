@@ -107,6 +107,7 @@
         <file>themes/default/algorithms/mAlgorithmDistanceMatrix.svg</file>
         <file>themes/default/algorithms/mAlgorithmExtractVertices.svg</file>
         <file>themes/default/algorithms/mAlgorithmExtractLayerExtent.svg</file>
+        <file>themes/default/algorithms/mAlgorithmInterpolation.svg</file>
         <file>themes/default/algorithms/mAlgorithmIntersect.svg</file>
         <file>themes/default/algorithms/mAlgorithmConcaveHull.svg</file>
         <file>themes/default/algorithms/mAlgorithmLineDensity.svg</file>
@@ -129,6 +130,7 @@
         <file>themes/default/algorithms/mAlgorithmRandomRaster.svg</file>
         <file>themes/default/algorithms/mAlgorithmRasterCalculator.svg</file>
         <file>themes/default/algorithms/mAlgorithmRegularPoints.svg</file>
+        <file>themes/default/algorithms/mAlgorithmRelief.svg</file>
         <file>themes/default/algorithms/mAlgorithmRoundRastervalues.svg</file>
         <file>themes/default/algorithms/mAlgorithmSelectLocation.svg</file>
         <file>themes/default/algorithms/mAlgorithmSelectDistance.svg</file>
@@ -1098,6 +1100,7 @@
         <file>themes/default/mIconRasterVector.svg</file>
         <file>themes/default/mIconEsriRest.svg</file>
         <file>themes/default/mIconImageServer.svg</file>
+        <file>themes/default/mIconUnlitMaterial.svg</file>
     </qresource>
     <qresource prefix="/images/tips">
         <file alias="symbol_levels.png">qgis_tips/symbol_levels.png</file>

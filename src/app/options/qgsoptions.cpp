@@ -582,7 +582,7 @@ QgsOptions::QgsOptions( QWidget *parent, Qt::WindowFlags fl, const QList<QgsOpti
   const QString defaultProjectCrs = mSettings->value( u"/projections/defaultProjectCrs"_s, Qgis::geographicCrsAuthId(), QgsSettings::App ).toString();
   leProjectGlobalCrs->setOptionVisible( QgsProjectionSelectionWidget::DefaultCrs, false );
   leProjectGlobalCrs->setOptionVisible( QgsProjectionSelectionWidget::CrsNotSet, true );
-  leProjectGlobalCrs->setNotSetText( tr( "No projection (or unknown/non-Earth projection)" ) );
+  leProjectGlobalCrs->setNotSetText( tr( "No projection (arbitrary Cartesian coordinate system)" ) );
   leProjectGlobalCrs->setCrs( QgsCoordinateReferenceSystem( defaultProjectCrs ) );
   leProjectGlobalCrs->setMessage( tr(
     "<h1>Default projection for new projects</h1>"
@@ -1164,6 +1164,10 @@ QgsOptions::QgsOptions( QWidget *parent, Qt::WindowFlags fl, const QList<QgsOpti
   mValidateGeometries->addItem( tr( "Off" ) );
   mValidateGeometries->addItem( tr( "QGIS" ) );
   mValidateGeometries->addItem( tr( "GEOS" ) );
+  if ( Qgis::hasSfcgal() )
+  {
+    mValidateGeometries->addItem( tr( "SFCGAL" ) );
+  }
 
   QString markerStyle = QgsSettingsRegistryCore::settingsDigitizingMarkerStyle->value();
   if ( markerStyle == "SemiTransparentCircle"_L1 )

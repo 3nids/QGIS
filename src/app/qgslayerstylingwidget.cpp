@@ -20,6 +20,7 @@
 #include "qgsannotationlayer.h"
 #include "qgsapplication.h"
 #include "qgsdiagramwidget.h"
+#include "qgsgui.h"
 #include "qgslabelingwidget.h"
 #include "qgsmapcanvas.h"
 #include "qgsmaplayer.h"
@@ -85,7 +86,7 @@ QgsLayerStylingWidget::QgsLayerStylingWidget( QgsMapCanvas *canvas, QgsMessageBa
   mContext.setMapCanvas( canvas );
   mContext.setMessageBar( messageBar );
 
-  mOptionsListWidget->setIconSize( QgisApp::instance()->iconSize( false ) );
+  mOptionsListWidget->setIconSize( QgsGui::iconSize( Qgis::UserInterfaceIconType::MainWindowToolbar ) );
   mOptionsListWidget->setMaximumWidth( static_cast<int>( mOptionsListWidget->iconSize().width() * 1.18 ) );
 
   connect( QgsProject::instance(), static_cast<void ( QgsProject::* )( QgsMapLayer * )>( &QgsProject::layerWillBeRemoved ), this, &QgsLayerStylingWidget::layerAboutToBeRemoved );
@@ -500,6 +501,10 @@ void QgsLayerStylingWidget::updateCurrentWidgetLayer()
     {
       mDiagramWidget = widget;
     }
+    else if ( QgsRasterAttributeTableWidget *widget = qobject_cast<QgsRasterAttributeTableWidget *>( current ) )
+    {
+      mRasterAttributeTableWidget = widget;
+    }
     else
     {
       delete current;
@@ -728,23 +733,20 @@ void QgsLayerStylingWidget::updateCurrentWidgetLayer()
             }
             else
             {
-              if ( !mRasterAttributeTableDisabledWidget )
-              {
-                mRasterAttributeTableDisabledWidget = new QgsPanelWidget { mWidgetStack };
-                QVBoxLayout *layout = new QVBoxLayout { mRasterAttributeTableDisabledWidget };
-                mRasterAttributeTableDisabledWidget->setLayout( layout );
-                QLabel *label { new QLabel( tr(
-                  "There are no raster attribute tables associated with this data source.<br>"
-                  "If the current symbology can be converted to an attribute table you "
-                  "can create a new attribute table using the context menu available in the "
-                  "layer tree or in the layer properties dialog."
-                ) ) };
-                label->setWordWrap( true );
-                mRasterAttributeTableDisabledWidget->layout()->addWidget( label );
-                layout->addStretch();
-                mRasterAttributeTableDisabledWidget->setDockMode( true );
-              }
-              mWidgetStack->setMainPanel( mRasterAttributeTableDisabledWidget );
+              QgsPanelWidget *widget = new QgsPanelWidget { mWidgetStack };
+              QVBoxLayout *layout = new QVBoxLayout { widget };
+              widget->setLayout( layout );
+              QLabel *label { new QLabel( tr(
+                "There are no raster attribute tables associated with this data source.<br>"
+                "If the current symbology can be converted to an attribute table you "
+                "can create a new attribute table using the context menu available in the "
+                "layer tree or in the layer properties dialog."
+              ) ) };
+              label->setWordWrap( true );
+              widget->layout()->addWidget( label );
+              layout->addStretch();
+              widget->setDockMode( true );
+              mWidgetStack->setMainPanel( widget );
             }
 
             break;

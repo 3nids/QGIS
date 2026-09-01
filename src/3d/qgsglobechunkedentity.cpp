@@ -335,7 +335,7 @@ Qt3DCore::QEntity *QgsGlobeChunkLoader::createEntity( Qt3DCore::QEntity *parent 
 QgsGlobeChunkLoaderFactory::QgsGlobeChunkLoaderFactory( Qgs3DMapSettings *mapSettings )
   : mMapSettings( mapSettings )
 {
-  mTextureGenerator = new QgsTerrainTextureGenerator( *mapSettings );
+  mTextureGenerator = std::make_unique<QgsTerrainTextureGenerator>( *mapSettings );
 
   // it does not matter what kind of ellipsoid is used, this is for rough estimates
   mDistanceArea.setEllipsoid( mapSettings->crs().ellipsoidAcronym() );
@@ -348,13 +348,11 @@ QgsGlobeChunkLoaderFactory::QgsGlobeChunkLoaderFactory( Qgs3DMapSettings *mapSet
 }
 
 QgsGlobeChunkLoaderFactory::~QgsGlobeChunkLoaderFactory()
-{
-  delete mTextureGenerator;
-}
+{}
 
 QgsChunkLoader *QgsGlobeChunkLoaderFactory::createChunkLoader( QgsChunkNode *node ) const
 {
-  return new QgsGlobeChunkLoader( node, Qgs3DRenderContext::fromMapSettings( mMapSettings ), mTextureGenerator, mGlobeCrsToLatLon );
+  return new QgsGlobeChunkLoader( node, Qgs3DRenderContext::fromMapSettings( mMapSettings ), mTextureGenerator.get(), mGlobeCrsToLatLon );
 }
 
 QgsChunkNode *QgsGlobeChunkLoaderFactory::createRootNode() const
@@ -467,10 +465,12 @@ class QgsGlobeMapUpdateJobFactory : public QgsChunkQueueJobFactory
 QgsGlobeEntity::QgsGlobeEntity( Qgs3DMapSettings *mapSettings )
   : QgsChunkedEntity( mapSettings, mapSettings->terrainSettings()->maximumScreenError(), new QgsGlobeChunkLoaderFactory( mapSettings ), true )
 {
-  mLayerWatcher.reset( new QgsLayerStyleWatcher( mapSettings ) );
+  mLayerWatcher = make_qobject_unique<QgsLayerStyleWatcher>( mapSettings );
   connect( mLayerWatcher.get(), &QgsLayerStyleWatcher::styleChanged, this, &QgsGlobeEntity::invalidateMapImages );
 
-  connect( mapSettings, &Qgs3DMapSettings::showTerrainBoundingBoxesChanged, this, [this, mapSettings] { setShowBoundingBoxes( mapSettings->showTerrainBoundingBoxes() ); } );
+  connect( mapSettings, &Qgs3DMapSettings::showTerrainBoundingBoxesChanged, this, [this, mapSettings] {
+    setShowBoundingBoxes( mapSettings->debugFlags().testFlag( Qgis::Map3DDebugFlag::ShowTerrainBoundingBoxes ) );
+  } );
   connect( mapSettings, &Qgs3DMapSettings::showTerrainTilesInfoChanged, this, &QgsGlobeEntity::invalidateMapImages );
   connect( mapSettings, &Qgs3DMapSettings::showLabelsChanged, this, &QgsGlobeEntity::invalidateMapImages );
   connect( mapSettings, &Qgs3DMapSettings::backgroundColorChanged, this, &QgsGlobeEntity::invalidateMapImages );

@@ -1,3 +1,4 @@
+
 /***************************************************************************
   qgsphongmaterialsettings.h
   --------------------------------------
@@ -52,6 +53,7 @@ class CORE_EXPORT QgsPhongMaterialSettings : public QgsAbstractMaterialSettings
 
     QgsPhongMaterialSettings *clone() const override SIP_FACTORY;
     bool equals( const QgsAbstractMaterialSettings *other ) const override;
+    QSet< QgsAbstractMaterialSettings::Property > supportedProperties() const override;
 
     //! Returns ambient color component
     QColor ambient() const { return mAmbient; }

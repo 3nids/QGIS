@@ -22,6 +22,7 @@
 #include "qgslayertree.h"
 #include "qgslayertreefiltersettings.h"
 #include "qgslayertreemodellegendnode.h"
+#include "qgslayertreeutils.h"
 #include "qgslayoutitemlegend.h"
 #include "qgsmaphittest.h"
 #include "qgsmaplayer.h"
@@ -801,6 +802,12 @@ void QgsLayerTreeModel::addTargetScreenProperties( const QgsScreenProperties &pr
   mTargetScreenProperties.insert( properties );
 }
 
+void QgsLayerTreeModel::setTargetScreenProperties( const QSet<QgsScreenProperties> &properties )
+{
+  mTargetScreenProperties = properties;
+  invalidateDisplayData();
+}
+
 QSet<QgsScreenProperties> QgsLayerTreeModel::targetScreenProperties() const
 {
   return mTargetScreenProperties;
@@ -820,6 +827,41 @@ void QgsLayerTreeModel::waitForHitTestBlocking()
 bool QgsLayerTreeModel::hitTestInProgress() const
 {
   return static_cast< bool >( mHitTestTask );
+}
+
+void QgsLayerTreeModel::invalidateDisplayData()
+{
+  std::function< void( QgsLayerTreeNode * ) > invalidateNode;
+  invalidateNode = [this, &invalidateNode]( QgsLayerTreeNode *node ) {
+    if ( !node )
+      return;
+
+    switch ( node->nodeType() )
+    {
+      case QgsLayerTreeNode::NodeLayer:
+      {
+        auto layerNode = qobject_cast< QgsLayerTreeLayer * >( node );
+        const QList<QgsLayerTreeModelLegendNode *> legendNodes = layerLegendNodes( layerNode );
+        for ( QgsLayerTreeModelLegendNode *legendNode : legendNodes )
+        {
+          legendNode->invalidateDisplayData();
+        }
+
+        break;
+      }
+
+      case QgsLayerTreeNode::NodeGroup:
+      case QgsLayerTreeNode::NodeCustom:
+        break;
+    }
+
+    const QList<QgsLayerTreeNode *> children = node->children();
+    for ( QgsLayerTreeNode *childNode : children )
+    {
+      invalidateNode( childNode );
+    }
+  };
+  invalidateNode( mRootNode );
 }
 
 void QgsLayerTreeModel::nodeWillAddChildren( QgsLayerTreeNode *node, int indexFrom, int indexTo )
@@ -1292,6 +1334,13 @@ bool QgsLayerTreeModel::dropMimeData( const QMimeData *data, Qt::DropAction acti
 
     if ( nodes.isEmpty() )
       return false;
+
+    // moving around layer group preserves id but copying creates new id for the group + subgroups
+    if ( action == Qt::CopyAction )
+    {
+      for ( QgsLayerTreeNode *node : std::as_const( nodes ) )
+        QgsLayerTreeUtils::regenerateGroupIds( node );
+    }
 
     QgsLayerTree::toGroup( nodeParent )->insertChildNodes( row, nodes );
   }

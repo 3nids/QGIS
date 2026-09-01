@@ -980,14 +980,12 @@ QgsRuleBasedRenderer::QgsRuleBasedRenderer( QgsRuleBasedRenderer::Rule *root )
 QgsRuleBasedRenderer::QgsRuleBasedRenderer( QgsSymbol *defaultSymbol )
   : QgsFeatureRenderer( u"RuleRenderer"_s )
 {
-  mRootRule = new Rule( nullptr ); // root has no symbol, no filter etc - just a container
+  mRootRule = std::make_unique<Rule>( nullptr ); // root has no symbol, no filter etc - just a container
   mRootRule->appendChild( new Rule( defaultSymbol ) );
 }
 
 QgsRuleBasedRenderer::~QgsRuleBasedRenderer()
-{
-  delete mRootRule;
-}
+{}
 
 
 QgsSymbol *QgsRuleBasedRenderer::symbolForFeature( const QgsFeature &, QgsRenderContext & ) const
@@ -1016,7 +1014,7 @@ Qgis::FeatureRendererFlags QgsRuleBasedRenderer::flags() const
       exploreRule( child );
     }
   };
-  exploreRule( mRootRule );
+  exploreRule( mRootRule.get() );
 
   return res;
 }
@@ -1277,6 +1275,13 @@ void QgsRuleBasedRenderer::setLegendSymbolItem( const QString &key, QgsSymbol *s
     rule->setSymbol( symbol );
   else
     delete symbol;
+}
+
+void QgsRuleBasedRenderer::setLegendSymbolItemLabel( const QString &key, const QString &label )
+{
+  Rule *rule = mRootRule->findRuleByKey( key );
+  if ( rule )
+    rule->setLabel( label );
 }
 
 QgsLegendSymbolList QgsRuleBasedRenderer::legendSymbolItems() const

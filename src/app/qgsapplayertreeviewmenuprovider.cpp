@@ -265,7 +265,7 @@ QMenu *QgsAppLayerTreeViewMenuProvider::createContextMenu()
 
                 QgsQueryResultDialog dialog( conn2.release() );
                 dialog.setObjectName( u"SqlUpdateDialog"_s );
-                dialog.setStyleSheet( QgisApp::instance()->styleSheet() );
+                dialog.setStyleSheet( QgsGui::applicationStyleSheet() );
 
                 const QString layerName = layer->name();
                 dialog.setWindowTitle( tr( "%1 — Update SQL" ).arg( layerName ) );
@@ -345,7 +345,7 @@ QMenu *QgsAppLayerTreeViewMenuProvider::createContextMenu()
 
                   QgsQueryResultMainWindow *dialog = new QgsQueryResultMainWindow( conn2.release(), layerName );
                   dialog->setAttribute( Qt::WA_DeleteOnClose );
-                  dialog->setStyleSheet( QgisApp::instance()->styleSheet() );
+                  dialog->setStyleSheet( QgsGui::applicationStyleSheet() );
                   dialog->resultWidget()->setSqlVectorLayerOptions( options );
 
                   connect( dialog->resultWidget(), &QgsQueryResultWidget::requestDialogTitleUpdate, dialog, [dialog]( const QString &fileName ) {
@@ -947,6 +947,14 @@ QMenu *QgsAppLayerTreeViewMenuProvider::createContextMenu()
       menu->addAction( QgsApplication::getThemeIcon( u"/mActionShowAllLayers.svg"_s ), tr( "&Show All Items" ), node, &QgsLayerTreeModelLegendNode::checkAllItems );
       menu->addAction( QgsApplication::getThemeIcon( u"/mActionHideAllLayers.svg"_s ), tr( "&Hide All Items" ), node, &QgsLayerTreeModelLegendNode::uncheckAllItems );
       menu->addSeparator()->setObjectName( "UserCheckableSeparator"_L1 );
+    }
+
+    if ( node->flags() & Qt::ItemIsEditable )
+    {
+      QAction *renameAction = new QAction( tr( "Rename Item…" ), menu );
+      connect( renameAction, &QAction::triggered, this, [this] { mView->edit( mView->currentIndex() ); } );
+      menu->addAction( renameAction );
+      menu->addSeparator()->setObjectName( "RenameItemSeparator"_L1 );
     }
 
     if ( QgsSymbolLegendNode *symbolNode = qobject_cast<QgsSymbolLegendNode *>( node ) )
