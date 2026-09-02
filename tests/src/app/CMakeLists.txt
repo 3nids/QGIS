@@ -15,6 +15,7 @@ set(TESTS
   testqgsappbrowserproviders.cpp
   testqgisappclipboard.cpp
   testqgisappdockwidgets.cpp
+  testqgsappdropfeedback.cpp
   testqgsadvanceddigitizing.cpp
   testqgsattributetable.cpp
   testqgsapplocatorfilters.cpp

@@ -248,6 +248,7 @@ using namespace Qt::StringLiterals;
 #include "qgsabstractmaptoolhandler.h"
 #include "qgsappauthrequesthandler.h"
 #include "qgsappbrowserproviders.h"
+#include "qgsappdropfeedback.h"
 #include "qgsappdbutils.h"
 #include "qgsapplayertreeviewmenuprovider.h"
 #include "qgsapplication.h"
@@ -1800,6 +1801,7 @@ QgisApp::QgisApp(
 
   // setup drag drop
   setAcceptDrops( true );
+  mDropFeedback = new QgsAppDropFeedback( this );
 
   // must be done before show() to properly restore state
   setCustomization( std::move( customization ) );
@@ -2165,6 +2167,7 @@ QgisApp::QgisApp()
   mMapCanvas->setMessageBar( mInfoBar );
 
   connect( mLayerTreeView, &QgsLayerTreeView::currentLayerChanged, this, &QgisApp::onActiveLayerChanged );
+  mDropFeedback = new QgsAppDropFeedback( this );
   // More tests may need more members to be initialized
 }
 
