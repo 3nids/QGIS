@@ -49,6 +49,7 @@ class TestQgsAppDropFeedback : public QgsTest
     void staysWhileTheDragMovesBetweenPanels();
     void forgetsAnAnnouncementWhenAnotherDragBegins();
     void saysNothingAboutTheDropsWhichNeedNoWarning();
+    void refusesWhatNothingCanRead();
     void ignoresWhatIsNotADatasetDrag();
 
   private:
@@ -193,6 +194,20 @@ void TestQgsAppDropFeedback::saysNothingAboutTheDropsWhichNeedNoWarning()
   QVERIFY( overlay()->isHidden() );
   QVERIFY( outcome.accepted );
   QCOMPARE( outcome.action, Qt::CopyAction );
+}
+
+void TestQgsAppDropFeedback::refusesWhatNothingCanRead()
+{
+  QWidget *panel = mQgisApp->layerTreeView()->viewport();
+
+  const std::unique_ptr<QMimeData> unreadable = fileMimeData( { testDataPath( u"points.qml"_s ) } );
+  const DragOutcome outcome = sendDragEnter( panel, unreadable.get() );
+
+  // the drag is still taken, so that the message stays with the cursor to the end, but no
+  // action is offered for it
+  QVERIFY( overlay()->isVisible() );
+  QVERIFY( outcome.accepted );
+  QCOMPARE( outcome.action, Qt::IgnoreAction );
 }
 
 void TestQgsAppDropFeedback::ignoresWhatIsNotADatasetDrag()

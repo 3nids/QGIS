@@ -36,6 +36,9 @@ class QgsDropFeedbackOverlay;
  * business speaking for the window: dropping a project over the layer tree closes the
  * whole project, not just that panel. So the drags are watched application wide and the
  * message covers everything.
+ *
+ * Watching them there also means a payload nothing in QGIS can read is refused once, for
+ * every widget of the window at once, instead of each having to work it out for itself.
  */
 class APP_EXPORT QgsAppDropFeedback : public QObject
 {
@@ -51,6 +54,9 @@ class APP_EXPORT QgsAppDropFeedback : public QObject
   private:
     //! Returns TRUE if \a watched is a widget of the window the drags are announced over
     bool isInWindow( QObject *watched ) const;
+
+    //! Returns TRUE if nothing in QGIS can read the drag currently hovering the window
+    bool isRefused() const;
 
     void dragEntered( const QMimeData *mimeData );
     void dragMayHaveEnded();

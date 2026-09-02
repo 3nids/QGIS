@@ -73,11 +73,29 @@ bool QgsAppDropFeedback::eventFilter( QObject *watched, QEvent *event )
     case QEvent::DragEnter:
     case QEvent::DragMove:
       if ( isInWindow( watched ) )
+      {
         dragEntered( static_cast<QDragMoveEvent *>( event )->mimeData() );
+        if ( isRefused() )
+        {
+          // the drag is taken, so that the message explaining why nothing will come of it
+          // stays with the cursor to the end, but no action is offered for it
+          event->accept();
+          static_cast<QDragMoveEvent *>( event )->setDropAction( Qt::IgnoreAction );
+          return true;
+        }
+      }
       break;
 
-    case QEvent::DragLeave:
     case QEvent::Drop:
+      if ( isInWindow( watched ) && isRefused() )
+      {
+        event->accept();
+        dragMayHaveEnded();
+        return true;
+      }
+      [[fallthrough]];
+
+    case QEvent::DragLeave:
       if ( isInWindow( watched ) )
         dragMayHaveEnded();
       break;
@@ -86,8 +104,13 @@ bool QgsAppDropFeedback::eventFilter( QObject *watched, QEvent *event )
       break;
   }
 
-  // only a bystander: the widgets keep deciding what to do with their own drags
+  // otherwise only a bystander: the widgets keep deciding what to do with their own drags
   return QObject::eventFilter( watched, event );
+}
+
+bool QgsAppDropFeedback::isRefused() const
+{
+  return mPayloadType == Qgis::DropPayloadType::Unsupported;
 }
 
 void QgsAppDropFeedback::dragEntered( const QMimeData *mimeData )
