@@ -42,6 +42,7 @@ class QgsAbout;
 class QgsAppDbUtils;
 class QgsAnnotation;
 class QgsMapCanvasAnnotationItem;
+class QgsAppDropFeedback;
 class QgsAuthManager;
 class QgsBookmarks;
 class QgsClipboard;
@@ -2852,6 +2853,7 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
     QList<QgsAbstractMapToolHandler *> mMapToolHandlers;
 
     QVector<QPointer<QgsCustomDropHandler>> mCustomDropHandlers;
+    QgsAppDropFeedback *mDropFeedback = nullptr;
     QVector<QPointer<QgsCustomProjectOpenHandler>> mCustomProjectOpenHandlers;
     QVector<QPointer<QgsLayoutCustomDropHandler>> mCustomLayoutDropHandlers;
 

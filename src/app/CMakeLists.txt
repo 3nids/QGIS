@@ -13,6 +13,7 @@ set(QGIS_APP_SRCS
   qgsabout.cpp
   qgsappauthrequesthandler.cpp
   qgsappbrowserproviders.cpp
+  qgsappdropfeedback.cpp
   qgsappcoordinateoperationhandlers.cpp
   qgsappdbutils.cpp
   qgsapplayertreeviewmenuprovider.cpp
