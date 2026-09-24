@@ -53,6 +53,16 @@ QString QgsOapifSharedData::appendExtraQueryParameters( const QString &url ) con
   return url + '&' + mExtraQueryParameters;
 }
 
+QString QgsOapifSharedData::itemsBaseUrl() const
+{
+  return mCollectionUrl + u"/items"_s;
+}
+
+QString QgsOapifSharedData::itemUrl( const QString &id ) const
+{
+  return itemsBaseUrl() + '/'_L1 + id;
+}
+
 bool QgsOapifSharedData::isRestrictedToRequestBBOX() const
 {
   return mURI.isRestrictedToRequestBBOX();

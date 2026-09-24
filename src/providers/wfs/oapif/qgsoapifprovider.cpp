@@ -259,7 +259,7 @@ bool QgsOapifProvider::init()
     mShared->mQueryables = queryablesRequest.queryables( queryablesUrl );
   }
 
-  mShared->mItemsUrl = mShared->mCollectionUrl + u"/items"_s;
+  mShared->mItemsUrl = mShared->itemsBaseUrl();
 
   mShared->mFeatureFormat = mShared->mURI.outputFormat();
   if ( !mShared->mFeatureFormat.isEmpty() )
@@ -551,7 +551,7 @@ void QgsOapifProvider::computeCapabilities( const QgsOapifItemsRequest &itemsReq
   // by issuing a OPTIONS HTTP request.
   QgsDataSourceUri uri( mShared->mURI.uri() );
   QgsOapifOptionsRequest optionsItemsRequest( uri );
-  QStringList supportedOptions = optionsItemsRequest.sendOPTIONS( mShared->mItemsUrl );
+  QStringList supportedOptions = optionsItemsRequest.sendOPTIONS( mShared->itemsBaseUrl() );
   if ( supportedOptions.contains( "POST"_L1 ) )
   {
     mCapabilities |= Qgis::VectorProviderCapability::AddFeatures;
@@ -570,10 +570,7 @@ void QgsOapifProvider::computeCapabilities( const QgsOapifItemsRequest &itemsReq
       testId = u"unknown_id"_s;
     }
     QgsOapifOptionsRequest optionsOneItemRequest( uri );
-    QString url( mShared->mItemsUrl );
-    url += '/'_L1;
-    url += testId;
-    supportedOptions = optionsOneItemRequest.sendOPTIONS( url );
+    supportedOptions = optionsOneItemRequest.sendOPTIONS( mShared->itemUrl( testId ) );
     if ( supportedOptions.contains( "PUT"_L1 ) )
     {
       mCapabilities |= Qgis::VectorProviderCapability::ChangeAttributeValues;
@@ -749,7 +746,7 @@ bool QgsOapifProvider::addFeatures( QgsFeatureList &flist, Flags flags )
     // /items/{id} request.
     if ( !( flags & QgsFeatureSink::FastInsert ) )
     {
-      QgsOapifSingleItemRequest itemRequest( mShared->mURI.uri(), mShared->appendExtraQueryParameters( mShared->mItemsUrl + QString( u"/"_s + id ) ) );
+      QgsOapifSingleItemRequest itemRequest( mShared->mURI.uri(), mShared->appendExtraQueryParameters( mShared->itemUrl( id ) ) );
       if ( itemRequest.request( /*synchronous=*/true, /*forceRefresh=*/true ) && itemRequest.errorCode() == QgsBaseNetworkRequest::NoError )
       {
         const QgsFeature &updatedFeature = itemRequest.feature();
@@ -944,7 +941,7 @@ bool QgsOapifProvider::deleteFeatures( const QgsFeatureIds &ids )
     }
 
     QgsOapifDeleteFeatureRequest req( uri );
-    QUrl url( mShared->mItemsUrl + QString( u"/"_s + jsonId ) );
+    QUrl url( mShared->itemUrl( jsonId ) );
     if ( !req.sendDELETE( url ) )
     {
       pushError( tr( "Feature deletion failed: %1" ).arg( req.errorMessage() ) );

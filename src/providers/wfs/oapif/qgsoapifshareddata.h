@@ -76,7 +76,11 @@ class QgsOapifSharedData final : public QObject, public QgsBackgroundCachedShare
     //! Url to /collections/{collectionId}
     QString mCollectionUrl;
 
-    //! Url to /collections/{collectionId}/items
+    /**
+     * Url to fetch pages of /collections/{collectionId}/items. It may be the
+     * link of a specific feature format and carry a query string, so it must
+     * not be used as the base of other URLs: use itemsBaseUrl() and itemUrl() for those.
+     */
     QString mItemsUrl;
 
     //! Url to a GML bulk download link (without paging), if it exists (empty otherwise)
@@ -118,6 +122,12 @@ class QgsOapifSharedData final : public QObject, public QgsBackgroundCachedShare
 
     //! Append extra query parameters if needed
     QString appendExtraQueryParameters( const QString &url ) const;
+
+    //! Url to /collections/{collectionId}/items, whatever the feature format
+    QString itemsBaseUrl() const;
+
+    //! Url to /collections/{collectionId}/items/{id}
+    QString itemUrl( const QString &id ) const;
 
   private:
     // Translate part of an expression to a server-side filter using Part1 features only

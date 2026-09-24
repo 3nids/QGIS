@@ -3228,11 +3228,16 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             "wb",
         ) as f:
             f.write(data)
+        # Editing URLs must not be derived from the format specific items link
         with open(
-            sanitize(endpoint, "/collections/mycollection/items?f=fgb&VERB=OPTIONS"),
+            sanitize(endpoint, "/collections/mycollection/items?VERB=OPTIONS"), "wb"
+        ) as f:
+            f.write(b"HEAD, GET, POST")
+        with open(
+            sanitize(endpoint, "/collections/mycollection/items/my_id?VERB=OPTIONS"),
             "wb",
         ) as f:
-            f.write(b"HEAD, GET")
+            f.write(b"HEAD, GET, PUT, DELETE")
 
         vl = QgsVectorLayer(
             "url='http://"
@@ -3242,6 +3247,18 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             "OAPIF",
         )
         self.assertTrue(vl.isValid())
+        self.assertNotEqual(
+            vl.dataProvider().capabilities() & vl.dataProvider().AddFeatures,
+            vl.dataProvider().NoCapabilities,
+        )
+        self.assertNotEqual(
+            vl.dataProvider().capabilities() & vl.dataProvider().ChangeAttributeValues,
+            vl.dataProvider().NoCapabilities,
+        )
+        self.assertNotEqual(
+            vl.dataProvider().capabilities() & vl.dataProvider().DeleteFeatures,
+            vl.dataProvider().NoCapabilities,
+        )
 
         with open(
             sanitize(
@@ -3299,10 +3316,18 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
         f = next(it)
         self.assertEqual(f.geometry().wkbType(), QgsWkbTypes.Type.Point)
         self.assertEqual(f.geometry().asWkt().upper(), "POINT (-70.5 66.5)")
+        my_id_fid = f.id()
 
         f = next(it)
         self.assertEqual(f.geometry().wkbType(), QgsWkbTypes.Type.Point)
         self.assertEqual(f.geometry().asWkt().upper(), "POINT (-70.25 66.25)")
+
+        with open(
+            sanitize(endpoint, "/collections/mycollection/items/my_id?VERB=DELETE"),
+            "wb",
+        ) as f:
+            f.write(b"")
+        self.assertTrue(vl.dataProvider().deleteFeatures([my_id_fid]))
 
     def _testJsonFG_oapif1_1_OutputFormat(self, profile, profile_in_next_link=True):
 
