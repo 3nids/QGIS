@@ -180,6 +180,13 @@ class CORE_EXPORT QgsSettingsRegistryCore : public QgsSettingsRegistry
     //! Settings entry enable WMS tile prefetching.
     static const QgsSettingsEntryBool *settingsEnableWMSTilePrefetching;
 
+    /**
+     * Settings entry whether the OGC API - Features provider requests items in
+     * the Arrow IPC stream format when a collection advertises it.
+     * \since QGIS 4.4
+     */
+    static const QgsSettingsEntryBool *settingsOapifPreferArrow;
+
     static const QgsSettingsEntryStringList *settingsMapScales;
 
     //! Settings entry maximum thread count used to load layer in parallel

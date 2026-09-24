@@ -29,6 +29,7 @@ from qgis.core import (
     QgsGeometry,
     QgsRectangle,
     QgsSettings,
+    QgsSettingsTree,
     QgsTestUtils,
     QgsVectorLayer,
     QgsWkbTypes,
@@ -3697,6 +3698,103 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             )
 
         vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
+        )
+
+    def _createGeoJSONAndArrowCollection(self, endpoint):
+        create_landing_page_api_collection(
+            endpoint,
+            collectionLinks=[
+                {
+                    "type": "application/geo+json",
+                    "rel": "items",
+                    "href": "http://" + endpoint + "/collections/mycollection/items",
+                },
+                arrow_items_link(endpoint),
+            ],
+        )
+
+    def _writeGeoJSONItems(self, endpoint):
+        items = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": "feat.1",
+                    "properties": {},
+                    "geometry": {"type": "Point", "coordinates": [2, 49]},
+                }
+            ],
+        }
+        for limit in (10, 1000):
+            write_fake_response(
+                endpoint,
+                f"/collections/mycollection/items?limit={limit}&" + ACCEPT_ITEMS,
+                json.dumps(items).encode("UTF-8"),
+            )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowAutoSelect(self):
+
+        endpoint = (
+            self.__class__.basetestpath + "/fake_qgis_http_endpoint_testArrowAutoSelect"
+        )
+        self._createGeoJSONAndArrowCollection(endpoint)
+        # Only the Arrow items are served: a layer reading GeoJSON would be invalid
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [("id", ogr.OFTString)], [({"id": "feat.1"}, "POINT (2 49)")]
+                )
+            ],
+        )
+
+        self.assertTrue(
+            QgsSettingsTree.node("wfs")
+            .childSetting("oapif-prefer-arrow")
+            .valueAsVariant()
+        )
+        vl = self._arrowLayer(endpoint, outputformat=None)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(
+            [(f["id"], f.geometry().asWkt()) for f in vl.getFeatures()],
+            [("feat.1", "Point (2 49)")],
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowAutoSelectOptOut(self):
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowAutoSelectOptOut"
+        )
+        self._createGeoJSONAndArrowCollection(endpoint)
+        self._writeGeoJSONItems(endpoint)
+
+        setting = QgsSettingsTree.node("wfs").childSetting("oapif-prefer-arrow")
+        setting.setVariantValue(False)
+        self.addCleanup(setting.remove)
+        vl = self._arrowLayer(endpoint, outputformat=None)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowAutoSelectKeepsRequestedFormat(self):
+        """A format asked for but not offered falls back to GeoJSON, not to Arrow"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowAutoSelectKeepsRequestedFormat"
+        )
+        self._createGeoJSONAndArrowCollection(endpoint)
+        self._writeGeoJSONItems(endpoint)
+
+        vl = self._arrowLayer(endpoint, outputformat="application/flatgeobuf")
         self.assertTrue(vl.isValid())
         self.assertEqual(
             [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]

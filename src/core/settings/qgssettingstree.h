@@ -75,6 +75,7 @@ class CORE_EXPORT QgsSettingsTree
     static inline QgsSettingsTreeNode *sTreeRaster = treeRoot()->createChildNode( u"raster"_s );
     static inline QgsSettingsTreeNode *sTreeRendering = treeRoot()->createChildNode( u"rendering"_s );
     static inline QgsSettingsTreeNode *sTreeSvg = treeRoot()->createChildNode( u"svg"_s );
+    static inline QgsSettingsTreeNode *sTreeWfs = treeRoot()->createChildNode( u"wfs"_s );
     static inline QgsSettingsTreeNode *sTreeWms = treeRoot()->createChildNode( u"wms"_s );
     static inline QgsSettingsTreeNode *sTreeMeasure = treeRoot()->createChildNode( u"measure"_s );
     static inline QgsSettingsTreeNode *sTreeAnnotations = treeRoot()->createChildNode( u"annotations"_s );

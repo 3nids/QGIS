@@ -36,6 +36,7 @@
 #include "qgsoapifshareddata.h"
 #include "qgsoapifsingleitemrequest.h"
 #include "qgsoapifutils.h"
+#include "qgssettingsregistrycore.h"
 #include "qgswfsconstants.h"
 #include "qgswfsdescribefeaturetype.h"
 #include "qgsxmlschemaanalyzer.h"
@@ -261,6 +262,8 @@ bool QgsOapifProvider::init()
 
   mShared->mItemsUrl = mShared->itemsBaseUrl();
 
+  // Taken from the URI: the format may be cleared below when the collection does not offer it
+  const bool userRequestedFormat = !mShared->mURI.outputFormat().isEmpty();
   mShared->mFeatureFormat = mShared->mURI.outputFormat();
   if ( !mShared->mFeatureFormat.isEmpty() )
   {
@@ -290,6 +293,19 @@ bool QgsOapifProvider::init()
     QgsMessageLog::logMessage( tr( "The Arrow feature format was requested, but GDAL lacks a usable Arrow driver (GDAL >= 3.8 is required). Falling back to GeoJSON." ), tr( "OAPIF" ), Qgis::MessageLevel::Warning );
     mShared->mFeatureFormat.clear();
     mShared->mItemsUrl = mShared->itemsBaseUrl();
+  }
+  else if ( !userRequestedFormat && QgsSettingsRegistryCore::settingsOapifPreferArrow->value() && QgsOAPIFArrowDriverUsable() )
+  {
+    // QMap iterates in key order, but a collection offers a single Arrow link in practice
+    for ( auto it = collectionDesc.mMapFeatureFormatToUrl.constBegin(); it != collectionDesc.mMapFeatureFormatToUrl.constEnd(); ++it )
+    {
+      if ( QgsOAPIFIsArrowMediaType( it.key() ) )
+      {
+        mShared->mFeatureFormat = it.key();
+        mShared->mItemsUrl = it.value();
+        break;
+      }
+    }
   }
 
   QString tenFeaturesRequestUrl = mShared->mItemsUrl;

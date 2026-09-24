@@ -160,6 +160,9 @@ const QgsSettingsEntryBool *QgsSettingsRegistryCore::settingsLayerTreeShowIdInLa
 const QgsSettingsEntryBool *QgsSettingsRegistryCore::settingsEnableWMSTilePrefetching
   = new QgsSettingsEntryBool( u"enable_wms_tile_prefetch"_s, QgsSettingsTree::sTreeWms, false, u"Whether to include WMS layers when rendering tiles adjacent to the visible map area"_s );
 
+const QgsSettingsEntryBool *QgsSettingsRegistryCore::settingsOapifPreferArrow
+  = new QgsSettingsEntryBool( u"oapif-prefer-arrow"_s, QgsSettingsTree::sTreeWfs, true, u"Whether the OGC API - Features provider requests items in the Arrow IPC stream format when a collection advertises it"_s );
+
 const QgsSettingsEntryStringList *QgsSettingsRegistryCore::settingsMapScales = new QgsSettingsEntryStringList( u"default_scales"_s, QgsSettingsTree::sTreeMap, Qgis::defaultProjectScales().split( ',' ) );
 
 const QgsSettingsEntryInteger *QgsSettingsRegistryCore::settingsLayerParallelLoadingMaxCount
