@@ -18,7 +18,7 @@ import shutil
 import tempfile
 import unittest
 
-from osgeo import gdal, ogr
+from osgeo import gdal, ogr, osr
 from providertestbase import ProviderTestCase
 from qgis.core import (
     NULL,
@@ -53,6 +53,71 @@ ACCEPT_CONFORMANCE = "Accept=application/json"
 ACCEPT_ITEMS = "Accept=application/geo+json, application/json"
 ACCEPT_QUERYABLES = "Accept=application/schema+json"
 ACCEPT_SCHEMA = "Accept=application/schema+json"
+
+ARROW_MEDIA_TYPE = "application/vnd.apache.arrow.stream"
+ACCEPT_ARROW = "Accept=" + ARROW_MEDIA_TYPE
+# GDAL 3.8 is the first version to recognize geoarrow.wkb geometry columns
+ARROW_USABLE = gdal.GetDriverByName("Arrow") is not None and int(
+    gdal.VersionInfo("VERSION_NUM")
+) >= GDAL_COMPUTE_VERSION(3, 8, 0)
+
+
+def write_fake_response(endpoint, query_params, content):
+    with open(sanitize(endpoint, query_params), "wb") as f:
+        f.write(content)
+
+
+def arrow_items_link(endpoint):
+    return {
+        "type": ARROW_MEDIA_TYPE,
+        "rel": "items",
+        "title": "Items as GeoArrow",
+        "href": "http://" + endpoint + "/collections/mycollection/items?f=arrow",
+    }
+
+
+def arrow_stream(fields, features, srs="OGC:CRS84", domains=()):
+    """Return an Arrow IPC stream, as a server would send it, with a geoarrow.wkb geometry column
+
+    fields is a list of (name, OGR field type) or (name, OGR field type, domain name),
+    features a list of (attributes, WKT)
+    """
+    filename = "/vsimem/oapif_items.arrows"
+    ds = gdal.GetDriverByName("Arrow").Create(filename, 0, 0, 0, gdal.GDT_Unknown)
+    sr = osr.SpatialReference()
+    sr.SetFromUserInput(srs)
+    # Neither the native GeoArrow encoding, which needs a known geometry type,
+    # nor the default LZ4 compression
+    lyr = ds.CreateLayer(
+        "items",
+        srs=sr,
+        geom_type=ogr.wkbPoint,
+        options=["GEOMETRY_ENCODING=WKB", "COMPRESSION=NONE"],
+    )
+    for domain in domains:
+        ds.AddFieldDomain(domain)
+    for name, field_type, *domain_name in fields:
+        field = ogr.FieldDefn(name, field_type)
+        if domain_name:
+            field.SetDomainName(domain_name[0])
+        lyr.CreateField(field)
+    for attributes, wkt in features:
+        f = ogr.Feature(lyr.GetLayerDefn())
+        for name, value in attributes.items():
+            f[name] = value
+        f.SetGeometry(ogr.CreateGeometryFromWkt(wkt))
+        lyr.CreateFeature(f)
+    del ds
+
+    f = gdal.VSIFOpenL(filename, "rb")
+    data = gdal.VSIFReadL(1, gdal.VSIStatL(filename).size, f)
+    gdal.VSIFCloseL(f)
+    gdal.Unlink(filename)
+    assert data[:4] == b"\xff\xff\xff\xff", "not an IPC stream"
+    assert b"geoarrow.wkb" in data
+    # The fake HTTP endpoint would read everything up to the last CRLF as headers
+    assert b"\r\n" not in data
+    return data
 
 
 def mergeDict(d1, d2):
@@ -3328,6 +3393,314 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
         ) as f:
             f.write(b"")
         self.assertTrue(vl.dataProvider().deleteFeatures([my_id_fid]))
+
+    def _writeArrowItems(
+        self, endpoint, pages, params="", next_link_type=ARROW_MEDIA_TYPE
+    ):
+        """Write the fixtures of the limit=10 request made when opening the layer,
+        and of the download of pages, each linking to the next one"""
+        items = "/collections/mycollection/items?f=arrow"
+        write_fake_response(
+            endpoint, items + "&limit=10" + params + "&" + ACCEPT_ARROW, pages[0]
+        )
+        for i, page in enumerate(pages):
+            query = items + ("&limit=1000" + params if i == 0 else f"&offset={i}")
+            headers = ""
+            if i + 1 < len(pages):
+                headers = f'Link: <http://{endpoint}{items}&offset={i + 1}>; rel="next"; type="{next_link_type}"\r\n'
+            write_fake_response(
+                endpoint,
+                query + "&" + ACCEPT_ARROW,
+                (headers + "\r\n").encode("utf-8") + page,
+            )
+
+    def _arrowLayer(self, endpoint, outputformat=ARROW_MEDIA_TYPE):
+        uri = "url='http://" + endpoint + "' typename='mycollection'"
+        if outputformat:
+            uri += " outputformat='" + outputformat + "'"
+        return QgsVectorLayer(uri, "test", "OAPIF")
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowOutputFormat(self):
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowOutputFormat"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        fields = [("id", ogr.OFTString), ("name", ogr.OFTString)]
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    fields, [({"id": "feat.1", "name": "foo"}, "POINT (2 49)")]
+                ),
+                arrow_stream(
+                    fields, [({"id": "feat.2", "name": "bar"}, "POINT (3 50)")]
+                ),
+            ],
+            # spelled differently from the link of the collection
+            next_link_type="Application/vnd.apache.arrow.stream; charset=binary",
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(vl.fields().names(), ["id", "name"])
+
+        features = list(vl.getFeatures())
+        self.assertEqual([f["id"] for f in features], ["feat.1", "feat.2"])
+        self.assertEqual([f["name"] for f in features], ["foo", "bar"])
+        self.assertEqual(
+            [f.geometry().asWkt() for f in features], ["Point (2 49)", "Point (3 50)"]
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowAxisOrder(self):
+        """GeoArrow coordinates are longitude first, whatever the axis order of the CRS"""
+
+        endpoint = (
+            self.__class__.basetestpath + "/fake_qgis_http_endpoint_testArrowAxisOrder"
+        )
+        crs = "http://www.opengis.net/def/crs/EPSG/0/4326"
+        create_landing_page_api_collection(
+            endpoint, storageCrs=crs, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [("id", ogr.OFTString)],
+                    [({"id": "feat.1"}, "POINT (2 49)")],
+                    srs="EPSG:4326",
+                )
+            ],
+            params="&crs=" + crs,
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(vl.sourceCrs().authid(), "EPSG:4326")
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowWithoutIdColumn(self):
+        """A column merely containing "id" in its name is not taken for the feature id"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowWithoutIdColumn"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [("width", ogr.OFTInteger)],
+                    [({"width": 10}, "POINT (2 49)"), ({"width": 10}, "POINT (3 50)")],
+                )
+            ],
+        )
+        write_fake_response(
+            endpoint, "/collections/mycollection/items?VERB=OPTIONS", b"HEAD, GET, POST"
+        )
+        # The id hashed from the content of a feature can't address it
+        write_fake_response(
+            endpoint,
+            "/collections/mycollection/items/?VERB=OPTIONS",
+            b"HEAD, GET, PUT, DELETE",
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        capabilities = vl.dataProvider().capabilities()
+        self.assertNotEqual(
+            capabilities & vl.dataProvider().AddFeatures,
+            vl.dataProvider().NoCapabilities,
+        )
+        self.assertEqual(
+            capabilities & vl.dataProvider().ChangeAttributeValues,
+            vl.dataProvider().NoCapabilities,
+        )
+        self.assertEqual(
+            capabilities & vl.dataProvider().DeleteFeatures,
+            vl.dataProvider().NoCapabilities,
+        )
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()],
+            ["Point (2 49)", "Point (3 50)"],
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowDictionaryColumn(self):
+        """Every page is a stream with its own dictionary"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowDictionaryColumn"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+
+        def page(values, id):
+            domain = ogr.CreateCodedFieldDomain(
+                "landuseDomain", "", ogr.OFTInteger, ogr.OFSTNone, values
+            )
+            return arrow_stream(
+                [("id", ogr.OFTString), ("landuse", ogr.OFTInteger, "landuseDomain")],
+                [({"id": id, "landuse": 1}, "POINT (2 49)")],
+                domains=[domain],
+            )
+
+        self._writeArrowItems(
+            endpoint,
+            [
+                page({0: "residential", 1: "commercial"}, "feat.1"),
+                page({0: "commercial", 1: "industrial"}, "feat.2"),
+            ],
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(vl.fields().field("landuse").type(), QMetaType.Type.QString)
+        self.assertEqual(
+            [f["landuse"] for f in vl.getFeatures()], ["commercial", "industrial"]
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowTruncatedStream(self):
+        """A stream cut inside a record batch opens, but must not pass for a page without features"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowTruncatedStream"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        page = arrow_stream(
+            [("id", ogr.OFTString)],
+            [({"id": f"feat.{i}"}, f"POINT ({i} 49)") for i in range(100)],
+        )
+        self._writeArrowItems(endpoint, [page[:-100]])
+
+        vl = self._arrowLayer(endpoint)
+        self.assertFalse(vl.isValid())
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowObjectPropertyOfPart5Schema(self):
+        """GDAL flattens an Arrow struct column into one field per member"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowObjectPropertyOfPart5Schema"
+        )
+        create_landing_page_api_collection(
+            endpoint,
+            additionalConformance=[
+                "http://www.opengis.net/spec/ogcapi-features-5/1.0/conf/schemas"
+            ],
+            collectionLinks=[
+                arrow_items_link(endpoint),
+                {
+                    "type": "application/schema+json",
+                    "rel": "http://www.opengis.net/def/rel/ogc/1.0/schema",
+                    "href": "http://"
+                    + endpoint
+                    + "/collections/mycollection/schema?f=json",
+                },
+            ],
+        )
+        schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+                "id": {"type": "string", "x-ogc-role": "id", "x-ogc-propertySeq": 1},
+                "address": {"type": "object", "x-ogc-propertySeq": 2},
+                "geometry": {
+                    "x-ogc-role": "primary-geometry",
+                    "format": "geometry-point",
+                    "x-ogc-propertySeq": 3,
+                },
+            },
+        }
+        write_fake_response(
+            endpoint,
+            "/collections/mycollection/schema?f=json&" + ACCEPT_SCHEMA,
+            json.dumps(schema).encode("UTF-8"),
+        )
+        # The names GDAL gives to the members of a struct column
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [
+                        ("id", ogr.OFTString),
+                        ("address.street", ogr.OFTString),
+                        ("address.city", ogr.OFTString),
+                    ],
+                    [
+                        (
+                            {
+                                "id": "feat.1",
+                                "address.street": "Main",
+                                "address.city": "Bern",
+                            },
+                            "POINT (2 49)",
+                        ),
+                        ({"id": "feat.2"}, "POINT (3 50)"),
+                    ],
+                )
+            ],
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(vl.fields().names(), ["id", "address"])
+        self.assertEqual(
+            [f["address"] for f in vl.getFeatures()],
+            [{"street": "Main", "city": "Bern"}, NULL],
+        )
+
+    @unittest.skipIf(ARROW_USABLE, "only meaningful without a usable Arrow driver")
+    def testArrowOutputFormatWithoutUsableDriver(self):
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowOutputFormatWithoutUsableDriver"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        items = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": "feat.1",
+                    "properties": {},
+                    "geometry": {"type": "Point", "coordinates": [2, 49]},
+                }
+            ],
+        }
+        for limit in (10, 1000):
+            write_fake_response(
+                endpoint,
+                f"/collections/mycollection/items?limit={limit}&" + ACCEPT_ITEMS,
+                json.dumps(items).encode("UTF-8"),
+            )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
+        )
 
     def _testJsonFG_oapif1_1_OutputFormat(self, profile, profile_in_next_link=True):
 

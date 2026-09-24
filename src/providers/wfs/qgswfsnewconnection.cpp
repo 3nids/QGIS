@@ -45,6 +45,9 @@ static QString translatedImageFormatFromMediaType( const QString &type )
     { u"application/gml+xml;version=3.2;profile=\"http://www.opengis.net/def/profile/ogc/2.0/gml-sf2\""_s, QObject::tr( "GML 3.2, Simple Features 2 profile" ) },
   };
 
+  if ( QgsOAPIFIsArrowMediaType( type ) )
+    return QObject::tr( "Arrow (GeoArrow)" );
+
   const auto iter = mapMimeTypeToTranslated.constFind( type );
   if ( iter != mapMimeTypeToTranslated.constEnd() )
     return iter.value();

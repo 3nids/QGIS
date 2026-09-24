@@ -88,7 +88,11 @@ bool QgsOapifCollection::deserialize( const json &j, const json &jCollections )
 
     if ( link.rel == "items"_L1 )
     {
-      if ( link.type == "application/geo+json"_L1 || link.type == "application/flatgeobuf"_L1 || link.type == PSEUDO_JSONFG_MEDIA_TYPE || link.type.startsWith( "application/gml+xml"_L1 ) )
+      if ( link.type == "application/geo+json"_L1
+           || link.type == "application/flatgeobuf"_L1
+           || link.type == PSEUDO_JSONFG_MEDIA_TYPE
+           || link.type.startsWith( "application/gml+xml"_L1 )
+           || QgsOAPIFIsArrowMediaType( link.type ) )
       {
         // OGC API 1.1 way no longer uses a "application/fg+json" media-type
         // but "application/geo+json" + profile = http://www.opengis.net/def/profile/ogc/0/jsonfg

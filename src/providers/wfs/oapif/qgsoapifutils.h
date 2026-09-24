@@ -59,4 +59,13 @@ extern const QString OAPIF_PROVIDER_DEFAULT_CRS;
 // sake of simplicity, internally, use the pseudo mime type.
 extern const QString PSEUDO_JSONFG_MEDIA_TYPE;
 
+// Media type of the Arrow IPC stream format, with GeoArrow geometries
+extern const QString OAPIF_ARROW_IPC_STREAM_MEDIA_TYPE;
+
+// Return whether mediaType is the Arrow IPC stream one, ignoring case, spaces and parameters
+bool QgsOAPIFIsArrowMediaType( const QString &mediaType );
+
+// Return whether the GDAL in use can read GeoArrow IPC streams
+bool QgsOAPIFArrowDriverUsable();
+
 #endif // QGSOAPIFUTILS_H

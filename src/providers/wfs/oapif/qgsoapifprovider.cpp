@@ -284,6 +284,14 @@ bool QgsOapifProvider::init()
     }
   }
 
+  if ( QgsOAPIFIsArrowMediaType( mShared->mFeatureFormat ) && !QgsOAPIFArrowDriverUsable() )
+  {
+    // A hand written URI, or a project opened with another build of QGIS
+    QgsMessageLog::logMessage( tr( "The Arrow feature format was requested, but GDAL lacks a usable Arrow driver (GDAL >= 3.8 is required). Falling back to GeoJSON." ), tr( "OAPIF" ), Qgis::MessageLevel::Warning );
+    mShared->mFeatureFormat.clear();
+    mShared->mItemsUrl = mShared->itemsBaseUrl();
+  }
+
   QString tenFeaturesRequestUrl = mShared->mItemsUrl;
   if ( tenFeaturesRequestUrl.indexOf( '?'_L1 ) < 0 )
     tenFeaturesRequestUrl += '?'_L1;
@@ -561,6 +569,10 @@ void QgsOapifProvider::computeCapabilities( const QgsOapifItemsRequest &itemsReq
     if ( !features.empty() )
     {
       testId = features[0].second;
+      // Features without an id from the server get one hashed from their
+      // content: it can't address them in /items/{id}
+      if ( testId.isEmpty() )
+        return;
     }
     else
     {

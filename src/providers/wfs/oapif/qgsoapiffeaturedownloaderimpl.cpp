@@ -36,6 +36,36 @@
 
 using namespace Qt::StringLiterals;
 
+// Member path within the object, and source field index, of each field an Arrow struct column was flattened into
+using FlattenedMembers = QList<QPair<QStringList, int>>;
+
+static void insertAtPath( QVariantMap &object, const QStringList &path, int depth, const QVariant &value )
+{
+  if ( depth == path.size() - 1 )
+  {
+    object.insert( path[depth], value );
+    return;
+  }
+  QVariantMap child = object.value( path[depth] ).toMap();
+  insertAtPath( child, path, depth + 1, value );
+  object.insert( path[depth], child );
+}
+
+// Rebuild an object from the fields GDAL flattened it into, NULL if they all are
+static QVariant objectFromFlattenedMembers( const FlattenedMembers &members, const QgsAttributes &attributes )
+{
+  QVariantMap object;
+  bool allNull = true;
+  for ( const auto &[path, srcIdx] : members )
+  {
+    const QVariant v = attributes.value( srcIdx );
+    if ( !QgsVariantUtils::isNull( v ) )
+      allNull = false;
+    insertAtPath( object, path, 0, v );
+  }
+  return allNull ? QgsVariantUtils::createNullVariant( QMetaType::Type::QVariantMap ) : QVariant( object );
+}
+
 QgsOapifFeatureDownloaderImpl::QgsOapifFeatureDownloaderImpl( QgsOapifSharedData *shared, QgsFeatureDownloader *downloader, bool requestMadeFromMainThread )
   : QgsBaseNetworkRequest( shared->mURI.auth(), tr( "OAPIF" ) )
   , QgsFeatureDownloaderImpl( shared, downloader )
@@ -476,6 +506,26 @@ void QgsOapifFeatureDownloaderImpl::runGenericDownload( QEventLoop &loop, QStrin
     size_t i = 0;
     const QgsFields srcFields = itemsRequest.fields();
     const QgsFields dstFields = mShared->fields();
+    const bool isArrow = QgsOAPIFIsArrowMediaType( mShared->mFeatureFormat );
+
+    // GDAL flattens an Arrow struct column into one field per member, named
+    // "column.member", where a Part 5 schema has a single object field
+    QHash<int, FlattenedMembers> dstFieldToFlattenedMembers;
+    if ( isArrow )
+    {
+      for ( int j = 0; j < dstFields.size(); j++ )
+      {
+        if ( dstFields.at( j ).type() != QMetaType::Type::QVariantMap || srcFields.indexOf( dstFields.at( j ).name() ) >= 0 )
+          continue;
+        const QString prefix = dstFields.at( j ).name() + '.'_L1;
+        for ( int k = 0; k < srcFields.size(); k++ )
+        {
+          if ( srcFields.at( k ).name().startsWith( prefix ) )
+            dstFieldToFlattenedMembers[j].append( { srcFields.at( k ).name().mid( prefix.size() ).split( '.'_L1 ), k } );
+        }
+      }
+    }
+
     for ( const auto &pair : itemsRequest.features() )
     {
       // In the case the features of the current page have not the same schema
@@ -485,7 +535,8 @@ void QgsOapifFeatureDownloaderImpl::runGenericDownload( QEventLoop &loop, QStrin
       if ( f.hasGeometry() )
       {
         QgsGeometry g = f.geometry();
-        if ( mShared->mSourceCrs.hasAxisInverted() )
+        // GeoArrow coordinates are longitude/easting first, whatever the axis order of the CRS
+        if ( mShared->mSourceCrs.hasAxisInverted() && !isArrow )
           g.get()->swapXy();
 
         // Promote single geometries to multipart if necessary
@@ -512,6 +563,10 @@ void QgsOapifFeatureDownloaderImpl::runGenericDownload( QEventLoop &loop, QStrin
             dstFeat.setAttribute( j, v );
           else
             dstFeat.setAttribute( j, QgsVectorDataProvider::convertValue( dstFieldType, v.toString() ) );
+        }
+        else if ( const auto it = dstFieldToFlattenedMembers.constFind( j ); it != dstFieldToFlattenedMembers.constEnd() )
+        {
+          dstFeat.setAttribute( j, objectFromFlattenedMembers( *it, srcAttrs ) );
         }
       }
 

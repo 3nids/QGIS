@@ -27,6 +27,7 @@ using namespace nlohmann;
 #include "qgsoapifshareddata.h"
 #include "qgsoapifutils.h"
 #include "qgsproviderregistry.h"
+#include "qgsvariantutils.h"
 #include "qgsvectordataprovider.h"
 
 #include "cpl_conv.h"
@@ -129,6 +130,7 @@ void QgsOapifItemsRequest::processReply()
 
   const bool isGeoJSON = mFeatureFormat.isEmpty() || mFeatureFormat == "application/geo+json"_L1;
   const bool isGML = mFeatureFormat.startsWith( "application/gml+xml"_L1 );
+  const bool isArrow = QgsOAPIFIsArrowMediaType( mFeatureFormat );
 
   if ( isGeoJSON )
   {
@@ -151,6 +153,8 @@ void QgsOapifItemsRequest::processReply()
   QString extension;
   if ( mFeatureFormat == "application/flatgeobuf"_L1 )
     extension = u"fgb"_s;
+  else if ( isArrow )
+    extension = u"arrows"_s;
   else if ( isGML )
     extension = u"gml"_s;
   else
@@ -180,8 +184,45 @@ void QgsOapifItemsRequest::processReply()
     return;
   }
 
+  // An Arrow stream cut inside a record batch still opens, but reading it
+  // stops short: only the errors raised from now on tell it apart.
+  CPLErrorReset();
+
   mGeometryAttribute = vectorProvider->geometryColumnName();
   mFields = vectorProvider->fields();
+
+  // GDAL exposes a dictionary encoded Arrow column as the integer codes, with
+  // a coded value domain. Every page is a stream with its own dictionary, so
+  // the same code may stand for different values on different pages: decode them.
+  QList<QPair<int, QHash<QString, QString>>> dictionaryFields;
+  if ( isArrow )
+  {
+    for ( int i = 0; i < mFields.size(); ++i )
+    {
+      QgsField &field = mFields[i];
+      if ( field.constraints().domainName().isEmpty() || field.editorWidgetSetup().type() != "ValueMap"_L1 )
+        continue;
+      QHash<QString, QString> codeToValue;
+      const QVariantList valueMap = field.editorWidgetSetup().config().value( u"map"_s ).toList();
+      for ( const QVariant &entry : valueMap )
+      {
+        const QVariantMap valueToCode = entry.toMap();
+        for ( auto it = valueToCode.constBegin(); it != valueToCode.constEnd(); ++it )
+          codeToValue.insert( it.value().toString(), it.key() );
+      }
+      field.setType( QMetaType::Type::QString );
+      field.setTypeName( u"String"_s );
+      field.setSubType( QMetaType::Type::UnknownType );
+      field.setLength( 0 );
+      field.setPrecision( 0 );
+      field.setEditorWidgetSetup( QgsEditorWidgetSetup() );
+      QgsFieldConstraints constraints = field.constraints();
+      constraints.setDomainName( QString() );
+      field.setConstraints( constraints );
+      dictionaryFields.append( { i, codeToValue } );
+    }
+  }
+
   if ( isGML )
   {
     if ( mGeometryAttribute.isEmpty() && buffer.contains( QByteArray( "bml:boreholePath" ) ) )
@@ -203,7 +244,18 @@ void QgsOapifItemsRequest::processReply()
   auto iter = vectorProvider->getFeatures();
 
   int idField = -1;
-  if ( !isGeoJSON )
+  if ( isArrow )
+  {
+    // Arrow has no standard place for the feature id: only trust a column
+    // named after it, or the FID column declared by the stream. A column
+    // merely containing "id" in its name, like "width", may repeat values.
+    idField = mFields.lookupField( u"id"_s );
+    if ( idField < 0 && vectorProvider->pkAttributeIndexes() == QgsAttributeList { 0 } )
+    {
+      idField = 0;
+    }
+  }
+  else if ( !isGeoJSON )
   {
     idField = mFields.indexOf( "id"_L1 );
     // If no "id" field, then use the first field if it contains "id" in it.
@@ -218,6 +270,11 @@ void QgsOapifItemsRequest::processReply()
     QgsFeature f;
     if ( !iter.nextFeature( f ) )
       break;
+    for ( const auto &[fieldIdx, codeToValue] : std::as_const( dictionaryFields ) )
+    {
+      const auto it = codeToValue.constFind( f.attribute( fieldIdx ).toString() );
+      f.setAttribute( fieldIdx, it != codeToValue.constEnd() ? QVariant( *it ) : QgsVariantUtils::createNullVariant( QMetaType::Type::QString ) );
+    }
     QString id;
     if ( idField >= 0 )
     {
@@ -229,10 +286,22 @@ void QgsOapifItemsRequest::processReply()
     }
     mFeatures.push_back( QgsFeatureUniqueIdPair( f, id ) );
   }
+  // Other drivers, like the GML one, raise errors on single features and go on
+  const QString decodingError = isArrow && CPLGetLastErrorType() == CE_Failure ? QString::fromUtf8( CPLGetLastErrorMsg() ) : QString();
   QgsDebugMsgLevel( u"OGR feature iteration end time: %1"_s.arg( time( nullptr ) ), 5 );
   vectorProvider.reset();
   VSIUnlink( vsimemFilename.toUtf8().constData() );
   VSIUnlink( CPLResetExtension( vsimemFilename.toUtf8().constData(), "gfs" ) );
+
+  if ( !decodingError.isEmpty() )
+  {
+    mFeatures.clear();
+    mErrorCode = QgsBaseNetworkRequest::ApplicationLevelError;
+    mAppLevelError = ApplicationLevelError::JsonError;
+    mErrorMessage = errorMessageWithReason( tr( "Loading of items failed: %1" ).arg( decodingError ) );
+    emit gotResponse();
+    return;
+  }
 
   if ( isGeoJSON )
   {

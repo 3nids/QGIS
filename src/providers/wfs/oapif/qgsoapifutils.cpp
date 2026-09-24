@@ -15,6 +15,7 @@
 
 #include "qgsoapifutils.h"
 
+#include <gdal.h>
 #include <limits>
 
 #include <QRegularExpression>
@@ -25,6 +26,23 @@ using namespace Qt::StringLiterals;
 const QString OAPIF_PROVIDER_DEFAULT_CRS = u"http://www.opengis.net/def/crs/OGC/1.3/CRS84"_s;
 
 const QString PSEUDO_JSONFG_MEDIA_TYPE = u"application/fg+json"_s;
+
+const QString OAPIF_ARROW_IPC_STREAM_MEDIA_TYPE = u"application/vnd.apache.arrow.stream"_s;
+
+bool QgsOAPIFIsArrowMediaType( const QString &mediaType )
+{
+  return mediaType.section( ';', 0, 0 ).trimmed().compare( OAPIF_ARROW_IPC_STREAM_MEDIA_TYPE, Qt::CaseInsensitive ) == 0;
+}
+
+bool QgsOAPIFArrowDriverUsable()
+{
+#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION( 3, 8, 0 )
+  // GDAL 3.8 is the first version to recognize geometry columns with the geoarrow.wkb extension
+  return GDALGetDriverByName( "Arrow" ) != nullptr;
+#else
+  return false;
+#endif
+}
 
 std::vector<QgsOAPIFJson::Link> QgsOAPIFJson::parseLinks( const json &jParent )
 {
@@ -246,6 +264,13 @@ QString QgsOAPIFGetNextLinkFromResponseHeader( const QList<QNetworkReply::RawHea
         {
           if ( type == formatType )
           {
+            nextUrl = href;
+            break;
+          }
+          else if ( QgsOAPIFIsArrowMediaType( formatType ) && QgsOAPIFIsArrowMediaType( type ) )
+          {
+            // The link header and the collection links are written independently,
+            // and may spell the media type differently
             nextUrl = href;
             break;
           }
