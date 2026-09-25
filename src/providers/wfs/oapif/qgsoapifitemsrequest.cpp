@@ -248,8 +248,14 @@ void QgsOapifItemsRequest::processReply()
   {
     // Arrow has no standard place for the feature id: only trust a column
     // named after it, or the FID column declared by the stream. A column
-    // merely containing "id" in its name, like "width", may repeat values.
-    idField = mFields.lookupField( u"id"_s );
+    // merely containing "id" in its name, like "width", may repeat values,
+    // and so may one merely aliased "id".
+    idField = mFields.indexOf( "id"_L1 );
+    for ( int i = 0; idField < 0 && i < mFields.size(); ++i )
+    {
+      if ( mFields.at( i ).name().compare( "id"_L1, Qt::CaseInsensitive ) == 0 )
+        idField = i;
+    }
     if ( idField < 0 && vectorProvider->pkAttributeIndexes() == QgsAttributeList { 0 } )
     {
       idField = 0;

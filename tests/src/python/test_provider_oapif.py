@@ -77,11 +77,11 @@ def arrow_items_link(endpoint):
     }
 
 
-def arrow_stream(fields, features, srs="OGC:CRS84", domains=()):
+def arrow_stream(fields, features, srs="OGC:CRS84", domains=(), alternative_names=None):
     """Return an Arrow IPC stream, as a server would send it, with a geoarrow.wkb geometry column
 
     fields is a list of (name, OGR field type) or (name, OGR field type, domain name),
-    features a list of (attributes, WKT)
+    features a list of (attributes, WKT), alternative_names a dict of field names to theirs
     """
     filename = "/vsimem/oapif_items.arrows"
     ds = gdal.GetDriverByName("Arrow").Create(filename, 0, 0, 0, gdal.GDT_Unknown)
@@ -101,6 +101,8 @@ def arrow_stream(fields, features, srs="OGC:CRS84", domains=()):
         field = ogr.FieldDefn(name, field_type)
         if domain_name:
             field.SetDomainName(domain_name[0])
+        if alternative_names and name in alternative_names:
+            field.SetAlternativeName(alternative_names[name])
         lyr.CreateField(field)
     for attributes, wkt in features:
         f = ogr.Feature(lyr.GetLayerDefn())
@@ -3532,6 +3534,39 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             capabilities & vl.dataProvider().DeleteFeatures,
             vl.dataProvider().NoCapabilities,
         )
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()],
+            ["Point (2 49)", "Point (3 50)"],
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowColumnAliasedId(self):
+        """A column merely aliased "id" is not taken for the feature id"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowColumnAliasedId"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [("category", ogr.OFTString)],
+                    [
+                        ({"category": "same"}, "POINT (2 49)"),
+                        ({"category": "same"}, "POINT (3 50)"),
+                    ],
+                    alternative_names={"category": "ID"},
+                )
+            ],
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(vl.fields().field("category").alias(), "ID")
         self.assertEqual(
             [f.geometry().asWkt() for f in vl.getFeatures()],
             ["Point (2 49)", "Point (3 50)"],
