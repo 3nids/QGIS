@@ -18,6 +18,9 @@
 #include <gdal.h>
 #include <limits>
 
+#include "qgsgeometry.h"
+#include "qgswkbtypes.h"
+
 #include <QRegularExpression>
 #include <QString>
 
@@ -32,6 +35,21 @@ const QString OAPIF_ARROW_IPC_STREAM_MEDIA_TYPE = u"application/vnd.apache.arrow
 bool QgsOAPIFIsArrowMediaType( const QString &mediaType )
 {
   return mediaType.section( ';', 0, 0 ).trimmed().compare( OAPIF_ARROW_IPC_STREAM_MEDIA_TYPE, Qt::CaseInsensitive ) == 0;
+}
+
+bool QgsOAPIFSetJsonFgPlace( json &object, const QgsGeometry &geometry, int precision, const QString &crs )
+{
+  if ( geometry.isNull() || !QgsWkbTypes::isCurvedType( geometry.wkbType() ) )
+    return false;
+  object["place"] = geometry.asJsonObject( precision, Qgis::GeoJsonProfile::JsonFg );
+  if ( !crs.isEmpty() )
+    object["coordRefSys"] = crs.toStdString();
+  return true;
+}
+
+json QgsOAPIFJsonFgCircularArcsConformance()
+{
+  return { "http://www.opengis.net/spec/json-fg-1/1.0/conf/core", "http://www.opengis.net/spec/json-fg-1/1.0/conf/circular-arcs" };
 }
 
 bool QgsOAPIFArrowDriverUsable()

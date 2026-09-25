@@ -68,4 +68,13 @@ bool QgsOAPIFIsArrowMediaType( const QString &mediaType );
 // Return whether the GDAL in use can read GeoArrow IPC streams
 bool QgsOAPIFArrowDriverUsable();
 
+class QgsGeometry;
+
+// If geometry has circular arcs, which a GeoJSON "geometry" can only carry linearized, set it as the
+// JSON-FG "place" of object, in crs (CRS84 if empty), and return true
+bool QgsOAPIFSetJsonFgPlace( json &object, const QgsGeometry &geometry, int precision, const QString &crs );
+
+// JSON-FG conformance classes of a feature with circular arcs in its "place"
+json QgsOAPIFJsonFgCircularArcsConformance();
+
 #endif // QGSOAPIFUTILS_H

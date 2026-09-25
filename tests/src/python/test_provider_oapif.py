@@ -26,6 +26,7 @@ from qgis.core import (
     QgsBox3d,
     QgsFeature,
     QgsFeatureRequest,
+    QgsFeatureSink,
     QgsGeometry,
     QgsRectangle,
     QgsSettings,
@@ -2489,6 +2490,98 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
 
         ret, _ = vl.dataProvider().addFeatures([f])
         self.assertTrue(ret)
+
+    def testCurvedGeometryWrites(self):
+        """Arcs are written as the JSON-FG "place", next to their linearized GeoJSON "geometry" """
+
+        crs = "http://www.opengis.net/def/crs/EPSG/0/2056"
+        arc = QgsGeometry.fromWkt(
+            "CircularString (2600000 1200000, 2600001 1200001, 2600002 1200000)"
+        )
+        place = '"place":{"coordinates":[[2600000.0,1200000.0],[2600001.0,1200001.0],[2600002.0,1200000.0]],"type":"CircularString"}'
+        conforms_to = '"conformsTo":["http://www.opengis.net/spec/json-fg-1/1.0/conf/core","http://www.opengis.net/spec/json-fg-1/1.0/conf/circular-arcs"]'
+        coord_ref_sys = f'"coordRefSys":"{crs}"'
+
+        for supports_patch in (False, True):
+            endpoint = (
+                self.__class__.basetestpath
+                + f"/fake_qgis_http_endpoint_testCurvedGeometryWrites_{supports_patch}"
+            )
+            create_landing_page_api_collection(endpoint, storageCrs=crs)
+            items = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "id": "feat.1",
+                        "properties": {"name": "a"},
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": [[2600000, 1200000], [2600002, 1200000]],
+                        },
+                    }
+                ],
+            }
+            for limit in (10, 1000):
+                write_fake_response(
+                    endpoint,
+                    f"/collections/mycollection/items?limit={limit}&crs={crs}&"
+                    + ACCEPT_ITEMS,
+                    json.dumps(items).encode("UTF-8"),
+                )
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items?VERB=OPTIONS",
+                b"HEAD, GET, POST",
+            )
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items/feat.1?VERB=OPTIONS",
+                b"HEAD, GET, PUT, DELETE" + (b", PATCH" if supports_patch else b""),
+            )
+
+            vl = QgsVectorLayer(
+                "url='http://" + endpoint + "' typename='mycollection'",
+                "test",
+                "OAPIF",
+            )
+            self.assertTrue(vl.isValid())
+            self.assertEqual([f["name"] for f in vl.getFeatures()], ["a"])
+
+            if supports_patch:
+                write_fake_response(
+                    endpoint,
+                    "/collections/mycollection/items/feat.1?PATCHDATA={"
+                    + f'{coord_ref_sys},"geometry":{arc.asJson()},{place}'
+                    + f"}}&Content-Crs={crs}&Content-Type=application_merge-patch+json",
+                    b"",
+                )
+                self.assertTrue(vl.dataProvider().changeGeometryValues({1: arc}))
+                continue
+
+            # the exporter writes 6 decimals
+            geometry = f'"geometry":{arc.asJson(6)}'
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items/feat.1?PUTDATA={"
+                + f'{conforms_to},{coord_ref_sys},{geometry},"id":"feat.1",{place},"properties":{{"name":"a"}},"type":"Feature"'
+                + f"}}&Content-Crs={crs}",
+                b"",
+            )
+            self.assertTrue(vl.dataProvider().changeGeometryValues({1: arc}))
+
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items?POSTDATA={"
+                + f'{conforms_to},{coord_ref_sys},{geometry},{place},"properties":{{"name":"b"}},"type":"Feature"'
+                + f"}}&Content-Crs={crs}",
+                b"Location: /collections/mycollection/items/new_id\r\n",
+            )
+            f = QgsFeature(vl.fields())
+            f.setAttribute("name", "b")
+            f.setGeometry(arc)
+            ret, _ = vl.dataProvider().addFeatures([f], QgsFeatureSink.Flag.FastInsert)
+            self.assertTrue(ret)
 
     def testFeatureGeometryChange(self):
 

@@ -26,6 +26,7 @@ using namespace nlohmann;
 #include "qgsoapifpatchfeaturerequest.h"
 #include "moc_qgsoapifpatchfeaturerequest.cpp"
 #include "qgsoapifshareddata.h"
+#include "qgsoapifutils.h"
 
 QgsOapifPatchFeatureRequest::QgsOapifPatchFeatureRequest( const QgsDataSourceUri &uri )
   : QgsBaseNetworkRequest( QgsAuthorizationSettings( uri.username(), uri.password(), QgsHttpHeaders(), uri.authConfigId() ), "OAPIF" )
@@ -41,6 +42,8 @@ bool QgsOapifPatchFeatureRequest::patchFeature( const QgsOapifSharedData *shared
 
   json j;
   j["geometry"] = geomModified.asJsonObject();
+  // GeoJSON has no arcs: keep them in "place", "geometry" being the linearized fallback
+  QgsOAPIFSetJsonFgPlace( j, geomModified, 17, contentCrs );
   QList<QNetworkReply::RawHeaderPair> extraHeaders;
   if ( !contentCrs.isEmpty() )
     extraHeaders.append( QNetworkReply::RawHeaderPair( QByteArray( "Content-Crs" ), contentCrs.toUtf8() ) );

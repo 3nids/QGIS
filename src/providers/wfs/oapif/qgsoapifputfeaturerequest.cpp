@@ -26,6 +26,7 @@ using namespace nlohmann;
 #include "qgsoapifputfeaturerequest.h"
 #include "moc_qgsoapifputfeaturerequest.cpp"
 #include "qgsoapifshareddata.h"
+#include "qgsoapifutils.h"
 
 QgsOapifPutFeatureRequest::QgsOapifPutFeatureRequest( const QgsDataSourceUri &uri )
   : QgsBaseNetworkRequest( QgsAuthorizationSettings( uri.username(), uri.password(), QgsHttpHeaders(), uri.authConfigId() ), "OAPIF" )
@@ -47,6 +48,9 @@ bool QgsOapifPutFeatureRequest::putFeature( const QgsOapifSharedData *sharedData
   auto iterBbox = j.find( "bbox" );
   if ( iterBbox != j.end() )
     j.erase( iterBbox );
+  // GeoJSON has no arcs: keep them in "place", "geometry" being the linearized fallback
+  if ( QgsOAPIFSetJsonFgPlace( j, fModified.geometry(), exporter.precision(), contentCrs ) )
+    j["conformsTo"] = QgsOAPIFJsonFgCircularArcsConformance();
   if ( !sharedData->mFoundIdInProperties )
   {
     auto jPropertiesIter = j.find( "properties" );
