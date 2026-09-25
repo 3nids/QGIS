@@ -270,15 +270,19 @@ void QgsOapifItemsRequest::processReply()
     QgsFeature f;
     if ( !iter.nextFeature( f ) )
       break;
+    // The string of a null integer is "0", which may be a code or an id too
     for ( const auto &[fieldIdx, codeToValue] : std::as_const( dictionaryFields ) )
     {
-      const auto it = codeToValue.constFind( f.attribute( fieldIdx ).toString() );
+      const QVariant code = f.attribute( fieldIdx );
+      const auto it = QgsVariantUtils::isNull( code ) ? codeToValue.constEnd() : codeToValue.constFind( code.toString() );
       f.setAttribute( fieldIdx, it != codeToValue.constEnd() ? QVariant( *it ) : QgsVariantUtils::createNullVariant( QMetaType::Type::QString ) );
     }
     QString id;
     if ( idField >= 0 )
     {
-      id = f.attribute( idField ).toString();
+      const QVariant idValue = f.attribute( idField );
+      if ( !QgsVariantUtils::isNull( idValue ) )
+        id = idValue.toString();
     }
     else if ( mFeatureFormat == PSEUDO_JSONFG_MEDIA_TYPE )
     {

@@ -3549,21 +3549,28 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             endpoint, collectionLinks=[arrow_items_link(endpoint)]
         )
 
-        def page(values, id):
+        def page(values, features):
             domain = ogr.CreateCodedFieldDomain(
                 "landuseDomain", "", ogr.OFTInteger, ogr.OFSTNone, values
             )
             return arrow_stream(
                 [("id", ogr.OFTString), ("landuse", ogr.OFTInteger, "landuseDomain")],
-                [({"id": id, "landuse": 1}, "POINT (2 49)")],
+                [(attributes, "POINT (2 49)") for attributes in features],
                 domains=[domain],
             )
 
         self._writeArrowItems(
             endpoint,
             [
-                page({0: "residential", 1: "commercial"}, "feat.1"),
-                page({0: "commercial", 1: "industrial"}, "feat.2"),
+                page(
+                    {0: "residential", 1: "commercial"},
+                    # a null code is not the one of the first value
+                    [{"id": "feat.1", "landuse": 1}, {"id": "feat.2"}],
+                ),
+                page(
+                    {0: "commercial", 1: "industrial"},
+                    [{"id": "feat.3", "landuse": 1}],
+                ),
             ],
         )
 
@@ -3571,8 +3578,38 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
         self.assertTrue(vl.isValid())
         self.assertEqual(vl.fields().field("landuse").type(), QMetaType.Type.QString)
         self.assertEqual(
-            [f["landuse"] for f in vl.getFeatures()], ["commercial", "industrial"]
+            [f["landuse"] for f in vl.getFeatures()],
+            ["commercial", NULL, "industrial"],
         )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowNullIntegerIds(self):
+        """Features whose integer id is null are not all taken for the feature of id 0"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowNullIntegerIds"
+        )
+        create_landing_page_api_collection(
+            endpoint, collectionLinks=[arrow_items_link(endpoint)]
+        )
+        self._writeArrowItems(
+            endpoint,
+            [
+                arrow_stream(
+                    [("id", ogr.OFTInteger), ("name", ogr.OFTString)],
+                    [
+                        ({"name": "a"}, "POINT (2 49)"),
+                        ({"name": "b"}, "POINT (3 50)"),
+                        ({"id": 0, "name": "c"}, "POINT (4 51)"),
+                    ],
+                )
+            ],
+        )
+
+        vl = self._arrowLayer(endpoint)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(sorted(f["name"] for f in vl.getFeatures()), ["a", "b", "c"])
 
     @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
     def testArrowTruncatedStream(self):
