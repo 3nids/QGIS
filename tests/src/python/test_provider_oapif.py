@@ -78,7 +78,7 @@ def arrow_items_link(endpoint):
 
 
 def arrow_stream(fields, features, srs="OGC:CRS84", domains=(), alternative_names=None):
-    """Return an Arrow IPC stream, as a server would send it, with a geoarrow.wkb geometry column
+    """Return an Arrow IPC stream, as a server would send it, with a WKB geometry column
 
     fields is a list of (name, OGR field type) or (name, OGR field type, domain name),
     features a list of (attributes, WKT), alternative_names a dict of field names to theirs
@@ -117,7 +117,8 @@ def arrow_stream(fields, features, srs="OGC:CRS84", domains=(), alternative_name
     gdal.VSIFCloseL(f)
     gdal.Unlink(filename)
     assert data[:4] == b"\xff\xff\xff\xff", "not an IPC stream"
-    assert b"geoarrow.wkb" in data
+    # GDAL 3.8 writes the ogc.wkb extension name, later versions geoarrow.wkb
+    assert b"geoarrow.wkb" in data or b"ogc.wkb" in data
     # The fake HTTP endpoint would read everything up to the last CRLF as headers
     assert b"\r\n" not in data
     return data
@@ -3871,6 +3872,104 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
         self.assertEqual(
             [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
         )
+
+    @unittest.skipIf(ARROW_USABLE, "only meaningful without a usable Arrow driver")
+    def testArrowAutoSelectWithoutUsableDriver(self):
+        """An advertised Arrow link is not selected when GDAL can't read it"""
+
+        endpoint = (
+            self.__class__.basetestpath
+            + "/fake_qgis_http_endpoint_testArrowAutoSelectWithoutUsableDriver"
+        )
+        self._createGeoJSONAndArrowCollection(endpoint)
+        self._writeGeoJSONItems(endpoint)
+
+        vl = self._arrowLayer(endpoint, outputformat=None)
+        self.assertTrue(vl.isValid())
+        self.assertEqual(
+            [f.geometry().asWkt() for f in vl.getFeatures()], ["Point (2 49)"]
+        )
+
+    @unittest.skipIf(not ARROW_USABLE, "GDAL >= 3.8 with the Arrow driver required")
+    def testArrowEditing(self):
+        """Edits go to /items and /items/{id}, not to the Arrow link of the collection"""
+
+        for supports_patch in (False, True):
+            endpoint = (
+                self.__class__.basetestpath
+                + f"/fake_qgis_http_endpoint_testArrowEditing_{supports_patch}"
+            )
+            self._createGeoJSONAndArrowCollection(endpoint)
+            self._writeArrowItems(
+                endpoint,
+                [
+                    arrow_stream(
+                        [("id", ogr.OFTString), ("name", ogr.OFTString)],
+                        [({"id": "feat.1", "name": "foo"}, "POINT (2 49)")],
+                    )
+                ],
+            )
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items?VERB=OPTIONS",
+                b"HEAD, GET, POST",
+            )
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items/feat.1?VERB=OPTIONS",
+                b"HEAD, GET, PUT, DELETE" + (b", PATCH" if supports_patch else b""),
+            )
+
+            vl = self._arrowLayer(endpoint, outputformat=None)
+            self.assertTrue(vl.isValid())
+            self.assertEqual([f["id"] for f in vl.getFeatures()], ["feat.1"])
+
+            if supports_patch:
+                write_fake_response(
+                    endpoint,
+                    '/collections/mycollection/items/feat.1?PATCHDATA={"properties":{"name":"bar"}}&Content-Type=application_merge-patch+json',
+                    b"",
+                )
+                self.assertTrue(
+                    vl.dataProvider().changeAttributeValues({1: {1: "bar"}})
+                )
+                continue
+
+            write_fake_response(
+                endpoint,
+                '/collections/mycollection/items/feat.1?PUTDATA={"geometry":{"coordinates":[3.0,50.0],"type":"Point"},"id":"feat.1","properties":{"name":"foo"},"type":"Feature"}',
+                b"",
+            )
+            self.assertTrue(
+                vl.dataProvider().changeGeometryValues(
+                    {1: QgsGeometry.fromWkt("Point (3 50)")}
+                )
+            )
+
+            write_fake_response(
+                endpoint,
+                '/collections/mycollection/items?POSTDATA={"geometry":{"coordinates":[4.0,51.0],"type":"Point"},"properties":{"name":"new"},"type":"Feature"}',
+                b"Location: /collections/mycollection/items/new_id\r\n",
+            )
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items/new_id?" + ACCEPT_ITEMS,
+                json.dumps(
+                    {
+                        "type": "Feature",
+                        "id": "new_id",
+                        "properties": {"name": "from server"},
+                        "geometry": {"type": "Point", "coordinates": [4, 51]},
+                    }
+                ).encode("UTF-8"),
+            )
+            f = QgsFeature(vl.fields())
+            f.setAttribute("name", "new")
+            f.setGeometry(QgsGeometry.fromWkt("Point (4 51)"))
+            ret, features = vl.dataProvider().addFeatures([f])
+            self.assertTrue(ret)
+            # refreshed from /items/new_id
+            self.assertEqual(features[0]["name"], "from server")
 
     def _testJsonFG_oapif1_1_OutputFormat(self, profile, profile_in_next_link=True):
 
