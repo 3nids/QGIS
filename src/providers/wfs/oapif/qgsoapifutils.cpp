@@ -41,7 +41,12 @@ bool QgsOAPIFSetJsonFgPlace( json &object, const QgsGeometry &geometry, int prec
 {
   if ( geometry.isNull() || !QgsWkbTypes::isCurvedType( geometry.wkbType() ) )
     return false;
-  object["place"] = geometry.asJsonObject( precision, Qgis::GeoJsonProfile::JsonFg );
+  // A measure would be taken for an elevation without the JSON-FG "measures" member: drop it, as the
+  // GeoJSON "geometry" does
+  QgsGeometry place( geometry );
+  if ( QgsWkbTypes::hasM( place.wkbType() ) )
+    place.get()->dropMValue();
+  object["place"] = place.asJsonObject( precision, Qgis::GeoJsonProfile::JsonFg );
   if ( !crs.isEmpty() )
     object["coordRefSys"] = crs.toStdString();
   return true;

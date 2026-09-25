@@ -2583,6 +2583,24 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             ret, _ = vl.dataProvider().addFeatures([f], QgsFeatureSink.Flag.FastInsert)
             self.assertTrue(ret)
 
+            # without the JSON-FG "measures" member, a measure would be read as an elevation
+            write_fake_response(
+                endpoint,
+                "/collections/mycollection/items?POSTDATA={"
+                + f'{conforms_to},{coord_ref_sys},{geometry},{place},"properties":{{"name":"c"}},"type":"Feature"'
+                + f"}}&Content-Crs={crs}",
+                b"Location: /collections/mycollection/items/new_id2\r\n",
+            )
+            f = QgsFeature(vl.fields())
+            f.setAttribute("name", "c")
+            f.setGeometry(
+                QgsGeometry.fromWkt(
+                    "CircularString M (2600000 1200000 5, 2600001 1200001 6, 2600002 1200000 7)"
+                )
+            )
+            ret, _ = vl.dataProvider().addFeatures([f], QgsFeatureSink.Flag.FastInsert)
+            self.assertTrue(ret)
+
     def testFeatureGeometryChange(self):
 
         endpoint = (
