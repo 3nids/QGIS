@@ -63,6 +63,7 @@ class QgsOapifCql2TextExpressionCompiler
 
     Result compileNodeFunction( const QgsExpressionNodeFunction *n, QString &result );
 
+    //! Returns \a value as a CQL2 literal, or an empty string if it can't be written in CQL2
     QString literalValue( const QVariant &value ) const;
 
     QString quotedIdentifier( const QString &identifier ) const;

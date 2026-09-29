@@ -1401,6 +1401,20 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
                 """"strfield" NOT ILIKE 'bar'""",
                 """filter=(CASEI(strfield)%20NOT%20LIKE%20CASEI('bar'))&filter-lang=cql2-text""",
             ),
+            # \\ is a single backslash in a QGIS string literal. A backslash is literal in a CQL2 one, and
+            # in a LIKE pattern escapes any character, whereas in QGIS it only escapes % and _
+            (
+                r"strfield = 'a\\b'",
+                """filter=(strfield%20%3D%20'a%5Cb')&filter-lang=cql2-text""",
+            ),
+            (
+                r"strfield LIKE 'a\\_b%'",
+                """filter=(strfield%20LIKE%20'a%5C_b%25')&filter-lang=cql2-text""",
+            ),
+            (
+                r"strfield LIKE 'a\\b%'",
+                """filter=(strfield%20LIKE%20'a%5C%5Cb%25')&filter-lang=cql2-text""",
+            ),
             (
                 """intersects_bbox($geometry, geomFromWkt('POLYGON((-180 -90,-180 90,180 90,180 -90,-180 -90))'))""",
                 """filter=S_INTERSECTS(geometry,BBOX(-180,-90,180,90))&filter-lang=cql2-text""",
@@ -1421,6 +1435,9 @@ class TestPyQgsOapifProvider(QgisTestCase, ProviderTestCase):
             # Only evaluated on client
             ("intfield >= 1 OR not_a_queryable = 3", ""),
             ("not_a_queryable = 3 AND not_a_queryable = 3", ""),
+            # CQL2 can't write a backslash before a quote
+            (r"strfield = 'a\\' OR strfield = 'foo=bar'", ""),
+            (r"strfield LIKE 'a\\' OR strfield = 'foo=bar'", ""),
         ]
         for expr, cql_filter in tests:
             assert vl.setSubsetString(expr)

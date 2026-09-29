@@ -44,6 +44,45 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
     return Fail;
 }
 
+//! Returns \a value as a CQL2 character literal, or an empty string if it can't be written as one
+static QString characterLiteral( const QString &value )
+{
+  // CQL2 only escapes quotes, as '' or \'. So a backslash is literal, but can't be followed by a quote,
+  // including the closing one.
+  QString literal = value;
+  literal.replace( '\'', "''"_L1 );
+  if ( literal.contains( "\\'"_L1 ) || literal.endsWith( '\\' ) )
+    return QString();
+  return literal.prepend( '\'' ).append( '\'' );
+}
+
+//! Converts a QGIS LIKE pattern, where a backslash only escapes % and _, to CQL2, where it escapes any character
+static QString cql2LikePattern( const QString &pattern )
+{
+  QString converted;
+  for ( qsizetype i = 0; i < pattern.size(); ++i )
+  {
+    converted += pattern[i];
+    if ( pattern[i] == '\\' && ( i + 1 == pattern.size() || ( pattern[i + 1] != '%' && pattern[i + 1] != '_' ) ) )
+      converted += '\\';
+  }
+  return converted;
+}
+
+//! Returns whether \a node is a constant string, and sets \a value to it
+static bool constantString( const QgsExpressionNode *node, QString &value )
+{
+  QVariant v;
+  if ( node->hasCachedStaticValue() )
+    v = node->cachedStaticValue();
+  else if ( node->nodeType() == QgsExpressionNode::ntLiteral )
+    v = static_cast<const QgsExpressionNodeLiteral *>( node )->value();
+  if ( v.userType() != QMetaType::Type::QString )
+    return false;
+  value = v.toString();
+  return true;
+}
+
 QString QgsOapifCql2TextExpressionCompiler::literalValue( const QVariant &value ) const
 {
   if ( QgsVariantUtils::isNull( value ) )
@@ -67,9 +106,7 @@ QString QgsOapifCql2TextExpressionCompiler::literalValue( const QVariant &value 
 
     case QMetaType::Type::QString:
     default:
-      QString v = value.toString();
-      v.replace( '\'', "''"_L1 );
-      return v.replace( '\\', "\\\\"_L1 ).prepend( '\'' ).append( '\'' );
+      return characterLiteral( value.toString() );
   }
 }
 
@@ -257,7 +294,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
   if ( node->hasCachedStaticValue() )
   {
     result = literalValue( node->cachedStaticValue() );
-    return Complete;
+    return result.isEmpty() ? Fail : Complete;
   }
 
   switch ( node->nodeType() )
@@ -300,6 +337,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
       const QgsExpressionNodeBinaryOperator *n = static_cast<const QgsExpressionNodeBinaryOperator *>( node );
 
       QString op;
+      bool isLike = false;
       bool isCaseI = false;
       switch ( n->op() )
       {
@@ -334,6 +372,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
         case QgsExpressionNodeBinaryOperator::boLike:
           if ( !mSupportsLikeBetweenIn )
             return Fail;
+          isLike = true;
           op = u"LIKE"_s;
           break;
 
@@ -342,6 +381,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
             return Fail;
           if ( !mSupportsCaseI )
             return Fail;
+          isLike = true;
           isCaseI = true;
           op = u"LIKE"_s;
           break;
@@ -349,6 +389,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
         case QgsExpressionNodeBinaryOperator::boNotLike:
           if ( !mSupportsLikeBetweenIn )
             return Fail;
+          isLike = true;
           op = u"NOT LIKE"_s;
           break;
 
@@ -357,6 +398,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
             return Fail;
           if ( !mSupportsCaseI )
             return Fail;
+          isLike = true;
           isCaseI = true;
           op = u"NOT LIKE"_s;
           break;
@@ -449,7 +491,18 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
         }
       }
 
-      const Result rr( right.isEmpty() ? compileNode( n->opRight(), right ) : Complete );
+      Result rr = Complete;
+      QString pattern;
+      if ( isLike && constantString( n->opRight(), pattern ) )
+      {
+        right = characterLiteral( cql2LikePattern( pattern ) );
+        if ( right.isEmpty() )
+          rr = Fail;
+      }
+      else if ( right.isEmpty() )
+      {
+        rr = compileNode( n->opRight(), right );
+      }
 
       if ( lr != Complete )
       {
@@ -506,7 +559,7 @@ QgsOapifCql2TextExpressionCompiler::Result QgsOapifCql2TextExpressionCompiler::c
     {
       const QgsExpressionNodeLiteral *n = static_cast<const QgsExpressionNodeLiteral *>( node );
       result = literalValue( n->value() );
-      return Complete;
+      return result.isEmpty() ? Fail : Complete;
     }
 
     case QgsExpressionNode::ntColumnRef:
