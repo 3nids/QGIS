@@ -904,6 +904,7 @@ set(QGIS_GUI_HDRS
   qgsconfigureshortcutsdialog.h
   qgscredentialdialog.h
   qgscurveeditorwidget.h
+  qgscustomcommiterrorhandler.h
   qgscustomdrophandler.h
   qgscustomprojectopenhandler.h
   qgsdatabaseschemacombobox.h

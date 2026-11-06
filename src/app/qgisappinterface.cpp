@@ -716,6 +716,16 @@ void QgisAppInterface::unregisterCustomProjectOpenHandler( QgsCustomProjectOpenH
   qgis->unregisterCustomProjectOpenHandler( handler );
 }
 
+void QgisAppInterface::registerCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler )
+{
+  qgis->registerCustomCommitErrorHandler( handler );
+}
+
+void QgisAppInterface::unregisterCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler )
+{
+  qgis->unregisterCustomCommitErrorHandler( handler );
+}
+
 QMenu *QgisAppInterface::projectMenu()
 {
   return qgis->projectMenu();

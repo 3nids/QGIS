@@ -91,14 +91,17 @@ bool QgsGuiVectorLayerTools::saveEdits( QgsVectorLayer *layer ) const
 
   if ( layer->isModified() )
   {
-    if ( !layer->commitChanges() )
-    {
-      commitError( layer );
-      // Leave the in-memory editing state alone,
-      // to give the user a chance to enter different values
-      // and try the commit again later
-      res = false;
-    }
+    const auto commitAndReport = [this, layer, &res] {
+      if ( !layer->commitChanges() )
+      {
+        commitError( layer );
+        // Leave the in-memory editing state alone,
+        // to give the user a chance to enter different values
+        // and try the commit again later
+        res = false;
+      }
+    };
+    QgisApp::instance()->holdLayerErrors( layer, commitAndReport );
     layer->startEditing();
   }
   else //layer not modified
@@ -125,17 +128,22 @@ bool QgsGuiVectorLayerTools::stopEditing( QgsVectorLayer *layer, bool allowCance
         break;
 
       case QMessageBox::Save:
-        if ( !layer->commitChanges() )
-        {
-          commitError( layer );
-          // Leave the in-memory editing state alone,
-          // to give the user a chance to enter different values
-          // and try the commit again later
-          res = false;
-        }
+      {
+        const auto commitAndReport = [this, layer, &res] {
+          if ( !layer->commitChanges() )
+          {
+            commitError( layer );
+            // Leave the in-memory editing state alone,
+            // to give the user a chance to enter different values
+            // and try the commit again later
+            res = false;
+          }
+        };
+        QgisApp::instance()->holdLayerErrors( layer, commitAndReport );
 
         layer->triggerRepaint();
         break;
+      }
 
       case QMessageBox::Discard:
         QgisApp::instance()->freezeCanvases();
@@ -212,6 +220,9 @@ bool QgsGuiVectorLayerTools::avoidIntersection( QgsVectorLayer *layer, QgsFeatur
 
 void QgsGuiVectorLayerTools::commitError( QgsVectorLayer *vlayer ) const
 {
+  if ( QgisApp::instance()->handleCommitErrors( vlayer, vlayer->commitErrors() ) )
+    return;
+
   QgsMessageViewer *mv = new QgsMessageViewer();
   mv->setWindowTitle( tr( "Commit Errors" ) );
   mv->setMessageAsPlainText( tr( "Could not commit changes to layer %1" ).arg( vlayer->name() ) + "\n\n" + tr( "Errors: %1\n" ).arg( vlayer->commitErrors().join( "\n  "_L1 ) ) );
