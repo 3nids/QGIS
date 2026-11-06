@@ -16,20 +16,45 @@
 
 #include "qgisapp.h"
 #include "qgsclipboard.h"
+#include "qgscustomcommiterrorhandler.h"
 #include "qgsfillsymbol.h"
 #include "qgsmaplayerlegend.h"
 #include "qgsmaplayerstore.h"
 #include "qgsmaplayerstylemanager.h"
+#include "qgsmessagebar.h"
+#include "qgsmessagebaritem.h"
 #include "qgsproject.h"
 #include "qgsrasterlayer.h"
 #include "qgssinglesymbolrenderer.h"
 #include "qgsstyle.h"
 #include "qgstest.h"
+#include "qgsvectorlayer.h"
+#include "qgsvectorlayertools.h"
 
 #include <QApplication>
 #include <QString>
 
 using namespace Qt::StringLiterals;
+
+//! A handler that records the commit errors it is asked to report, and reports them or not
+class TestCommitErrorHandler : public QgsCustomCommitErrorHandler
+{
+  public:
+    explicit TestCommitErrorHandler( bool reports )
+      : mReports( reports )
+    {}
+
+    bool handleCommitErrors( QgsVectorLayer *layer, const QStringList &errors ) override
+    {
+      mLayer = layer;
+      mErrors = errors;
+      return mReports;
+    }
+
+    bool mReports = false;
+    QgsVectorLayer *mLayer = nullptr;
+    QStringList mErrors;
+};
 
 /**
  * \ingroup UnitTests
@@ -50,6 +75,8 @@ class TestQgisApp : public QObject
     //! Test for issue GH #63346
     void pasteRasterStyleCategory();
     void copyPasteMultipleStyles();
+    void customCommitErrorHandlers();
+    void layerErrorsWhileCommitting();
 
   public slots:
     void addVectorLayerShp();
@@ -286,6 +313,94 @@ void TestQgisApp::copyPasteMultipleStyles()
   QVERIFY( sourceLayer->styleManager()->styles().contains( u"third style" ) );
 }
 
+
+void TestQgisApp::customCommitErrorHandlers()
+{
+  QgsVectorLayer layer( u"Point?crs=EPSG:2056"_s, u"points"_s, u"memory"_s );
+  QgsMessageBar *bar = mQgisApp->messageBar();
+  bar->clearWidgets();
+  const QStringList errors { u"refused"_s };
+
+  // a handler that does not report the errors leaves them to QGIS
+  TestCommitErrorHandler declining( false );
+  mQgisApp->registerCustomCommitErrorHandler( &declining );
+  mQgisApp->commitError( &layer, errors );
+  QCOMPARE( declining.mLayer, &layer );
+  QCOMPARE( declining.mErrors, errors );
+  QCOMPARE( bar->items().count(), 1 );
+
+  // one that reports them silences QGIS
+  TestCommitErrorHandler reporting( true );
+  mQgisApp->registerCustomCommitErrorHandler( &reporting );
+  mQgisApp->commitError( &layer, errors );
+  QCOMPARE( reporting.mLayer, &layer );
+  QCOMPARE( reporting.mErrors, errors );
+  QCOMPARE( bar->items().count(), 1 );
+
+  // also for the saves of the attribute table and of the forms
+  reporting.mLayer = nullptr;
+  QVERIFY( layer.startEditing() );
+  QgsFeature feature( layer.fields() );
+  QVERIFY( layer.addFeature( feature ) );
+  layer.setAllowCommit( false );
+  QVERIFY( !mQgisApp->vectorLayerTools()->saveEdits( &layer ) );
+  QCOMPARE( reporting.mLayer, &layer );
+  QCOMPARE( bar->items().count(), 1 );
+
+  // unregistered, they are asked no more
+  mQgisApp->unregisterCustomCommitErrorHandler( &reporting );
+  mQgisApp->unregisterCustomCommitErrorHandler( &declining );
+  declining.mLayer = nullptr;
+  mQgisApp->commitError( &layer, errors );
+  QVERIFY( !declining.mLayer );
+  QCOMPARE( bar->items().count(), 2 );
+
+  QVERIFY( layer.rollBack() );
+  bar->clearWidgets();
+}
+
+void TestQgisApp::layerErrorsWhileCommitting()
+{
+  QgsVectorLayer layer( u"Point?crs=EPSG:2056"_s, u"points"_s, u"memory"_s );
+  // as QGIS connects the layers of the project
+  connect( &layer, &QgsVectorLayer::raiseError, mQgisApp, &QgisApp::onLayerError );
+  QgsMessageBar *bar = mQgisApp->messageBar();
+  bar->clearWidgets();
+  const QStringList errors { u"refused"_s };
+
+  // held while QGIS commits and reports, then shown
+  mQgisApp->holdLayerErrors( &layer, [&] {
+    emit layer.raiseError( u"refused"_s );
+    QCOMPARE( bar->items().count(), 0 );
+    mQgisApp->commitError( &layer, errors );
+  } );
+  QCOMPARE( bar->items().count(), 2 );
+  QCOMPARE( bar->items().at( 0 )->text(), u"refused"_s );
+
+  // not when a handler reported the errors of the commit
+  bar->clearWidgets();
+  TestCommitErrorHandler reporting( true );
+  mQgisApp->registerCustomCommitErrorHandler( &reporting );
+  mQgisApp->holdLayerErrors( &layer, [&] {
+    emit layer.raiseError( u"refused"_s );
+    mQgisApp->commitError( &layer, errors );
+  } );
+  QCOMPARE( bar->items().count(), 0 );
+  mQgisApp->unregisterCustomCommitErrorHandler( &reporting );
+
+  // held by the outer of nested holds
+  mQgisApp->holdLayerErrors( &layer, [&] {
+    mQgisApp->holdLayerErrors( &layer, [&] { emit layer.raiseError( u"inner"_s ); } );
+    QCOMPARE( bar->items().count(), 0 );
+  } );
+  QCOMPARE( bar->items().count(), 1 );
+
+  // and shown at once otherwise
+  emit layer.raiseError( u"unreadable"_s );
+  QCOMPARE( bar->items().count(), 2 );
+
+  bar->clearWidgets();
+}
 
 QGSTEST_MAIN( TestQgisApp )
 #include "testqgisapp.moc"

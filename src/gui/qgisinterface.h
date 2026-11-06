@@ -40,6 +40,7 @@ class QActionGroup;
 
 class QgsAdvancedDigitizingDockWidget;
 class QgsAttributeDialog;
+class QgsCustomCommitErrorHandler;
 class QgsCustomDropHandler;
 class QgsCustomProjectOpenHandler;
 class QgsLayoutCustomDropHandler;
@@ -1633,6 +1634,24 @@ class GUI_EXPORT QgisInterface : public QObject
      * \since QGIS 3.14
      */
     virtual void unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler ) = 0;
+
+    /**
+     * Registers a new custom commit error \a handler.
+     * \note Ownership of \a handler is not transferred, and the handler must
+     *       be unregistered when plugin is unloaded.
+     * \see QgsCustomCommitErrorHandler
+     * \see unregisterCustomCommitErrorHandler()
+     * \since QGIS 4.6
+     */
+    virtual void registerCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler ) = 0;
+
+    /**
+     * Unregisters a previously registered custom commit error \a handler.
+     * \see QgsCustomCommitErrorHandler
+     * \see registerCustomCommitErrorHandler()
+     * \since QGIS 4.6
+     */
+    virtual void unregisterCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler ) = 0;
 
     /**
      * Registers a new custom drop \a handler for layout windows.

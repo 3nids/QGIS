@@ -1903,6 +1903,33 @@ Unregisters a previously registered custom project open ``handler``.
 .. versionadded:: 3.14
 %End
 
+    virtual void registerCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler ) = 0;
+%Docstring
+Registers a new custom commit error ``handler``.
+
+.. note::
+
+   Ownership of ``handler`` is not transferred, and the handler must
+   be unregistered when plugin is unloaded.
+
+.. seealso:: :py:class:`QgsCustomCommitErrorHandler`
+
+.. seealso:: :py:func:`unregisterCustomCommitErrorHandler`
+
+.. versionadded:: 4.6
+%End
+
+    virtual void unregisterCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler ) = 0;
+%Docstring
+Unregisters a previously registered custom commit error ``handler``.
+
+.. seealso:: :py:class:`QgsCustomCommitErrorHandler`
+
+.. seealso:: :py:func:`registerCustomCommitErrorHandler`
+
+.. versionadded:: 4.6
+%End
+
     virtual void registerCustomLayoutDropHandler( QgsLayoutCustomDropHandler *handler ) = 0;
 %Docstring
 Registers a new custom drop ``handler`` for layout windows.

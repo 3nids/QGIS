@@ -50,6 +50,7 @@ class QgsComposition;
 class QgsComposerManager;
 class QgsContrastEnhancement;
 class QgsCoordinateReferenceSystem;
+class QgsCustomCommitErrorHandler;
 class QgsCustomDropHandler;
 class QgsCustomProjectOpenHandler;
 class QgsCustomLayerOrderWidget;
@@ -948,6 +949,37 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
      * \see registerCustomProjectOpenHandler()
      */
     void unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler );
+
+    /**
+     * Register a new custom commit error \a handler.
+     * \note Ownership of \a handler is not transferred, and the handler must
+     *       be unregistered when plugin is unloaded.
+     * \see QgsCustomCommitErrorHandler
+     * \see unregisterCustomCommitErrorHandler()
+     */
+    void registerCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler );
+
+    /**
+     * Unregister a previously registered custom commit error \a handler.
+     * \see QgsCustomCommitErrorHandler
+     * \see registerCustomCommitErrorHandler()
+     */
+    void unregisterCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler );
+
+    /**
+     * Asks the custom commit error handlers to report the \a errors of the commit of
+     * \a layer. Returns TRUE if one of them did, and QGIS should not report them.
+     * \see registerCustomCommitErrorHandler()
+     */
+    bool handleCommitErrors( QgsVectorLayer *layer, const QStringList &errors );
+
+    /**
+     * Calls \a commitAndReport, which commits the changes of \a layer and reports a commit that
+     * fails with commitError(). The errors \a layer raises meanwhile are held, and shown once
+     * \a commitAndReport is done, unless a custom commit error handler reported the commit.
+     * \see handleCommitErrors()
+     */
+    void holdLayerErrors( QgsVectorLayer *layer, const std::function<void()> &commitAndReport );
 
     //! Returns a list of registered custom drop handlers.
     QVector<QPointer<QgsCustomDropHandler>> customDropHandlers() const;
@@ -2866,6 +2898,9 @@ class APP_EXPORT QgisApp : public QMainWindow, private Ui::MainWindow
 
     QVector<QPointer<QgsCustomDropHandler>> mCustomDropHandlers;
     QVector<QPointer<QgsCustomProjectOpenHandler>> mCustomProjectOpenHandlers;
+    QVector<QPointer<QgsCustomCommitErrorHandler>> mCustomCommitErrorHandlers;
+    //! The errors held until the commit is reported
+    QHash<QgsMapLayer *, QStringList> mHeldLayerErrors;
     QVector<QPointer<QgsLayoutCustomDropHandler>> mCustomLayoutDropHandlers;
 
     QgsLayoutCustomDropHandler *mLayoutQptDropHandler = nullptr;

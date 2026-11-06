@@ -277,6 +277,7 @@ using namespace Qt::StringLiterals;
 #include "qgscoordinatetransform.h"
 #include "qgscoordinateutils.h"
 #include "qgscredentialdialog.h"
+#include "qgscustomcommiterrorhandler.h"
 #include "qgscustomdrophandler.h"
 #include "qgscustomprojectopenhandler.h"
 #include "qgscustomization.h"
@@ -2518,6 +2519,48 @@ void QgisApp::registerCustomProjectOpenHandler( QgsCustomProjectOpenHandler *han
 void QgisApp::unregisterCustomProjectOpenHandler( QgsCustomProjectOpenHandler *handler )
 {
   mCustomProjectOpenHandlers.removeOne( handler );
+}
+
+void QgisApp::registerCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler )
+{
+  if ( !mCustomCommitErrorHandlers.contains( handler ) )
+    mCustomCommitErrorHandlers << handler;
+}
+
+void QgisApp::unregisterCustomCommitErrorHandler( QgsCustomCommitErrorHandler *handler )
+{
+  mCustomCommitErrorHandlers.removeOne( handler );
+}
+
+bool QgisApp::handleCommitErrors( QgsVectorLayer *layer, const QStringList &errors )
+{
+  for ( int i = 0; i < mCustomCommitErrorHandlers.count(); i++ )
+  {
+    QgsCustomCommitErrorHandler *handler = mCustomCommitErrorHandlers.at( i );
+    if ( handler && handler->handleCommitErrors( layer, errors ) )
+    {
+      if ( const auto held = mHeldLayerErrors.find( layer ); held != mHeldLayerErrors.end() )
+        held->clear();
+      return true;
+    }
+  }
+  return false;
+}
+
+void QgisApp::holdLayerErrors( QgsVectorLayer *layer, const std::function<void()> &commitAndReport )
+{
+  // held already by a commit of the layer
+  if ( mHeldLayerErrors.contains( layer ) )
+  {
+    commitAndReport();
+    return;
+  }
+
+  mHeldLayerErrors.insert( layer, QStringList() );
+  commitAndReport();
+  const QStringList errors = mHeldLayerErrors.take( layer );
+  for ( const QString &error : errors )
+    visibleMessageBar()->pushCritical( tr( "Layer %1" ).arg( layer->name() ), error );
 }
 
 QVector<QPointer<QgsCustomDropHandler>> QgisApp::customDropHandlers() const
@@ -8096,6 +8139,9 @@ void QgisApp::commitError( QgsVectorLayer *vlayer, const QStringList &commitErro
     return;
   }
 
+  if ( vlayer && handleCommitErrors( vlayer, commitErrors ) )
+    return;
+
   const QString messageText = vlayer ? tr( "Could not commit changes to layer %1" ).arg( vlayer->name() ) : tr( "Could not commit changes" );
 
   QgsMessageViewer *mv = new QgsMessageViewer();
@@ -11029,15 +11075,18 @@ bool QgisApp::toggleEditingVectorLayer( QgsVectorLayer *vlayer, bool allowCancel
       {
         QApplication::setOverrideCursor( Qt::WaitCursor );
 
-        QStringList commitErrors;
-        if ( !QgsProject::instance()->commitChanges( commitErrors, true, vlayer ) )
-        {
-          commitError( vlayer, commitErrors );
-          // Leave the in-memory editing state alone,
-          // to give the user a chance to enter different values
-          // and try the commit again later
-          res = false;
-        }
+        const auto commitAndReport = [this, vlayer, &res] {
+          QStringList commitErrors;
+          if ( !QgsProject::instance()->commitChanges( commitErrors, true, vlayer ) )
+          {
+            commitError( vlayer, commitErrors );
+            // Leave the in-memory editing state alone,
+            // to give the user a chance to enter different values
+            // and try the commit again later
+            res = false;
+          }
+        };
+        holdLayerErrors( vlayer, commitAndReport );
 
         vlayer->triggerRepaint();
 
@@ -11350,12 +11399,15 @@ void QgisApp::saveVectorLayerEdits( QgsMapLayer *layer, bool leaveEditable, bool
     mSaveRollbackInProgress = true;
 
 
-  QStringList commitErrors;
-  if ( !QgsProject::instance()->commitChanges( commitErrors, !leaveEditable, vlayer ) )
-  {
-    mSaveRollbackInProgress = false;
-    commitError( vlayer, commitErrors );
-  }
+  const auto commitAndReport = [this, vlayer, leaveEditable] {
+    QStringList commitErrors;
+    if ( !QgsProject::instance()->commitChanges( commitErrors, !leaveEditable, vlayer ) )
+    {
+      mSaveRollbackInProgress = false;
+      commitError( vlayer, commitErrors );
+    }
+  };
+  holdLayerErrors( vlayer, commitAndReport );
 
   if ( triggerRepaint )
   {
@@ -17293,6 +17345,13 @@ void QgisApp::onLayerError( const QString &msg )
   QgsMapLayer *layer = qobject_cast<QgsMapLayer *>( sender() );
 
   Q_ASSERT( layer );
+
+  // the msg will be shown once reported unless a handler reported the layer already
+  if ( const auto held = mHeldLayerErrors.find( layer ); held != mHeldLayerErrors.end() )
+  {
+    held->append( msg );
+    return;
+  }
 
   visibleMessageBar()->pushCritical( tr( "Layer %1" ).arg( layer->name() ), msg );
 }

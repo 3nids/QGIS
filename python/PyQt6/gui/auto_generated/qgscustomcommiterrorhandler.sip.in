@@ -1,0 +1,46 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgscustomcommiterrorhandler.h                                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class QgsCustomCommitErrorHandler : QObject
+{
+%Docstring(signature="appended")
+Abstract base class that may be implemented to report commit errors of a
+vector layer.
+
+QGIS reports these errors in its message bar. A handler allows plugins
+to report them in their own way.
+
+.. versionadded:: 4.6
+%End
+
+%TypeHeaderCode
+#include "qgscustomcommiterrorhandler.h"
+%End
+  public:
+    virtual bool handleCommitErrors( QgsVectorLayer *layer, const QStringList &errors ) = 0;
+%Docstring
+Called when the commit of the changes of ``layer`` failed with the given
+``errors``. If ``True`` is returned, then the handler has reported the
+errors and they should not be further reported (e.g. by other
+QgsCustomCommitErrorHandler, or by QGIS).
+
+Reimplemented methods should return ``False`` for errors they do not
+report.
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/gui/qgscustomcommiterrorhandler.h                                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
