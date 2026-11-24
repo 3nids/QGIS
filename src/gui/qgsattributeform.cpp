@@ -1823,6 +1823,9 @@ void QgsAttributeForm::init()
 
   qDeleteAll( mWidgets );
   mWidgets.clear();
+  mEditableDataDefinedProperties.clear();
+  mLabelDataDefinedProperties.clear();
+  mCustomCommentDataDefinedProperties.clear();
 
   while ( QWidget *w = this->findChild<QWidget *>() )
   {
